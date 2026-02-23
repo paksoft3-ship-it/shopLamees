@@ -239,5 +239,25 @@
         "return_title": "سياسة الاستبدال والاسترجاع",
         "last_updated": "آخر تحديث",
         "nav_title": "قائمة التنقل"
+    },
+    "Auth": {
+        "title": "تسجيل الدخول",
+        "tab_login": "تسجيل الدخول",
+        "tab_register": "إنشاء حساب",
+        "welcome": "مرحباً بك مجدداً",
+        "subtitle": "سجّل الدخول للمتابعة في عالم الأناقة",
+        "email_phone": "رقم الجوال أو البريد الإلكتروني",
+        "email_placeholder": "example@email.com",
+        "phone_placeholder": "مثال: 0555555555",
+        "password": "كلمة المرور",
+        "password_placeholder": "••••••••",
+        "show": "إظهار",
+        "hide": "إخفاء",
+        "forgot_password": "نسيت كلمة المرور؟",
+        "login_button": "تسجيل الدخول",
+        "login_otp_button": "تسجيل الدخول عبر رمز التحقق (OTP)",
+        "or_continue": "أو المتابعة عبر",
+        "guest_checkout": "المتابعة كزائر",
+        "secure_data": "تشفير آمن للمعلومات ١٠٠٪"
     }
 }

@@ -239,5 +239,25 @@
         "return_title": "Return & Exchange Policy",
         "last_updated": "Last updated",
         "nav_title": "Navigation"
+    },
+    "Auth": {
+        "title": "Login",
+        "tab_login": "Login",
+        "tab_register": "Create Account",
+        "welcome": "Welcome back",
+        "subtitle": "Sign in to continue to the world of elegance",
+        "email_phone": "Email or Phone Number",
+        "email_placeholder": "example@email.com",
+        "phone_placeholder": "E.g. 0555555555",
+        "password": "Password",
+        "password_placeholder": "••••••••",
+        "show": "Show",
+        "hide": "Hide",
+        "forgot_password": "Forgot Password?",
+        "login_button": "Login",
+        "login_otp_button": "Login with OTP",
+        "or_continue": "Or continue with",
+        "guest_checkout": "Continue as Guest",
+        "secure_data": "Your data is encrypted and secure 100%"
     }
 }

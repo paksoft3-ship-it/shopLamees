@@ -1,1 +1,10 @@
-export default function Page() { return <div className="p-8 text-xl font-heading flex flex-col items-center justify-center flex-1 h-full min-h-[50vh]">Admin Placeholder: admin/products/[id]/edit</div>; }
+'use client';
+
+import { ProductForm } from '@/components/admin/ProductForm';
+import { mockAdminProducts } from '@/mock/admin';
+
+export default function EditProductPage({ params }: { params: { id: string } }) {
+    const product = mockAdminProducts.find(p => p.id === params.id) || mockAdminProducts[0];
+
+    return <ProductForm isEdit={true} initialData={product} />;
+}
