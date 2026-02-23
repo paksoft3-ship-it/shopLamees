@@ -5,6 +5,8 @@ import { Link } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { formatPrice } from '@/lib/utils/price';
+import { trackEvent } from '@/lib/tracking/track';
+import { useEffect } from 'react';
 
 export default function OrderConfirmationPage() {
     const t = useTranslations('OrderConfirmation');
@@ -18,6 +20,23 @@ export default function OrderConfirmationPage() {
 
     // Generate a pseudo order number
     const orderNumber = `SL-${Math.floor(10000 + Math.random() * 90000)}`;
+
+    useEffect(() => {
+        if (items.length > 0) {
+            trackEvent('purchase', {
+                transaction_id: orderNumber,
+                currency,
+                value: total,
+                shipping: vat,
+                items: items.map(item => ({
+                    item_id: item.variantId,
+                    item_name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                }))
+            });
+        }
+    }, [items, total, currency, orderNumber]);
 
     return (
         <section className="bg-[#FBF7F2] min-h-screen flex flex-col">
@@ -122,6 +141,7 @@ export default function OrderConfirmationPage() {
                             href="https://wa.me/97477808007"
                             target="_blank"
                             rel="noopener noreferrer"
+                            onClick={() => trackEvent('cart_whatsapp_send')}
                             className="w-full h-12 bg-white border border-slate-200 hover:bg-slate-50 text-slate-900 rounded-xl font-bold text-base transition-colors flex items-center justify-center gap-2 group font-kufi"
                         >
                             <span className="material-symbols-outlined text-[#25D366] group-hover:scale-110 transition-transform">chat</span>

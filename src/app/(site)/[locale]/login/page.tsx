@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { Eye, EyeOff, Lock, User, Mail, Smartphone, Diamond } from 'lucide-react';
+import { Lock, User, Diamond } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 export default function LoginPage() {

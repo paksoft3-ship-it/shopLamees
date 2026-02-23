@@ -1,10 +1,15 @@
-import { Noto_Kufi_Arabic, Cairo, Inter } from 'next/font/google';
+import { Noto_Sans_Arabic, Cairo, Manrope } from 'next/font/google';
 import '../../globals.css';
 import { AdminLayoutClient } from '@/components/admin/AdminLayoutClient';
 
-const notoKufi = Noto_Kufi_Arabic({ subsets: ['arabic'], variable: '--font-noto-kufi' });
+const notoSansArabic = Noto_Sans_Arabic({ subsets: ['arabic'], variable: '--font-noto-sans-arabic' });
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' });
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
+
+
+import { NextIntlClientProvider } from 'next-intl';
+
+import arMessages from '../../../messages/ar.json';
 
 export default function AdminLayout({
     children,
@@ -12,11 +17,16 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="en" dir="ltr">
-            <body className={`${notoKufi.variable} ${cairo.variable} ${inter.variable} antialiased font-body bg-background-light text-on-surface`}>
-                <AdminLayoutClient>
-                    {children}
-                </AdminLayoutClient>
+        <html lang="ar" dir="rtl">
+            <head>
+                <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
+            </head>
+            <body className={`${notoSansArabic.variable} ${cairo.variable} ${manrope.variable} antialiased font-body bg-background-light text-on-surface`}>
+                <NextIntlClientProvider locale="ar" messages={arMessages}>
+                    <AdminLayoutClient>
+                        {children}
+                    </AdminLayoutClient>
+                </NextIntlClientProvider>
             </body>
         </html>
     );

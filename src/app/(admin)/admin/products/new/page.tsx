@@ -1,5 +1,10 @@
-import { ProductForm } from '@/components/admin/ProductForm';
+'use client';
+
+import { useLocale } from 'next-intl';
+import ProductForm from '../components/ProductForm';
 
 export default function NewProductPage() {
-    return <ProductForm isEdit={false} />;
+    const locale = useLocale();
+
+    return <ProductForm isEdit={false} locale={locale} />;
 }

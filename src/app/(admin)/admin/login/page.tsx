@@ -243,7 +243,7 @@ export default function AdminLogin() {
                                     </button>
 
                                     <div className="flex flex-col items-center justify-center gap-2 pt-2">
-                                        <p className="text-subtle text-xs">Didn't receive the code?</p>
+                                        <p className="text-subtle text-xs">Didn&apos;t receive the code?</p>
                                         <div className="flex items-center gap-2 font-bold">
                                             <button
                                                 className={`text-on-surface transition-colors text-xs font-bold flex items-center gap-1 group ${timeLeft > 0 ? 'opacity-50 cursor-not-allowed' : 'hover:text-primary'}`}

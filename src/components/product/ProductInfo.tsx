@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
+import { useFormattedMoney } from '@/lib/money';
 import { trackEvent } from '@/lib/tracking/track';
 import type { Product } from '@/mock/products';
 import { toast } from 'react-hot-toast';
@@ -13,6 +14,7 @@ export function ProductInfo({ product }: { product: Product }) {
     const t = useTranslations('Product.Info');
     const { addItem } = useCartStore();
     const { currency } = usePrefsStore();
+    const { format } = useFormattedMoney();
 
     const [quantity, setQuantity] = useState(1);
     const [selectedSize, setSelectedSize] = useState('M');
@@ -26,7 +28,7 @@ export function ProductInfo({ product }: { product: Product }) {
         ? (typeof product.badge === 'string' ? product.badge : (product.badge as Record<string, string>)[locale])
         : null;
 
-    const currencySymbol = currency === 'QAR' ? 'ر.ق' : 'ر.س';
+
 
     useEffect(() => {
         trackEvent('view_item', {
@@ -76,7 +78,7 @@ export function ProductInfo({ product }: { product: Product }) {
                     {/* Mobile top stock indicator */}
                     <span className="md:hidden shrink-0 bg-[#f4f2e6] px-3 py-1 rounded-lg flex items-center gap-1.5 ml-2">
                         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
-                        <span className="text-xs font-bold text-slate-700 font-kufi">{t('in_stock')}</span>
+                        <span className="text-xs font-bold text-subtle font-kufi">{t('in_stock')}</span>
                     </span>
                 </div>
 
@@ -84,11 +86,11 @@ export function ProductInfo({ product }: { product: Product }) {
                 <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-3 mb-4">
                     <div className="flex items-center gap-2">
                         <span className="text-2xl md:text-3xl font-bold text-[#0e1b12]">
-                            {product.price} {currencySymbol}
+                            {format(product.price)}
                         </span>
                         {product.compareAtPrice && (
                             <span className="text-lg text-[#9ca3af] line-through mb-1">
-                                {product.compareAtPrice} {currencySymbol}
+                                {format(product.compareAtPrice)}
                             </span>
                         )}
                         {productBadge && (
@@ -171,21 +173,21 @@ export function ProductInfo({ product }: { product: Product }) {
                 <div className="mt-6 md:hidden">
                     <label className="block text-sm font-bold text-[#0e1b12] font-kufi mb-3">{t('notes_label')}</label>
                     <textarea
-                        className="w-full bg-white border border-gray-200 focus:border-primary/50 text-[#0e1b12] text-sm p-4 rounded-2xl focus:outline-none focus:ring-0 transition-colors resize-none placeholder:text-slate-400 font-kufi"
+                        className="w-full bg-white border border-gray-200 focus:border-primary/50 text-[#0e1b12] text-sm p-4 rounded-2xl focus:outline-none focus:ring-0 transition-colors resize-none placeholder:text-subtle font-kufi"
                         placeholder={t('notes_placeholder')}
                         rows={3}
                     ></textarea>
                 </div>
 
                 {/* Mobile Trust Signals Grid */}
-                <div className="grid grid-cols-2 gap-3 py-4 mt-6 md:hidden border-t border-slate-200">
+                <div className="grid grid-cols-2 gap-3 py-4 mt-6 md:hidden border-t border-border">
                     <div className="flex items-center gap-3 p-3 bg-white/50 rounded-xl border border-gray-200">
                         <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-[#C5A059] shadow-sm shrink-0">
                             <span className="material-symbols-outlined text-[20px]">local_shipping</span>
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-xs font-bold text-slate-900 font-kufi">{t('fast_delivery')}</span>
-                            <span className="text-[10px] text-slate-500 font-kufi mt-1 leading-tight">{t('delivery_time')}</span>
+                            <span className="text-xs font-bold text-on-surface font-kufi">{t('fast_delivery')}</span>
+                            <span className="text-[10px] text-subtle font-kufi mt-1 leading-tight">{t('delivery_time')}</span>
                         </div>
                     </div>
                     <div className="flex items-center gap-3 p-3 bg-white/50 rounded-xl border border-gray-200">
@@ -193,8 +195,8 @@ export function ProductInfo({ product }: { product: Product }) {
                             <span className="material-symbols-outlined text-[20px]">payments</span>
                         </div>
                         <div className="flex flex-col">
-                            <span className="text-xs font-bold text-slate-900 font-kufi">{t('secure_payment')}</span>
-                            <span className="text-[10px] text-slate-500 font-kufi mt-1 leading-tight">{t('cod_available')}</span>
+                            <span className="text-xs font-bold text-on-surface font-kufi">{t('secure_payment')}</span>
+                            <span className="text-[10px] text-subtle font-kufi mt-1 leading-tight">{t('cod_available')}</span>
                         </div>
                     </div>
                 </div>
@@ -255,21 +257,21 @@ export function ProductInfo({ product }: { product: Product }) {
                 <p className="hidden md:block text-center text-xs text-[#9ca3af] font-kufi mt-2">{t('return_policy')}</p>
 
                 {/* Mobile Add to Cart Area (Inline, NOT sticky) */}
-                <div className="md:hidden mt-6 pt-4 border-t border-slate-200">
+                <div className="md:hidden mt-6 pt-4 border-t border-border">
                     <div className="flex items-center gap-4">
                         {/* Add to Cart Button */}
                         <button
                             onClick={handleAddToCart}
-                            className="flex-1 bg-black text-white h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-base hover:bg-slate-800 transition-colors shadow-lg pb-1"
+                            className="flex-1 bg-black text-white h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-base hover:bg-primary-dark transition-colors shadow-lg pb-1"
                         >
                             <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
                             {t('add_to_cart')}
                         </button>
                         {/* Price Summary */}
                         <div className="flex flex-col items-end shrink-0 min-w-[80px]">
-                            <span className="text-[10px] text-slate-500 font-kufi uppercase">الإجمالي</span>
-                            <span className="text-xl font-bold text-slate-900 leading-tight">
-                                {(product.price * quantity).toLocaleString()} {currencySymbol}
+                            <span className="text-[10px] text-subtle font-kufi uppercase">الإجمالي</span>
+                            <span className="text-xl font-bold text-on-surface leading-tight">
+                                {format(product.price * quantity)}
                             </span>
                         </div>
                     </div>

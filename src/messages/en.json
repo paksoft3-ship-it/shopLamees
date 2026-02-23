@@ -1,4 +1,24 @@
 {
+    "AdminNav": {
+        "dashboard": "Dashboard",
+        "orders": "Orders",
+        "products": "Products",
+        "categories": "Categories",
+        "customers": "Customers",
+        "content": "Content",
+        "media": "Media",
+        "shipping": "Shipping",
+        "payments": "Payments",
+        "reports": "Reports",
+        "settings": "Settings",
+        "users": "Users",
+        "activity": "Activity Log",
+        "logout": "Sign Out",
+        "admin_panel": "Admin Panel",
+        "welcome": "Welcome back",
+        "search": "Search orders, products...",
+        "super_admin": "Super Admin"
+    },
     "Home": {
         "Header": {
             "home": "Home",

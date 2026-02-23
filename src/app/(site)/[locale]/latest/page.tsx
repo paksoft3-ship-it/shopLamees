@@ -92,7 +92,7 @@ export default function LatestPage() {
                 {/* Trust Strip */}
                 <div className="grid grid-cols-3 gap-3 mb-8">
                     {[
-                        { icon: 'local_shipping', ar: 'شحن مجاني فوق ٥٠٠ ر.س', en: 'Free shipping over 500 SAR' },
+                        { icon: 'local_shipping', ar: 'شحن مجاني فوق ٥٠٠', en: 'Free shipping over 500 SAR' },
                         { icon: 'checkroom', ar: 'تفصيل حسب الطلب', en: 'Custom tailoring' },
                         { icon: 'refresh', ar: 'إرجاع خلال ١٤ يوم', en: '14-day returns' },
                     ].map((item) => (

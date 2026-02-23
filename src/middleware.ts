@@ -34,6 +34,6 @@ export default function middleware(request: NextRequest) {
 }
 
 export const config = {
-    // Only run middleware on / and underneath, excluding api, _next, static files, and admin
+    // Only run middleware on / and underneath, excluding api, _next, and static files
     matcher: ['/((?!api|_next|_fallback|admin|.*\\..*).*)']
 };

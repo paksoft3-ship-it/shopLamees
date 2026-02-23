@@ -1,4 +1,24 @@
 {
+    "AdminNav": {
+        "dashboard": "لوحة التحكم",
+        "orders": "الطلبات",
+        "products": "المنتجات",
+        "categories": "التصنيفات",
+        "customers": "العملاء",
+        "content": "المحتوى",
+        "media": "الوسائط",
+        "shipping": "الشحن",
+        "payments": "المدفوعات",
+        "reports": "التقارير",
+        "settings": "الإعدادات",
+        "users": "المستخدمين",
+        "activity": "سجل النشاط",
+        "logout": "تسجيل خروج",
+        "admin_panel": "لوحة التحكم المتجر",
+        "welcome": "مرحباً بك",
+        "search": "ابحث عن طلب، منتج...",
+        "super_admin": "المدير العام"
+    },
     "Home": {
         "Header": {
             "home": "الرئيسية",

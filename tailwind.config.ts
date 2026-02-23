@@ -42,6 +42,10 @@ const config: Config = {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
 				},
+				'accent-amber': '#F59E0B',
+				'accent-blue': '#3B82F6',
+				'accent-green': '#10B981',
+				'accent-red': '#EF4444',
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
 					foreground: 'hsl(var(--destructive-foreground))'
@@ -58,8 +62,8 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				display: ['var(--font-noto-kufi)', 'var(--font-inter)', 'sans-serif'],
-				body: ['var(--font-cairo)', 'var(--font-inter)', 'sans-serif'],
+				display: ['var(--font-noto-kufi)', 'var(--font-noto-sans-arabic)', 'var(--font-inter)', 'sans-serif'],
+				body: ['var(--font-cairo)', 'var(--font-manrope)', 'var(--font-inter)', 'sans-serif'],
 				code: ['var(--font-inter)', 'monospace'],
 			},
 			borderRadius: {

@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { products } from '@/mock/products';
-import { usePrefsStore } from '@/lib/stores/prefs';
+import { useFormattedMoney } from '@/lib/money';
 
 interface RelatedProductsProps {
     currentProductId: string;
@@ -13,8 +13,7 @@ interface RelatedProductsProps {
 export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
     const locale = useLocale();
     const t = useTranslations('Product.Related');
-    const { currency } = usePrefsStore();
-    const currencySymbol = currency === 'QAR' ? 'ر.ق' : 'ر.س';
+    const { format } = useFormattedMoney();
 
     const related = products.filter(p => p.id !== currentProductId).slice(0, 3);
     if (related.length === 0) return null;
@@ -67,7 +66,7 @@ export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-[#0e1b12] font-kufi mb-1">{name}</h4>
-                                <p className="text-sm text-[#6b7280]">{prod.price} {currencySymbol}</p>
+                                <p className="text-sm text-[#6b7280]">{format(prod.price)}</p>
                             </div>
                         </Link>
                     );

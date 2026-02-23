@@ -6,6 +6,8 @@ import { Link } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { formatPrice } from '@/lib/utils/price';
+import { trackEvent } from '@/lib/tracking/track';
+import { useEffect } from 'react';
 
 type Step = 'info' | 'address' | 'shipping' | 'payment';
 const STEPS: Step[] = ['info', 'address', 'shipping', 'payment'];
@@ -19,10 +21,25 @@ export default function CheckoutPage() {
     const [paymentMethod, setPaymentMethod] = useState('apple_pay');
     const [coupon, setCoupon] = useState('');
 
+    useEffect(() => {
+        if (items.length > 0) {
+            trackEvent('begin_checkout', {
+                currency,
+                value: subtotal,
+                items: items.map(item => ({
+                    item_id: item.variantId,
+                    item_name: item.name,
+                    price: item.price,
+                    quantity: item.quantity
+                }))
+            });
+        }
+    }, []);
+
     const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const vat = Math.round(subtotal * 0.05);
     const total = subtotal + vat;
-    const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
+    // const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
     const stepIndex = STEPS.indexOf(currentStep);
 
@@ -337,10 +354,10 @@ export default function CheckoutPage() {
                                 )}
 
                                 {currentStep === 'payment' ? (
-                                    <button className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 font-kufi">
+                                    <Link href="/checkout/confirmation" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 font-kufi">
                                         {t('confirm_order')}
                                         <span className="material-symbols-outlined text-lg">check_circle</span>
-                                    </button>
+                                    </Link>
                                 ) : (
                                     <button onClick={goNext} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 font-kufi">
                                         {t('continue')}

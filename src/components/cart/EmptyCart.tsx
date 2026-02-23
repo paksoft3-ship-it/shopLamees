@@ -25,10 +25,10 @@ export function EmptyCart() {
                     </div>
                 </div>
 
-                <h2 className="text-3xl md:text-4xl font-bold text-slate-900 tracking-tight mb-4 font-kufi">
+                <h2 className="text-3xl md:text-4xl font-bold text-on-surface tracking-tight mb-4 font-kufi">
                     {t('empty_title')}
                 </h2>
-                <p className="text-slate-500 text-base md:text-lg leading-relaxed max-w-md mb-10 font-kufi">
+                <p className="text-subtle text-base md:text-lg leading-relaxed max-w-md mb-10 font-kufi">
                     {t('empty_desc')}
                 </p>
 
@@ -45,7 +45,7 @@ export function EmptyCart() {
 
                 {/* Quick Category Links */}
                 <div className="w-full border-t border-[#e5e0d8] pt-10">
-                    <span className="block text-sm font-bold text-slate-500 tracking-wider uppercase mb-6 font-kufi">
+                    <span className="block text-sm font-bold text-subtle tracking-wider uppercase mb-6 font-kufi">
                         {locale === 'ar' ? 'قد يعجبك' : 'You might like'}
                     </span>
                     <div className="flex flex-wrap justify-center gap-3">
@@ -58,9 +58,9 @@ export function EmptyCart() {
                             <Link
                                 key={cat.icon}
                                 href={cat.href}
-                                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#e5e0d8] rounded-full hover:border-slate-900 hover:shadow-md transition-all duration-300 group"
+                                className="flex items-center gap-2 px-5 py-2.5 bg-white border border-[#e5e0d8] rounded-full hover:border-on-surface hover:shadow-md transition-all duration-300 group"
                             >
-                                <span className="material-symbols-outlined text-[#C5A059] group-hover:text-slate-900 transition-colors text-[20px]">
+                                <span className="material-symbols-outlined text-[#C5A059] group-hover:text-on-surface transition-colors text-[20px]">
                                     {cat.icon}
                                 </span>
                                 <span className="text-sm font-medium font-kufi">{cat.label}</span>
@@ -79,7 +79,7 @@ export function EmptyCart() {
                         </h3>
                         <Link
                             href="/category/all"
-                            className="text-sm font-medium text-slate-500 hover:text-slate-900 flex items-center gap-1 font-kufi"
+                            className="text-sm font-medium text-subtle hover:text-on-surface flex items-center gap-1 font-kufi"
                         >
                             {locale === 'ar' ? 'عرض الكل' : 'View All'}
                             <span className="material-symbols-outlined text-lg rtl:rotate-180">arrow_right_alt</span>
