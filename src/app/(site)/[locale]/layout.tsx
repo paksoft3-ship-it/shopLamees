@@ -6,6 +6,7 @@ import { Footer } from '@/components/layout/Footer';
 import { WhatsAppChatbot } from '@/components/layout/WhatsAppChatbot';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ToasterProvider } from '@/components/providers/ToasterProvider';
+import { CartDrawer } from '@/components/cart/CartDrawer';
 import { Noto_Kufi_Arabic, Cairo, Inter } from 'next/font/google';
 import '../../globals.css';
 
@@ -20,9 +21,7 @@ export default async function SiteLayout({
     children: React.ReactNode;
     params: { locale: string };
 }) {
-    // Explicitly set the locale context for next-intl server APIs
     setRequestLocale(locale);
-
     const messages = await getMessages();
 
     return (
@@ -30,6 +29,7 @@ export default async function SiteLayout({
             <body className={`${notoKufi.variable} ${cairo.variable} ${inter.variable} antialiased font-body bg-background-light text-on-surface`}>
                 <ToasterProvider />
                 <NextIntlClientProvider messages={messages}>
+                    <CartDrawer />
                     <div className="flex flex-col min-h-screen">
                         <TrustBar />
                         <Header />

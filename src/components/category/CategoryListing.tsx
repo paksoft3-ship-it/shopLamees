@@ -16,7 +16,7 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
     // Filtering State
     const [products, setProducts] = useState(initialProducts);
     const [sortOption, setSortOption] = useState('suggestions');
-    const [priceRange, setPriceRange] = useState({ min: 0, max: 1000 });
+    const [priceRange] = useState({ min: 0, max: 1000 });
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
     // Tracking Page View
@@ -96,7 +96,7 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
                             className="w-full flex items-center justify-between gap-2 bg-white px-4 py-2.5 rounded-lg border border-border text-sm text-text-main hover:border-primary transition-colors"
                         >
-                            <span className="font-body">{t('sort_by', { option: tSort(sortOption as any) })}</span>
+                            <span className="font-body">{t('sort_by', { option: tSort(sortOption as string) })}</span>
                             <span className="material-symbols-outlined text-lg">expand_more</span>
                         </button>
 
@@ -108,7 +108,7 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
                                         onClick={() => handleSort(opt)}
                                         className={`w-full text-start px-4 py-2 text-sm hover:bg-background-light hover:text-primary transition-colors ${sortOption === opt ? 'text-primary bg-background-light font-bold' : 'text-text-main'}`}
                                     >
-                                        {tSort(opt as any)}
+                                        {tSort(opt as string)}
                                     </button>
                                 ))}
                             </div>

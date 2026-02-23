@@ -16,7 +16,7 @@ export function ProductCard({ product }: { product: Product }) {
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
-        addItem({ id: product.id, variantId: `${product.id}-default`, name: product.name[locale], price: product.price, quantity: 1 });
+        addItem({ id: product.id, variantId: `${product.id}-default`, name: product.name[locale], price: product.price, quantity: 1, image: product.image });
         toast.success(locale === 'en' ? `${product.name[locale]} added to cart!` : `تمت إضافة ${product.name[locale]} للسلة بنجاح!`, {
             icon: '🛍️',
         });

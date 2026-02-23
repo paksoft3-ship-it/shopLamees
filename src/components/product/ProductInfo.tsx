@@ -44,6 +44,11 @@ export function ProductInfo({ product }: { product: Product }) {
             name: productName,
             price: product.price,
             quantity,
+            image: product.image,
+            size: selectedSize,
+            cut: selectedCut === 'quarter'
+                ? (locale === 'ar' ? 'ربع كلوش' : 'Quarter Cloche')
+                : (locale === 'ar' ? 'نص كلوش' : 'Half Cloche'),
         });
         trackEvent('add_to_cart', {
             product_id: product.id,
