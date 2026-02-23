@@ -1,8 +1,7 @@
 // ─── Prisma Schema — Shop Lamees ───────────────────────────────────
 
 generator client {
-  provider = "prisma-client"
-  output   = "../src/generated/prisma"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -22,6 +21,11 @@ enum OrderStatus {
 enum Currency {
   QAR
   SAR
+}
+
+enum Country {
+  QA
+  SA
 }
 
 enum AdminRole {
@@ -66,7 +70,7 @@ model Product {
   updatedAt    DateTime @updatedAt
 
   images     ProductImage[]
-  variants   Variant[]
+  variants   ProductVariant[]
   categories ProductCategory[]
   orderItems OrderItem[]
 
@@ -97,7 +101,7 @@ model ProductImage {
   @@map("product_images")
 }
 
-model Variant {
+model ProductVariant {
   id        String   @id @default(cuid())
   productId String
   size      String
@@ -112,59 +116,59 @@ model Variant {
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 
-  @@map("variants")
+  @@map("product_variants")
 }
 
 // ─── Orders ─────────────────────────────────────────────────────────
 
 model Order {
-  id           String      @id @default(cuid())
-  orderNumber  String      @unique
-  status       OrderStatus @default(NEW)
-  currency     Currency    @default(SAR)
-  subtotal     Decimal     @db.Decimal(10, 2)
-  discount     Decimal     @default(0) @db.Decimal(10, 2)
-  discountCode String?
-  shippingFee  Decimal     @default(0) @db.Decimal(10, 2)
-  total        Decimal     @db.Decimal(10, 2)
-  country      String      @default("SA")
-  customerName String
-  phone        String
-  email        String?
-  customerNote String?
-  internalNote String?
-  paymentMethod String    @default("COD")
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
+  id            String      @id @default(cuid())
+  orderNumber   String      @unique
+  status        OrderStatus @default(NEW)
+  currency      Currency    @default(SAR)
+  subtotal      Decimal     @db.Decimal(10, 2)
+  discount      Decimal     @default(0) @db.Decimal(10, 2)
+  discountCode  String?
+  shippingFee   Decimal     @default(0) @db.Decimal(10, 2)
+  total         Decimal     @db.Decimal(10, 2)
+  country       Country     @default(SA)
+  customerName  String
+  phone         String
+  email         String?
+  customerNote  String?
+  internalNote  String?
+  paymentMethod String      @default("COD")
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
 
   items   OrderItem[]
-  address Address?
+  address OrderAddress?
 
   @@map("orders")
 }
 
 model OrderItem {
-  id               String  @id @default(cuid())
-  orderId          String
-  productId        String?
-  variantId        String?
-  nameSnapshotAr   String
-  nameSnapshotEn   String
-  variantLabel     String?
-  sku              String?
-  imageSnapshot    String?
-  qty              Int
-  unitPrice        Decimal @db.Decimal(10, 2)
-  lineTotal        Decimal @db.Decimal(10, 2)
+  id             String  @id @default(cuid())
+  orderId        String
+  productId      String?
+  variantId      String?
+  nameSnapshotAr String
+  nameSnapshotEn String
+  variantLabel   String?
+  sku            String?
+  imageSnapshot  String?
+  qty            Int
+  unitPrice      Decimal @db.Decimal(10, 2)
+  lineTotal      Decimal @db.Decimal(10, 2)
 
-  order   Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product Product? @relation(fields: [productId], references: [id], onDelete: SetNull)
-  variant Variant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  order   Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
+  variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
   @@map("order_items")
 }
 
-model Address {
+model OrderAddress {
   id         String  @id @default(cuid())
   orderId    String  @unique
   country    String
@@ -178,7 +182,7 @@ model Address {
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
 
-  @@map("addresses")
+  @@map("order_addresses")
 }
 
 // ─── Admin / RBAC ───────────────────────────────────────────────────
@@ -190,11 +194,34 @@ model AdminUser {
   passwordHash String
   role         AdminRole @default(STAFF)
   isActive     Boolean   @default(true)
-  permissions  String[]  @default([])
   createdAt    DateTime  @default(now())
   updatedAt    DateTime  @updatedAt
 
+  rolePermissions RolePermission[]
+
   @@map("admin_users")
+}
+
+model Permission {
+  id          String @id @default(cuid())
+  key         String @unique
+  description String @default("")
+
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model RolePermission {
+  id           String @id @default(cuid())
+  adminUserId  String
+  permissionId String
+
+  adminUser  AdminUser  @relation(fields: [adminUserId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+
+  @@unique([adminUserId, permissionId])
+  @@map("role_permissions")
 }
 
 // ─── Store Settings ─────────────────────────────────────────────────
