@@ -1,0 +1,1 @@
+export default function Page() { return <div className="p-8 text-center text-xl font-heading flex flex-col items-center justify-center flex-1 h-full min-h-[50vh]">Coming soon: account/login</div>; }

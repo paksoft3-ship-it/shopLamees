@@ -1,0 +1,164 @@
+{
+    "Home": {
+        "Header": {
+            "home": "Home",
+            "latest_products": "Latest Products",
+            "categories": "Categories",
+            "about": "About",
+            "brand_name": "Shop Lamees"
+        },
+        "Hero": {
+            "badge": "Best Quality in Market",
+            "title_1": "Luxury Abaya",
+            "title_2": "with Elegant Details",
+            "description": "Modern designs blending authenticity and modernity. Fast 3-7 days delivery across GCC with golden quality guarantee.",
+            "shop_now": "Shop Now",
+            "latest_products": "Latest Products",
+            "stats_customers": "Happy Customers",
+            "stats_models": "New Models",
+            "stats_rating": "Excellent Rating",
+            "bestseller": "Best Seller",
+            "abaya_name": "Royal Crepe Abaya"
+        },
+        "Categories": {
+            "all": "View All"
+        },
+        "FeaturedProducts": {
+            "title": "Featured Products",
+            "subtitle": "Browse the latest collection of luxury abayas",
+            "view_all": "View All",
+            "add_to_cart": "Add to Cart"
+        },
+        "ValueProps": {
+            "quality_title": "Quality Guarantee",
+            "quality_desc": "We use the finest international fabrics ensuring lasting comfort and elegance.",
+            "price_title": "Competitive Pricing",
+            "price_desc": "We offer luxury designs at affordable prices with continuous seasonal offers.",
+            "support_title": "24/7 Support",
+            "support_desc": "Our customer service team is ready to answer your inquiries via WhatsApp anytime."
+        },
+        "Newsletter": {
+            "title": "Join Our Mailing List",
+            "subtitle": "Get a 10% discount on your first order and be the first to know about new collections.",
+            "placeholder": "Email Address",
+            "subscribe": "Subscribe"
+        },
+        "Layout": {
+            "TrustBar": {
+                "free_delivery": "Free delivery on orders over 500 SAR",
+                "free_returns": "Free returns within 14 days"
+            },
+            "MobileBottomNav": {
+                "home": "Home",
+                "categories": "Categories",
+                "cart": "Cart",
+                "account": "Account"
+            },
+            "WhatsAppChatbot": {
+                "ai_title": "Smart Assistant (AI)",
+                "ai_greeting": "Welcome! How can we help you today? (AI Chatbot Placeholder)"
+            },
+            "Footer": {
+                "brand_name": "Shop Lamees",
+                "description": "A leading Saudi brand in the world of abayas, offering designs that combine modesty and modern elegance for Gulf women.",
+                "quick_links": "Quick Links",
+                "about": "About Us",
+                "refund_policy": "Refund & Exchange Policy",
+                "size_guide": "Size Guide",
+                "shipping": "Shipping & Delivery",
+                "faq": "FAQ",
+                "categories": "Categories",
+                "black_abayas": "Black Abayas",
+                "color_abayas": "Color Abayas",
+                "niqabs": "Niqabs & Scarves",
+                "occasion_abayas": "Occasion Abayas",
+                "luxury_sets": "Luxury Sets",
+                "contact_us": "Contact Us",
+                "address": "Riyadh, Saudi Arabia",
+                "copyright": "All Rights Reserved © 2024 Shop Lamees"
+            }
+        }
+    },
+    "Product": {
+        "Info": {
+            "in_stock": "In Stock",
+            "size": "Size",
+            "size_guide": "Size Guide",
+            "cut": "Cut",
+            "quarter_cloche": "Quarter Cloche",
+            "half_cloche": "Half Cloche",
+            "lead_title": "Lead time 3-7 days",
+            "lead_desc": "Order will be prepared with care & shipped via DHL Express",
+            "add_to_cart": "Add to Cart",
+            "return_policy": "7-day return policy",
+            "notes_label": "Additional Notes",
+            "notes_placeholder": "Write your note here...",
+            "fast_delivery": "Fast Delivery",
+            "delivery_time": "Within 3-5 working days",
+            "secure_payment": "Secure Payment",
+            "cod_available": "Cash on delivery available"
+        },
+        "Specs": {
+            "title": "Product Details",
+            "fabric_label": "Fabric Type",
+            "fabric_value": "Luxury Japanese Crepe",
+            "color_label": "Color",
+            "color_value": "Jet Black",
+            "cut_label": "Cut Style",
+            "cut_value": "Quarter / Half Cloche",
+            "origin_label": "Origin",
+            "origin_value": "Kingdom of Saudi Arabia",
+            "washing_label": "Washing Instructions",
+            "washing_value": "Dry Clean Only"
+        },
+        "Related": {
+            "title": "Best Sellers"
+        },
+        "Breadcrumbs": {
+            "home": "Home",
+            "abayas": "Abayas"
+        }
+    },
+    "Category": {
+        "products_available": "{count} products available",
+        "clear_all": "Clear All",
+        "sort_by": "Sort by: {option}",
+        "load_more": "Load More",
+        "Sort": {
+            "suggestions": "Our suggestions",
+            "bestseller": "Best Seller",
+            "highest_rated": "Highest Rated",
+            "price_high_low": "Price: High to Low",
+            "price_low_high": "Price: Low to High"
+        },
+        "Filters": {
+            "price": "Price",
+            "size": "Size",
+            "color": "Color",
+            "fabric": "Fabric",
+            "availability": "Availability",
+            "in_stock": "In Stock",
+            "out_of_stock": "Out of Stock"
+        },
+        "Breadcrumbs": {
+            "home": "Home",
+            "categories": "Categories"
+        }
+    },
+    "Cart": {
+        "title": "Your Cart",
+        "empty_title": "Your cart is empty",
+        "empty_desc": "Explore our latest collections and find something you love.",
+        "continue_shopping": "Continue Shopping",
+        "headers_product": "Product",
+        "headers_quantity": "Quantity",
+        "headers_total": "Total",
+        "summary_title": "Order Summary",
+        "subtotal": "Subtotal",
+        "shipping": "Shipping",
+        "shipping_calc": "Calculated at checkout",
+        "proceed_checkout": "Proceed to Checkout",
+        "remove": "Remove",
+        "add_note": "Add an order note"
+    }
+}

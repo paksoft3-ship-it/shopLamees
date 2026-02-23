@@ -1,0 +1,1 @@
+export default function Page() { return <div className="p-8 text-xl font-heading flex flex-col items-center justify-center flex-1 h-full min-h-[50vh]">Admin Placeholder: admin/pages/[id]/edit</div>; }

@@ -1,0 +1,30 @@
+
+> shop-lamees@0.1.0 build
+> next build
+
+  ▲ Next.js 14.2.35
+
+   Creating an optimized production build ...
+ ✓ Compiled successfully
+   Linting and checking validity of types ...
+
+Failed to compile.
+
+./src/app/(site)/[locale]/product/[slug]/page.tsx
+24:94  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+52:98  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+./src/components/home/CategoriesRow.tsx
+17:33  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/home/Hero.tsx
+52:29  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/product/ProductCard.tsx
+24:17  Warning: Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+./src/components/product/ProductInfo.tsx
+5:8  Error: 'Image' is defined but never used.  @typescript-eslint/no-unused-vars
+34:86  Error: Unexpected any. Specify a different type.  @typescript-eslint/no-explicit-any
+
+info  - Need to disable some ESLint rules? Learn more here: https://nextjs.org/docs/basic-features/eslint#disabling-rules
