@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 
@@ -79,16 +80,17 @@ export function CartSummary() {
                 </div>
 
                 {/* Checkout Button */}
-                <button className="w-full bg-black hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 font-kufi">
+                <Link href="/checkout" className="w-full bg-black hover:bg-slate-800 text-white font-bold py-4 rounded-xl shadow-lg transition-transform hover:-translate-y-0.5 active:translate-y-0 flex items-center justify-center gap-2 font-kufi">
                     <span className="material-symbols-outlined text-[20px]">lock</span>
                     {t('proceed_checkout')}
-                </button>
+                </Link>
 
                 {/* Payment Icons */}
-                <div className="mt-6 flex justify-center gap-4 grayscale opacity-60">
-                    <img alt="Mastercard" className="h-6 object-contain" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1000px-Mastercard-logo.svg.png" />
-                    <img alt="Visa" className="h-5 object-contain" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2000px-Visa_Inc._logo.svg.png" />
-                    <img alt="Apple Pay" className="h-6 object-contain" src="https://upload.wikimedia.org/wikipedia/ar/thumb/a/ab/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" />
+                <div className="mt-6 flex justify-center gap-3">
+                    <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm border border-slate-200 text-xs font-bold font-display tracking-widest text-slate-500">VISA</div>
+                    <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm border border-slate-200 text-xs font-bold font-display tracking-widest text-slate-500">MASTERCARD</div>
+                    <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm border border-slate-200 text-xs font-bold font-display tracking-widest text-slate-500">MADA</div>
+                    <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm border border-slate-200 text-xs font-bold font-display tracking-widest text-slate-500"> PAY</div>
                 </div>
             </div>
 
