@@ -6,7 +6,9 @@ config({ path: '.env' });
 import { PrismaClient } from '@prisma/client';
 import { createHash } from 'crypto';
 
-const prisma = new PrismaClient({});
+const prisma = new PrismaClient({
+    datasourceUrl: process.env.DATABASE_URL,
+});
 
 // Simple password hash using Node crypto (no bcrypt dependency needed for seed)
 function hashPassword(password: string): string {

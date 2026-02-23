@@ -1,14 +1,13 @@
-'use client';
 import { useTranslations, useLocale } from 'next-intl';
-import { Product } from '@/mock/products';
 import { Link } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { formatPrice } from '@/lib/utils/price';
 import { ShoppingCart, Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
+import { ProductDTO } from '@/lib/data/types';
 
-export function ProductCard({ product }: { product: Product }) {
+export function ProductCard({ product }: { product: ProductDTO }) {
     const t = useTranslations('Home.FeaturedProducts');
     const locale = useLocale() as 'ar' | 'en';
     const addItem = useCartStore((state) => state.addItem);
@@ -16,7 +15,17 @@ export function ProductCard({ product }: { product: Product }) {
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
-        addItem({ id: product.id, variantId: `${product.id}-default`, name: product.name[locale], price: product.price, quantity: 1, image: product.image });
+        addItem({
+            id: product.id,
+            productId: product.id,
+            variantId: `${product.id}-default`,
+            slug: product.slug,
+            name: product.name[locale],
+            unitPrice: product.variants[0]?.priceSar || product.basePriceSar,
+            currency: currency,
+            quantity: 1,
+            image: product.image
+        });
         toast.success(locale === 'en' ? `${product.name[locale]} added to cart!` : `تمت إضافة ${product.name[locale]} للسلة بنجاح!`, {
             icon: '🛍️',
         });
@@ -46,9 +55,9 @@ export function ProductCard({ product }: { product: Product }) {
                 <p className="text-sm text-subtle mb-3">{product.description[locale]}</p>
                 <div className="flex items-center justify-between mt-auto">
                     <div className="flex items-center gap-2">
-                        <span className="font-bold text-lg text-on-surface">{formatPrice(product.price, currency, locale)}</span>
-                        {product.compareAtPrice && (
-                            <span className="text-sm text-subtle/70 line-through">{formatPrice(product.compareAtPrice, currency, locale)}</span>
+                        <span className="font-bold text-lg text-on-surface">{formatPrice(product.variants[0]?.priceSar || product.basePriceSar, currency, locale)}</span>
+                        {product.variants[0]?.priceSar < product.basePriceSar && (
+                            <span className="text-sm text-subtle/70 line-through">{formatPrice(product.basePriceSar, currency, locale)}</span>
                         )}
                     </div>
                     <div className="flex text-primary text-sm gap-0.5">

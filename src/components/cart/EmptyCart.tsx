@@ -2,14 +2,12 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { products } from '@/mock/products';
 import { ProductCard } from '@/components/product/ProductCard';
+import { ProductDTO } from '@/lib/data/types';
 
-export function EmptyCart() {
+export function EmptyCart({ recommended = [] }: { recommended?: ProductDTO[] }) {
     const t = useTranslations('Cart');
     const locale = useLocale() as 'ar' | 'en';
-
-    const recommended = products.filter(p => p.availability !== false).slice(0, 4);
 
     return (
         <div className="flex flex-col items-center">

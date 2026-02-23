@@ -3,7 +3,6 @@
 import { useLocale } from 'next-intl';
 import { useCartStore } from '@/lib/stores/cart';
 import { useFormattedMoney } from '@/lib/money';
-import { products } from '@/mock/products';
 import { Link } from '@/i18n/navigation';
 
 export function CartList() {
@@ -14,9 +13,8 @@ export function CartList() {
     return (
         <div className="space-y-6">
             {items.map((item) => {
-                const originalProduct = products.find(p => p.id === item.id);
-                const productImage = item.image || originalProduct?.image || '';
-                const productSlug = originalProduct?.slug || 'black-crepe-abaya';
+                const productImage = item.image || '/placeholder.png';
+                const productSlug = item.slug;
 
                 return (
                     <div key={item.variantId} className="group bg-white rounded-2xl p-4 md:p-6 shadow-sm border border-border hover:shadow-md transition-all">
@@ -54,7 +52,7 @@ export function CartList() {
                                     </div>
 
                                     <p className="text-primary font-bold text-lg mb-2 font-display">
-                                        {format(item.price)}
+                                        {format(item.unitPrice)}
                                     </p>
 
                                     {/* Size / Cut Tags */}
@@ -94,7 +92,7 @@ export function CartList() {
 
                                     {/* Line total on mobile */}
                                     <span className="text-base font-bold text-on-surface font-display sm:hidden">
-                                        {format(item.price * item.quantity)}
+                                        {format(item.unitPrice * item.quantity)}
                                     </span>
                                 </div>
                             </div>

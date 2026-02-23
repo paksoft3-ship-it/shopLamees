@@ -1,22 +1,19 @@
-'use client';
-
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { products } from '@/mock/products';
 import { useFormattedMoney } from '@/lib/money';
+import { ProductDTO } from '@/lib/data/types';
 
 interface RelatedProductsProps {
-    currentProductId: string;
+    products: ProductDTO[];
 }
 
-export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
-    const locale = useLocale();
+export function RelatedProducts({ products }: RelatedProductsProps) {
+    const locale = useLocale() as 'ar' | 'en';
     const t = useTranslations('Product.Related');
     const { format } = useFormattedMoney();
 
-    const related = products.filter(p => p.id !== currentProductId).slice(0, 3);
-    if (related.length === 0) return null;
+    if (products.length === 0) return null;
 
     return (
         <div className="lg:col-span-8">
@@ -35,13 +32,10 @@ export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
 
             {/* Product Cards Grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {related.map((prod) => {
-                    const name = typeof prod.name === 'string'
-                        ? prod.name
-                        : (prod.name as Record<string, string>)[locale] || (prod.name as Record<string, string>)['ar'];
-                    const badge = prod.badge
-                        ? (typeof prod.badge === 'string' ? prod.badge : (prod.badge as Record<string, string>)[locale])
-                        : null;
+                {products.map((prod) => {
+                    const name = prod.name[locale];
+                    const badge = prod.badge;
+                    const price = prod.variants[0]?.priceSar || prod.basePriceSar;
 
                     return (
                         <Link key={prod.id} href={`/product/${prod.slug}`} className="group flex flex-col gap-3 cursor-pointer">
@@ -55,7 +49,7 @@ export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
                                 />
                                 {badge && (
                                     <div className="absolute top-3 right-3 bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded">
-                                        {badge}
+                                        {badge[locale]}
                                     </div>
                                 )}
                                 <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -66,7 +60,7 @@ export function RelatedProducts({ currentProductId }: RelatedProductsProps) {
                             </div>
                             <div>
                                 <h4 className="text-sm font-bold text-[#0e1b12] font-kufi mb-1">{name}</h4>
-                                <p className="text-sm text-[#6b7280]">{format(prod.price)}</p>
+                                <p className="text-sm text-[#6b7280]">{format(price)}</p>
                             </div>
                         </Link>
                     );

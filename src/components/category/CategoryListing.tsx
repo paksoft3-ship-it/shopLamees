@@ -1,13 +1,12 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Category } from '@/mock/categories';
-import { Product } from '@/mock/products';
+import { CategoryDTO, ProductDTO } from '@/lib/data/types';
 import { trackEvent } from '@/lib/tracking/track';
 import { ProductCard } from '../product/ProductCard';
 import { Link } from '@/i18n/navigation';
 
-export function CategoryListing({ category, initialProducts }: { category: Category, initialProducts: Product[] }) {
+export function CategoryListing({ category, initialProducts }: { category: CategoryDTO, initialProducts: ProductDTO[] }) {
     const t = useTranslations('Category');
     const locale = useLocale() as 'ar' | 'en';
     const tSort = useTranslations('Category.Sort');
@@ -33,13 +32,16 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
         let result = [...initialProducts];
 
         // Mock filter logic
-        result = result.filter(p => p.price >= priceRange.min && p.price <= priceRange.max);
+        result = result.filter(p => {
+            const price = p.variants[0]?.priceSar || p.basePriceSar;
+            return price >= priceRange.min && price <= priceRange.max;
+        });
 
         // Sort
         if (sortOption === 'price_low_high') {
-            result.sort((a, b) => a.price - b.price);
+            result.sort((a, b) => (a.variants[0]?.priceSar || a.basePriceSar) - (b.variants[0]?.priceSar || b.basePriceSar));
         } else if (sortOption === 'price_high_low') {
-            result.sort((a, b) => b.price - a.price);
+            result.sort((a, b) => (b.variants[0]?.priceSar || b.basePriceSar) - (a.variants[0]?.priceSar || a.basePriceSar));
         } else if (sortOption === 'highest_rated') {
             result.sort((a, b) => b.rating - a.rating);
         }

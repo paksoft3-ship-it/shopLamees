@@ -29,14 +29,14 @@ export default function CheckoutPage() {
                 items: items.map(item => ({
                     item_id: item.variantId,
                     item_name: item.name,
-                    price: item.price,
+                    price: item.unitPrice,
                     quantity: item.quantity
                 }))
             });
         }
     }, []);
 
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
     const vat = Math.round(subtotal * 0.05);
     const total = subtotal + vat;
     // const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -119,7 +119,7 @@ export default function CheckoutPage() {
                                                 )}
                                             </div>
                                             <p className="font-bold text-sm font-display">
-                                                {formatPrice(item.price * item.quantity, currency, locale)}
+                                                {formatPrice(item.unitPrice * item.quantity, currency, locale)}
                                             </p>
                                         </div>
                                     </div>

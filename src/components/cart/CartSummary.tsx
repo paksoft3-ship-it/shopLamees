@@ -13,7 +13,7 @@ export function CartSummary() {
     const { format } = useFormattedMoney();
     const [coupon, setCoupon] = useState('');
 
-    const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const subtotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
     const vat = Math.round(subtotal * 0.15);
     const total = subtotal + vat;
 

@@ -3,16 +3,16 @@
 import { useLocale } from 'next-intl';
 import { useCartStore } from '@/lib/stores/cart';
 import { useFormattedMoney } from '@/lib/money';
-import { products } from '@/mock/products';
 import { Link } from '@/i18n/navigation';
 import { useEffect } from 'react';
+import { ProductDTO } from '@/lib/data/types';
 
 export function CartDrawer() {
     const locale = useLocale();
     const { items, isDrawerOpen, closeDrawer, removeItem, updateQuantity } = useCartStore();
     const { format } = useFormattedMoney();
 
-    const subtotal = items.reduce((total, item) => total + item.price * item.quantity, 0);
+    const subtotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
 
     // Free shipping threshold
@@ -37,9 +37,8 @@ export function CartDrawer() {
 
     if (!isDrawerOpen) return null;
 
-    // Cross-sell products (not already in cart)
-    const cartIds = items.map(i => i.id);
-    const crossSell = products.filter(p => !cartIds.includes(p.id) && p.availability !== false).slice(0, 3);
+    // TODO: Implement real cross-sell recommendations from DB
+    const crossSell: ProductDTO[] = [];
 
     return (
         <>
@@ -103,20 +102,20 @@ export function CartDrawer() {
                     ) : (
                         <ul className="-my-6 divide-y divide-border">
                             {items.map((item) => {
-                                const originalProduct = products.find(p => p.id === item.id);
-                                const productImage = item.image || originalProduct?.image || '';
+                                const productImage = item.image || '/placeholder.png';
+                                const productSlug = item.slug;
 
                                 return (
                                     <li key={item.variantId} className="flex py-6">
-                                        <div className="h-28 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-background-light">
+                                        <Link href={`/products/${productSlug}`} onClick={closeDrawer} className="h-28 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-background-light">
                                             {/* eslint-disable-next-line @next/next/no-img-element */}
                                             <img src={productImage} alt={item.name} className="h-full w-full object-cover object-center" />
-                                        </div>
+                                        </Link>
                                         <div className="mr-4 rtl:ml-4 rtl:mr-0 flex flex-1 flex-col font-kufi">
                                             <div>
                                                 <div className="flex justify-between text-base font-bold text-on-surface">
-                                                    <h3 className="leading-tight">{item.name}</h3>
-                                                    <p className="mr-4 font-display">{format(item.price)}</p>
+                                                    <Link href={`/products/${productSlug}`} onClick={closeDrawer} className="leading-tight">{item.name}</Link>
+                                                    <p className="mr-4 font-display">{format(item.unitPrice)}</p>
                                                 </div>
                                                 {item.size && (
                                                     <div className="flex items-center gap-1 mt-1 text-xs text-subtle">
@@ -125,6 +124,11 @@ export function CartDrawer() {
                                                     </div>
                                                 )}
                                             </div>
+
+                                            {/* Line total on mobile */}
+                                            <span className="text-base font-bold text-on-surface font-display sm:hidden">
+                                                {format(item.unitPrice * item.quantity)}
+                                            </span>
 
                                             <div className="mt-2 flex items-center gap-2 text-xs text-subtle">
                                                 {item.size && (
@@ -183,7 +187,9 @@ export function CartDrawer() {
                                                 <img src={p.image} alt={p.name[locale as 'ar' | 'en']} className="h-full w-full object-cover" />
                                             </div>
                                             <p className="text-xs text-on-surface font-medium truncate font-kufi">{p.name[locale as 'ar' | 'en']}</p>
-                                            <p className="text-xs font-bold font-display mt-0.5">{format(p.price)}</p>
+                                            <p className="text-primary font-bold text-lg mb-2 font-display">
+                                                {format(p.variants[0]?.priceSar || p.basePriceSar)}
+                                            </p>
                                         </div>
                                     ))}
                                 </div>

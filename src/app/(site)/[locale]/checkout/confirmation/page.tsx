@@ -14,7 +14,7 @@ export default function OrderConfirmationPage() {
     const { items } = useCartStore();
     const { currency } = usePrefsStore();
 
-    const subtotal = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
     const vat = Math.round(subtotal * 0.05);
     const total = subtotal + vat;
 
@@ -31,7 +31,7 @@ export default function OrderConfirmationPage() {
                 items: items.map(item => ({
                     item_id: item.variantId,
                     item_name: item.name,
-                    price: item.price,
+                    price: item.unitPrice,
                     quantity: item.quantity
                 }))
             });
@@ -100,7 +100,7 @@ export default function OrderConfirmationPage() {
                                         </div>
                                         <div className="text-end">
                                             <span className="font-bold text-sm text-slate-900 font-display">
-                                                {formatPrice(item.price * item.quantity, currency, locale)}
+                                                {formatPrice(item.unitPrice * item.quantity, currency, locale)}
                                             </span>
                                         </div>
                                     </div>

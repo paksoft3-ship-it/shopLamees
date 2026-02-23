@@ -4,12 +4,16 @@ import { persist } from 'zustand/middleware';
 export type CartItem = {
     id: string;
     variantId: string;
+    productId: string;
+    slug: string;
     name: string;
-    price: number;
+    unitPrice: number;
+    currency: string;
     quantity: number;
     image?: string;
     size?: string;
     cut?: string;
+    color?: string;
     note?: string;
 };
 

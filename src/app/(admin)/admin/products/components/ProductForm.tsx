@@ -1,7 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import { upload } from '@vercel/blob/client';
 import { AdminProduct, ProductStatus, useAdminProducts } from '@/lib/stores/adminProducts';
 
 interface ProductFormProps {
@@ -33,6 +34,8 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
     });
 
     const [activeTab, setActiveTab] = useState('general');
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleChange = <K extends keyof AdminProduct>(field: K, value: AdminProduct[K]) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -45,6 +48,35 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
             addProduct(formData as Omit<AdminProduct, 'id' | 'createdAt' | 'updatedAt'>);
         }
         router.push(`/admin/products`);
+    };
+
+    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (!event.target.files?.length) return;
+
+        const file = event.target.files[0];
+        setUploading(true);
+
+        try {
+            const newBlob = await upload(file.name, file, {
+                access: 'public',
+                handleUploadUrl: '/api/upload',
+            });
+
+            const newImages = [...(formData.images || []), newBlob.url];
+            handleChange('images', newImages);
+        } catch (error) {
+            console.error('Error uploading image:', error);
+            alert('Failed to upload image. Please check your connection and configuration.');
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
+    const removeImage = (index: number) => {
+        const newImages = [...(formData.images || [])];
+        newImages.splice(index, 1);
+        handleChange('images', newImages);
     };
 
     const tabs = [
@@ -294,21 +326,41 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
 
                     {activeTab === 'images' && (
                         <div className="space-y-6">
-                            <div className="border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center text-center bg-gray-50 hover:bg-gray-100 transition-colors cursor-pointer">
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleUpload}
+                                accept="image/*"
+                                className="hidden"
+                            />
+
+                            <div
+                                onClick={() => !uploading && fileInputRef.current?.click()}
+                                className={`border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer ${uploading ? 'bg-gray-100 opacity-50 cursor-not-allowed' : 'bg-gray-50 hover:bg-gray-100'}`}
+                            >
                                 <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                                    <span className="material-symbols-outlined text-[24px]">cloud_upload</span>
+                                    <span className="material-symbols-outlined text-[24px]">
+                                        {uploading ? 'sync' : 'cloud_upload'}
+                                    </span>
                                 </div>
-                                <h4 className="font-bold text-gray-900">{isRtl ? 'انقر لرفع صور المنتج' : 'Click to upload product images'}</h4>
-                                <p className="text-sm text-gray-500 mt-1">PNG, JPG, أو WEBP (الحد الأقصى للتنزيل 2MB)</p>
+                                <h4 className="font-bold text-gray-900">
+                                    {uploading
+                                        ? (isRtl ? 'جاري الرفع...' : 'Uploading...')
+                                        : (isRtl ? 'انقر لرفع صور المنتج' : 'Click to upload product images')}
+                                </h4>
+                                <p className="text-sm text-gray-500 mt-1">PNG, JPG, أو WEBP (الحد الأقصى 4MB)</p>
                             </div>
 
                             {formData.images && formData.images.length > 0 && (
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                     {formData.images.map((img, idx) => (
-                                        <div key={idx} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-gray-200 group">
+                                        <div key={idx} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-gray-200 group bg-gray-50">
                                             <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
                                             <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-                                                <button className="p-2 bg-white text-gray-700 rounded-full hover:bg-red-50 hover:text-red-500">
+                                                <button
+                                                    onClick={() => removeImage(idx)}
+                                                    className="p-2 bg-white text-gray-700 rounded-full hover:bg-red-50 hover:text-red-500 transition-colors"
+                                                >
                                                     <span className="material-symbols-outlined text-[18px]">delete</span>
                                                 </button>
                                             </div>

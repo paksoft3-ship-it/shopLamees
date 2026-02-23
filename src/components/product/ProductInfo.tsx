@@ -6,57 +6,59 @@ import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { useFormattedMoney } from '@/lib/money';
 import { trackEvent } from '@/lib/tracking/track';
-import type { Product } from '@/mock/products';
+import { ProductDTO } from '@/lib/data/types';
 import { toast } from 'react-hot-toast';
 
-export function ProductInfo({ product }: { product: Product }) {
-    const locale = useLocale();
+interface ProductInfoProps {
+    product: ProductDTO;
+}
+
+export function ProductInfo({ product }: ProductInfoProps) {
+    const locale = useLocale() as 'ar' | 'en';
     const t = useTranslations('Product.Info');
     const { addItem } = useCartStore();
     const { currency } = usePrefsStore();
     const { format } = useFormattedMoney();
 
     const [quantity, setQuantity] = useState(1);
-    const [selectedSize, setSelectedSize] = useState('M');
+    const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'M');
     const [selectedCut, setSelectedCut] = useState('quarter');
 
-    const productName = typeof product.name === 'string'
-        ? product.name
-        : (product.name as Record<string, string>)[locale] || (product.name as Record<string, string>)['ar'];
-
-    const productBadge = product.badge
-        ? (typeof product.badge === 'string' ? product.badge : (product.badge as Record<string, string>)[locale])
-        : null;
-
-
+    const productName = product.name[locale];
+    const productPrice = product.variants[0]?.priceSar || product.basePriceSar;
+    const productBadge = product.badge;
 
     useEffect(() => {
         trackEvent('view_item', {
             product_id: product.id,
             product_name: productName,
-            value: product.price,
+            value: productPrice,
             currency,
         });
-    }, [product.id, productName, product.price, currency]);
+    }, [product.id, productName, productPrice, currency]);
 
     const handleAddToCart = () => {
         addItem({
             id: product.id,
+            productId: product.id,
             variantId: `${product.id}-${selectedSize}-${selectedCut}`,
+            slug: product.slug,
             name: productName,
-            price: product.price,
+            unitPrice: productPrice,
+            currency: currency,
             quantity,
             image: product.image,
             size: selectedSize,
             cut: selectedCut === 'quarter'
                 ? (locale === 'ar' ? 'ربع كلوش' : 'Quarter Cloche')
                 : (locale === 'ar' ? 'نص كلوش' : 'Half Cloche'),
+            color: product.color || undefined,
         });
         trackEvent('add_to_cart', {
             product_id: product.id,
             product_name: productName,
             quantity,
-            value: product.price * quantity,
+            value: productPrice * quantity,
             currency,
         });
         toast.success(locale === 'en' ? `${productName} added to cart!` : `تمت إضافة ${productName} للسلة بنجاح!`, {
@@ -86,16 +88,16 @@ export function ProductInfo({ product }: { product: Product }) {
                 <div className="flex flex-col md:flex-row md:items-end gap-2 md:gap-3 mb-4">
                     <div className="flex items-center gap-2">
                         <span className="text-2xl md:text-3xl font-bold text-[#0e1b12]">
-                            {format(product.price)}
+                            {format(productPrice)}
                         </span>
-                        {product.compareAtPrice && (
+                        {product.variants[0]?.priceSar < product.basePriceSar && (
                             <span className="text-lg text-[#9ca3af] line-through mb-1">
-                                {format(product.compareAtPrice)}
+                                {format(product.basePriceSar)}
                             </span>
                         )}
                         {productBadge && (
                             <span className="text-xs font-bold text-[#C5A059] border border-[#C5A059]/30 bg-[#C5A059]/10 px-2 py-1 rounded-md mb-1 font-display">
-                                {productBadge}
+                                {productBadge[locale]}
                             </span>
                         )}
                     </div>
@@ -127,7 +129,7 @@ export function ProductInfo({ product }: { product: Product }) {
                             </button>
                         </div>
                         <div className="grid grid-cols-4 gap-2">
-                            {['S', 'M', 'L', 'XL'].map((size) => (
+                            {(product.sizes && product.sizes.length > 0 ? product.sizes : ['52', '54', '56', '58']).map((size) => (
                                 <label key={size} className="cursor-pointer">
                                     <input
                                         type="radio"
@@ -225,7 +227,7 @@ export function ProductInfo({ product }: { product: Product }) {
                     {/* Quantity */}
                     <div className="w-32 h-14 relative flex items-center rounded-lg border border-[#d1d5db]">
                         <button
-                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                            onClick={() => setQuantity(quantity + 1)}
                             className="w-10 h-full flex items-center justify-center text-[#6b7280] hover:bg-[#f9fafb] rounded-r-lg"
                         >
                             <span className="material-symbols-outlined text-[18px]">add</span>
@@ -271,7 +273,7 @@ export function ProductInfo({ product }: { product: Product }) {
                         <div className="flex flex-col items-end shrink-0 min-w-[80px]">
                             <span className="text-[10px] text-subtle font-kufi uppercase">الإجمالي</span>
                             <span className="text-xl font-bold text-on-surface leading-tight">
-                                {format(product.price * quantity)}
+                                {format(productPrice * quantity)}
                             </span>
                         </div>
                     </div>

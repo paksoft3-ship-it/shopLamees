@@ -1,6 +1,7 @@
 import { useTranslations } from 'next-intl';
+import { ProductDTO } from '@/lib/data/types';
 
-export function ProductSpecs() {
+export function ProductSpecs({ product }: { product: ProductDTO }) {
     const t = useTranslations('Product.Specs');
 
     return (
@@ -9,11 +10,11 @@ export function ProductSpecs() {
             <div className="space-y-4 font-cairo text-sm">
                 <div className="flex justify-between py-3 border-b border-[#f3f4f6]">
                     <span className="text-[#6b7280]">{t('fabric_label')}</span>
-                    <span className="font-bold text-[#0e1b12]">{t('fabric_value')}</span>
+                    <span className="font-bold text-[#0e1b12]">{product.fabric || t('fabric_value')}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-[#f3f4f6]">
                     <span className="text-[#6b7280]">{t('color_label')}</span>
-                    <span className="font-bold text-[#0e1b12]">{t('color_value')}</span>
+                    <span className="font-bold text-[#0e1b12]">{product.color || t('color_value')}</span>
                 </div>
                 <div className="flex justify-between py-3 border-b border-[#f3f4f6]">
                     <span className="text-[#6b7280]">{t('cut_label')}</span>

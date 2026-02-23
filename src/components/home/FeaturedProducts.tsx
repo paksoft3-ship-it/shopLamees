@@ -1,13 +1,15 @@
-'use client';
 import { useTranslations } from 'next-intl';
-import { products } from '@/mock/products';
 import { Link } from '@/i18n/navigation';
 import { ProductCard } from '@/components/product/ProductCard';
 import { ArrowRight } from 'lucide-react';
+import { ProductDTO } from '@/lib/data/types';
 
-export function FeaturedProducts() {
+interface FeaturedProductsProps {
+    products: ProductDTO[];
+}
+
+export function FeaturedProducts({ products }: FeaturedProductsProps) {
     const t = useTranslations('Home.FeaturedProducts');
-    const featured = products.slice(0, 4);
 
     return (
         <section className="py-16 lg:py-24">
@@ -23,7 +25,7 @@ export function FeaturedProducts() {
                     </Link>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {featured.map((prod) => (
+                    {products.slice(0, 4).map((prod) => (
                         <ProductCard key={prod.id} product={prod} />
                     ))}
                 </div>
