@@ -162,5 +162,11 @@
         "proceed_checkout": "Proceed to Checkout",
         "remove": "Remove",
         "add_note": "Add an order note"
+    },
+    "Latest": {
+        "home": "Home",
+        "title": "Latest Products",
+        "subtitle": "Discover our newest designs, freshly arrived",
+        "load_more": "Load More"
     }
 }
