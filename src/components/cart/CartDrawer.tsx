@@ -1,7 +1,7 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
-import { useCartStore, CartItem } from '@/lib/stores/cart';
+import { useLocale } from 'next-intl';
+import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { products } from '@/mock/products';
 import { Link } from '@/i18n/navigation';

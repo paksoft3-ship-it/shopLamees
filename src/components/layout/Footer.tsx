@@ -68,12 +68,20 @@ export function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-sm text-gray-500 text-center md:text-right">{t('copyright')}</p>
-                    <div className="flex items-center gap-2 text-gray-500 text-sm">
-                        <CreditCard className="w-5 h-5" />
-                        <Banknote className="w-5 h-5" />
-                    </div>
+                <div className="border-t border-gray-800 pt-8 flex flex-col items-center gap-3 text-gray-500 text-sm">
+                    <p className="text-center">&copy; {new Date().getFullYear()} {t('brand_name')}. {t('copyright')}</p>
+                    <a
+                        href="https://paksoft.com.tr"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1.5 group"
+                    >
+                        <span className="text-gray-500 group-hover:text-primary transition-colors">Developed by</span>
+                        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 -rotate-12 text-primary group-hover:text-primary/80 transition-colors">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.85 0 3.58-.5 5.08-1.38-.7.13-1.42.21-2.16.21-5.52 0-10-4.48-10-10S9.42 2.83 14.92 2.83c.74 0 1.46.08 2.16.21C15.58 2.5 13.85 2 12 2z" />
+                        </svg>
+                        <span className="font-bold text-base tracking-wide text-primary group-hover:text-primary/80 transition-colors">PakSoft</span>
+                    </a>
                 </div>
             </div>
         </footer>
