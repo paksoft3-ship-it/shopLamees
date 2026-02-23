@@ -32,7 +32,9 @@ export function Footer() {
                         <h4 className="font-display font-bold text-lg mb-6 text-white">{t('quick_links')}</h4>
                         <ul className="space-y-3">
                             <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/about">{t('about')}</Link></li>
-                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/refund">{t('refund_policy')}</Link></li>
+                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/return-policy">{t('refund_policy')}</Link></li>
+                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/privacy-policy">{t('privacy_policy')}</Link></li>
+                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/terms">{t('terms')}</Link></li>
                             <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/size-guide">{t('size_guide')}</Link></li>
                             <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/shipping">{t('shipping')}</Link></li>
                             <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/faq">{t('faq')}</Link></li>
