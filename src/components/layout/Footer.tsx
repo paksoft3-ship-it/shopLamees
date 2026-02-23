@@ -79,7 +79,7 @@ export function Footer() {
                         rel="noopener noreferrer"
                         className="inline-flex items-center gap-1 group"
                     >
-                        <span className="group-hover:text-primary transition-colors">Developed by</span>
+                        <span className="group-hover:text-primary transition-colors">{t('developed_by')}</span>
                         <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 -rotate-12 text-primary">
                             <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10c1.85 0 3.58-.5 5.08-1.38-.7.13-1.42.21-2.16.21-5.52 0-10-4.48-10-10S9.42 2.83 14.92 2.83c.74 0 1.46.08 2.16.21C15.58 2.5 13.85 2 12 2z" />
                         </svg>
@@ -87,10 +87,25 @@ export function Footer() {
                     </a>
 
                     {/* Right: Payment Icons */}
-                    <div className="flex items-center gap-3 grayscale opacity-60">
-                        <img alt="Visa" className="h-5 object-contain" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/5e/Visa_Inc._logo.svg/2000px-Visa_Inc._logo.svg.png" />
-                        <img alt="Mastercard" className="h-5 object-contain" src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1000px-Mastercard-logo.svg.png" />
-                        <img alt="Apple Pay" className="h-5 object-contain" src="https://upload.wikimedia.org/wikipedia/ar/thumb/a/ab/Apple_Pay_logo.svg/2560px-Apple_Pay_logo.svg.png" />
+                    <div className="flex items-center gap-3 opacity-50">
+                        {/* Visa */}
+                        <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="32" rx="4" fill="#fff" />
+                            <path d="M19.5 21h-2.7l1.7-10.5h2.7L19.5 21zm11.1-10.2c-.5-.2-1.4-.4-2.4-.4-2.7 0-4.5 1.4-4.5 3.4 0 1.5 1.4 2.3 2.4 2.8 1 .5 1.4.8 1.4 1.3 0 .7-.8 1-1.6 1-1.1 0-1.6-.2-2.5-.5l-.3-.2-.4 2.2c.6.3 1.8.5 3 .5 2.8 0 4.7-1.4 4.7-3.5 0-1.2-.7-2-2.3-2.8-.9-.5-1.5-.8-1.5-1.3 0-.4.5-.9 1.5-.9.9 0 1.5.2 2 .4l.2.1.3-2.1zm6.8-.3h-2.1c-.6 0-1.1.2-1.4.8L30 21h2.8l.6-1.5h3.5l.3 1.5H40l-2.3-10.5h-2.3zm-2.5 6.8l1.1-3 .3-.8.2.7.6 3.1h-2.2zM16.3 10.5L13.6 18l-.3-1.4c-.5-1.7-2.1-3.6-3.8-4.5l2.4 8.9h2.9l4.3-10.5h-2.8z" fill="#1A1F71" />
+                            <path d="M11.5 10.5H7.1l0 .2c3.4.9 5.6 2.9 6.5 5.4l-.9-4.7c-.2-.7-.7-.9-1.2-.9z" fill="#F9A533" />
+                        </svg>
+                        {/* Mastercard */}
+                        <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="32" rx="4" fill="#fff" />
+                            <circle cx="19" cy="16" r="8" fill="#EB001B" />
+                            <circle cx="29" cy="16" r="8" fill="#F79E1B" />
+                            <path d="M24 9.8a8 8 0 0 1 0 12.4 8 8 0 0 1 0-12.4z" fill="#FF5F00" />
+                        </svg>
+                        {/* Apple Pay */}
+                        <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="48" height="32" rx="4" fill="#fff" />
+                            <path d="M16.2 11.5c-.6.7-1.5 1.2-2.4 1.1-.1-.9.3-1.9.9-2.5.6-.7 1.6-1.2 2.3-1.2.1 1-.3 1.9-.8 2.6zm.8 1.3c-1.3-.1-2.5.8-3.1.8-.6 0-1.6-.7-2.7-.7-1.4 0-2.7.8-3.4 2.1-1.4 2.5-.4 6.2 1 8.2.7 1 1.5 2.1 2.6 2 1-.1 1.4-.7 2.7-.7 1.2 0 1.6.7 2.7.7 1.1 0 1.8-.9 2.5-2 .8-1.1 1.1-2.2 1.1-2.3 0 0-2.2-.8-2.2-3.2 0-2 1.6-3 1.7-3-1-1.4-2.4-1.6-2.9-1.6zm10.5-1.3v11.8h1.8v-4h2.5c2.3 0 3.9-1.6 3.9-3.9s-1.6-3.9-3.9-3.9h-4.3zm1.8 1.5h2.1c1.6 0 2.5.8 2.5 2.4s-.9 2.4-2.5 2.4h-2.1v-4.8z" fill="#000" />
+                        </svg>
                     </div>
                 </div>
             </div>
