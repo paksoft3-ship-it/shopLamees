@@ -70,9 +70,9 @@ export function Header() {
                     {/* Desktop Right Icons */}
                     <div className="hidden lg:flex items-center gap-4">
                         <LocaleSwitcher />
-                        <button className="p-2 text-slate-900 hover:text-primary transition-colors">
+                        <Link href="/search" className="p-2 text-slate-900 hover:text-primary transition-colors">
                             <Search className="w-6 h-6" />
-                        </button>
+                        </Link>
                         <div className="relative">
                             <Link href="/cart" className="p-2 text-slate-900 hover:text-primary transition-colors inline-block">
                                 <ShoppingBag className="w-6 h-6" />

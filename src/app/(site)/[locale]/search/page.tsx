@@ -1,1 +1,234 @@
-export default function Page() { return <div className="p-8 text-center text-xl font-heading flex flex-col items-center justify-center flex-1 h-full min-h-[50vh]">Coming soon: search</div>; }
+'use client';
+
+import { useState, useMemo, useEffect, useRef } from 'react';
+import { useTranslations, useLocale } from 'next-intl';
+import { useSearchParams } from 'next/navigation';
+import { Link } from '@/i18n/navigation';
+import { products } from '@/mock/products';
+import { ProductCard } from '@/components/product/ProductCard';
+
+type SortOption = 'relevance' | 'price_low' | 'price_high' | 'rating';
+
+export default function SearchPage() {
+    const t = useTranslations('Search');
+    const locale = useLocale() as 'ar' | 'en';
+    const searchParams = useSearchParams();
+    const initialQuery = searchParams.get('q') || '';
+
+    const [query, setQuery] = useState(initialQuery);
+    const [sortOption, setSortOption] = useState<SortOption>('relevance');
+    const [isSortOpen, setIsSortOpen] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const sortRef = useRef<HTMLDivElement>(null);
+
+    const suggestions = locale === 'ar'
+        ? ['عباية', 'نقاب', 'طرحة', 'كريب', 'حرير']
+        : ['Abaya', 'Niqab', 'Scarf', 'Crepe', 'Silk'];
+
+    const sortLabels: Record<SortOption, string> = {
+        relevance: locale === 'ar' ? 'الأكثر تطابقاً' : 'Most Relevant',
+        price_low: locale === 'ar' ? 'السعر: من الأقل' : 'Price: Low to High',
+        price_high: locale === 'ar' ? 'السعر: من الأعلى' : 'Price: High to Low',
+        rating: locale === 'ar' ? 'الأعلى تقييماً' : 'Highest Rated',
+    };
+
+    // Close sort on outside click
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+            if (sortRef.current && !sortRef.current.contains(e.target as Node)) setIsSortOpen(false);
+        };
+        document.addEventListener('mousedown', handleClick);
+        return () => document.removeEventListener('mousedown', handleClick);
+    }, []);
+
+    // Filter products by query
+    const results = useMemo(() => {
+        if (!query.trim()) return [];
+        const q = query.toLowerCase().trim();
+        return products.filter(
+            (p) =>
+                p.name.ar.includes(q) ||
+                p.name.en.toLowerCase().includes(q) ||
+                p.description.ar.includes(q) ||
+                p.description.en.toLowerCase().includes(q) ||
+                (p.fabric && p.fabric.toLowerCase().includes(q)) ||
+                (p.color && p.color.toLowerCase().includes(q))
+        );
+    }, [query]);
+
+    // Sort filtered results
+    const sorted = useMemo(() => {
+        const list = [...results];
+        switch (sortOption) {
+            case 'price_low': return list.sort((a, b) => a.price - b.price);
+            case 'price_high': return list.sort((a, b) => b.price - a.price);
+            case 'rating': return list.sort((a, b) => b.rating - a.rating);
+            default: return list;
+        }
+    }, [results, sortOption]);
+
+    const hasResults = sorted.length > 0;
+    const hasQuery = query.trim().length > 0;
+
+    return (
+        <section className="bg-[#FBF7F2] min-h-screen">
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+                {/* Search Input */}
+                <div className="w-full max-w-3xl mx-auto mb-10">
+                    <div className="relative flex items-center bg-white h-14 w-full border border-slate-200 rounded-xl shadow-sm focus-within:shadow-md focus-within:border-primary/30 transition-all px-4">
+                        <span className="material-symbols-outlined text-primary text-2xl ltr:mr-3 rtl:ml-3">search</span>
+                        <input
+                            ref={inputRef}
+                            type="text"
+                            value={query}
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder={t('placeholder')}
+                            className="w-full bg-transparent border-none focus:ring-0 text-lg font-medium text-slate-900 placeholder:text-slate-400 font-kufi"
+                        />
+                        {query && (
+                            <button
+                                onClick={() => { setQuery(''); inputRef.current?.focus(); }}
+                                className="text-slate-400 hover:text-primary transition-colors p-2"
+                            >
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        )}
+                    </div>
+                </div>
+
+                {/* Results State */}
+                {hasQuery && hasResults && (
+                    <>
+                        {/* Results Header */}
+                        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold text-slate-900 font-kufi mb-1">
+                                    {t('results_for')} <span className="text-primary">{query}</span>
+                                </h1>
+                                <p className="text-slate-500 font-kufi">{sorted.length} {locale === 'ar' ? 'منتج' : 'products'}</p>
+                            </div>
+
+                            {/* Sort */}
+                            <div ref={sortRef} className="relative min-w-[200px]">
+                                <button
+                                    onClick={() => setIsSortOpen(!isSortOpen)}
+                                    className="flex items-center justify-between w-full px-4 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-medium text-slate-900 hover:border-primary transition-all font-kufi"
+                                >
+                                    <span>{locale === 'ar' ? 'ترتيب: ' : 'Sort: '}{sortLabels[sortOption]}</span>
+                                    <span className={`material-symbols-outlined text-slate-500 transition-transform ${isSortOpen ? 'rotate-180' : ''}`}>expand_more</span>
+                                </button>
+                                {isSortOpen && (
+                                    <div className="absolute left-0 right-0 mt-1 bg-white border border-slate-200 rounded-lg shadow-lg z-20 overflow-hidden">
+                                        {(Object.keys(sortLabels) as SortOption[]).map((opt) => (
+                                            <button
+                                                key={opt}
+                                                onClick={() => { setSortOption(opt); setIsSortOpen(false); }}
+                                                className={`w-full text-start px-4 py-2.5 text-sm hover:bg-slate-50 hover:text-primary transition-colors font-kufi ${sortOption === opt ? 'text-primary bg-slate-50 font-bold' : 'text-slate-700'}`}
+                                            >
+                                                {sortLabels[opt]}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+
+                        {/* Product Grid */}
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                            {sorted.map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    </>
+                )}
+
+                {/* Empty State */}
+                {hasQuery && !hasResults && (
+                    <div className="flex flex-col items-center justify-center text-center py-16 max-w-md mx-auto">
+                        {/* Illustration */}
+                        <div className="relative mb-8">
+                            <div className="absolute -inset-4 bg-primary/5 rounded-full blur-2xl" />
+                            <div className="relative bg-white p-8 rounded-full shadow-sm border border-slate-100">
+                                <span className="material-symbols-outlined text-6xl text-slate-200">styler</span>
+                            </div>
+                            <div className="absolute -bottom-2 -right-2 bg-white p-2 rounded-full shadow-sm border border-slate-100">
+                                <span className="material-symbols-outlined text-2xl text-primary">search_off</span>
+                            </div>
+                        </div>
+
+                        <h2 className="text-xl font-bold text-slate-900 font-kufi mb-2">{t('no_results')}</h2>
+                        <p className="text-sm text-slate-500 font-kufi leading-relaxed mb-8 max-w-xs">{t('no_results_hint')}</p>
+
+                        {/* Suggestion Chips */}
+                        <div className="w-full mb-8">
+                            <p className="text-xs font-bold text-slate-500 mb-3 font-kufi">{t('popular')}</p>
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {suggestions.map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setQuery(s)}
+                                        className="px-5 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-full hover:border-primary hover:text-primary transition-colors font-kufi"
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <Link
+                            href="/"
+                            className="bg-slate-900 text-white font-bold py-3 px-10 rounded-full hover:bg-slate-800 transition-all flex items-center gap-2 font-kufi"
+                        >
+                            <span>{t('back_home')}</span>
+                            <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_back</span>
+                        </Link>
+                    </div>
+                )}
+
+                {/* Initial State — no query yet */}
+                {!hasQuery && (
+                    <div className="flex flex-col items-center justify-center text-center py-16 max-w-md mx-auto">
+                        <span className="material-symbols-outlined text-6xl text-slate-200 mb-4">search</span>
+                        <h2 className="text-xl font-bold text-slate-900 font-kufi mb-2">{t('start_searching')}</h2>
+                        <p className="text-sm text-slate-500 font-kufi mb-8">{t('start_hint')}</p>
+
+                        {/* Suggestions */}
+                        <div className="w-full">
+                            <p className="text-xs font-bold text-slate-500 mb-3 font-kufi">{t('popular')}</p>
+                            <div className="flex flex-wrap justify-center gap-2">
+                                {suggestions.map((s) => (
+                                    <button
+                                        key={s}
+                                        onClick={() => setQuery(s)}
+                                        className="px-5 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-medium rounded-full hover:border-primary hover:text-primary transition-colors font-kufi"
+                                    >
+                                        {s}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Recommendations (shown on empty/initial states) */}
+                {(!hasResults || !hasQuery) && (
+                    <div className="mt-16 pt-12 border-t border-slate-200">
+                        <div className="flex items-center justify-between mb-8">
+                            <h3 className="text-xl md:text-2xl font-bold text-slate-900 font-kufi">{t('you_may_like')}</h3>
+                            <Link href="/category/all" className="text-sm font-bold text-primary hover:text-primary/80 flex items-center gap-1 transition-colors font-kufi">
+                                {t('view_all')}
+                                <span className="material-symbols-outlined text-sm rtl:rotate-180">arrow_forward</span>
+                            </Link>
+                        </div>
+                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+                            {products.slice(0, 4).map((product) => (
+                                <ProductCard key={product.id} product={product} />
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </div>
+        </section>
+    );
+}

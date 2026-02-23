@@ -168,5 +168,17 @@
         "title": "Latest Products",
         "subtitle": "Discover our newest designs, freshly arrived",
         "load_more": "Load More"
+    },
+    "Search": {
+        "placeholder": "Search for a product...",
+        "results_for": "Search results for:",
+        "no_results": "No results found",
+        "no_results_hint": "Try different keywords or check the spelling",
+        "popular": "Popular searches:",
+        "start_searching": "Start searching",
+        "start_hint": "Search by product name, fabric, or color",
+        "back_home": "Back to Home",
+        "you_may_like": "You may also like",
+        "view_all": "View All"
     }
 }
