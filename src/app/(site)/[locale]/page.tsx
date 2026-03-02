@@ -1,6 +1,8 @@
 import { Hero } from "@/components/home/Hero";
 import { CategoriesRow } from "@/components/home/CategoriesRow";
 import { FeaturedProducts } from "@/components/home/FeaturedProducts";
+import { Lookbook } from "@/components/home/Lookbook";
+import { VideoShowcase } from "@/components/home/VideoShowcase";
 import { ValueProps } from "@/components/home/ValueProps";
 import { Newsletter } from "@/components/home/Newsletter";
 import { getCategories, getFeaturedProducts } from "@/lib/data/catalog";
@@ -20,6 +22,8 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             <Hero />
             <CategoriesRow categories={categories} />
             <FeaturedProducts products={featuredProducts} />
+            <Lookbook />
+            <VideoShowcase />
             <ValueProps />
             <Newsletter />
         </>

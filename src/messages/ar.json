@@ -101,6 +101,19 @@
                 "developed_by": "تم التطوير بواسطة",
                 "copyright": "جميع الحقوق محفوظة"
             }
+        },
+        "Lookbook": {
+            "title": "مجموعتنا",
+            "subtitle": "عبايات مصنوعة يدوياً بتفاصيل دانتيل رائعة",
+            "shop_collection": "تسوقي المجموعة"
+        },
+        "VideoShowcase": {
+            "title": "شاهديها في الحركة",
+            "subtitle": "اكتشفي عباياتنا بشكل حي",
+            "shop_now": "تسوقي الآن",
+            "video_detail": "تفاصيل الدانتيل",
+            "video_collection": "الإطلالة الكاملة",
+            "video_style": "بأناقة"
         }
     },
     "Product": {

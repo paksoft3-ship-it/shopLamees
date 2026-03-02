@@ -101,6 +101,19 @@
                 "developed_by": "Developed by",
                 "copyright": "All Rights Reserved"
             }
+        },
+        "Lookbook": {
+            "title": "Our Collection",
+            "subtitle": "Handcrafted abayas with exquisite lace detailing",
+            "shop_collection": "Shop Collection"
+        },
+        "VideoShowcase": {
+            "title": "See It in Motion",
+            "subtitle": "Watch our abayas come to life",
+            "shop_now": "Shop Now",
+            "video_detail": "Lace Detail",
+            "video_collection": "Full Look",
+            "video_style": "In Style"
         }
     },
     "Product": {
