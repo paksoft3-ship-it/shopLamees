@@ -2,32 +2,14 @@
 
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { ArrowRight, Play } from 'lucide-react';
+import { ArrowRight, Play, Pause } from 'lucide-react';
 import { useRef, useState } from 'react';
-
-const videos = [
-    {
-        src: '/videos/video-3.mp4',
-        poster: '/videos/posters/video-3.jpg',
-        labelKey: 'video_detail',
-    },
-    {
-        src: '/videos/video-4.mp4',
-        poster: '/videos/posters/video-4.jpg',
-        labelKey: 'video_collection',
-    },
-    {
-        src: '/videos/video-5.mp4',
-        poster: '/videos/posters/video-5.jpg',
-        labelKey: 'video_style',
-    },
-];
 
 function VideoCard({ src, poster, label }: { src: string; poster: string; label: string }) {
     const ref = useRef<HTMLVideoElement>(null);
     const [playing, setPlaying] = useState(false);
 
-    const handlePlay = () => {
+    const handleClick = () => {
         if (!playing) {
             ref.current?.play();
             setPlaying(true);
@@ -38,7 +20,10 @@ function VideoCard({ src, poster, label }: { src: string; poster: string; label:
     };
 
     return (
-        <div className="relative rounded-2xl overflow-hidden aspect-video group cursor-pointer border border-border shadow-soft" onClick={handlePlay}>
+        <div
+            className="relative rounded-2xl overflow-hidden aspect-[9/16] group cursor-pointer border border-border shadow-soft bg-black"
+            onClick={handleClick}
+        >
             <video
                 ref={ref}
                 src={src}
@@ -46,17 +31,24 @@ function VideoCard({ src, poster, label }: { src: string; poster: string; label:
                 loop
                 muted
                 playsInline
-                preload="none"
+                preload="metadata"
                 className="w-full h-full object-cover"
             />
+
             {/* Overlay */}
-            <div className={`absolute inset-0 bg-black/30 flex items-center justify-center transition-opacity duration-300 ${playing ? 'opacity-0 group-hover:opacity-100' : 'opacity-100'}`}>
-                <div className="w-14 h-14 rounded-full bg-surface/80 backdrop-blur flex items-center justify-center border border-border/50 shadow-card">
-                    <Play className="w-6 h-6 text-on-surface fill-on-surface" />
+            <div className={`absolute inset-0 flex items-center justify-center transition-all duration-300
+                ${playing ? 'bg-black/0 opacity-0 group-hover:opacity-100 group-hover:bg-black/20' : 'bg-black/30'}`}
+            >
+                <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 flex items-center justify-center shadow-lg transition-transform duration-200 group-hover:scale-110">
+                    {playing
+                        ? <Pause className="w-7 h-7 text-white fill-white" />
+                        : <Play className="w-7 h-7 text-white fill-white translate-x-0.5" />
+                    }
                 </div>
             </div>
+
             {/* Label */}
-            <div className="absolute bottom-4 ltr:left-4 rtl:right-4 bg-surface/80 backdrop-blur px-3 py-1.5 rounded-full text-xs font-bold text-on-surface border border-border/30">
+            <div className="absolute bottom-4 ltr:left-4 rtl:right-4 bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full text-white text-xs font-semibold border border-white/20">
                 {label}
             </div>
         </div>
@@ -80,10 +72,20 @@ export function VideoShowcase() {
                     </Link>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {videos.map((v) => (
-                        <VideoCard key={v.src} src={v.src} poster={v.poster} label={t(v.labelKey)} />
-                    ))}
+                {/* 3-column portrait grid — 9:16 cards match the video format exactly */}
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                    <VideoCard src="/videos/video-1.mp4"  poster="/videos/posters/video-1.jpg"  label={t('video_collection')} />
+                    <VideoCard src="/videos/video-2.mp4"  poster="/videos/posters/video-2.jpg"  label={t('video_style')} />
+                    <VideoCard src="/videos/video-3.mp4"  poster="/videos/posters/video-3.jpg"  label={t('video_detail')} />
+                    <VideoCard src="/videos/video-4.mp4"  poster="/videos/posters/video-4.jpg"  label={t('video_collection')} />
+                    <VideoCard src="/videos/video-5.mp4"  poster="/videos/posters/video-5.jpg"  label={t('video_style')} />
+                    <VideoCard src="/videos/video-6.mp4"  poster="/videos/posters/video-6.jpg"  label={t('video_detail')} />
+                    <VideoCard src="/videos/video-7.mp4"  poster="/videos/posters/video-7.jpg"  label={t('video_collection')} />
+                    <VideoCard src="/videos/video-8.mp4"  poster="/videos/posters/video-8.jpg"  label={t('video_style')} />
+                    <VideoCard src="/videos/video-9.mp4"  poster="/videos/posters/video-9.jpg"  label={t('video_detail')} />
+                    <VideoCard src="/videos/video-10.mp4" poster="/videos/posters/video-10.jpg" label={t('video_collection')} />
+                    <VideoCard src="/videos/video-11.mp4" poster="/videos/posters/video-11.jpg" label={t('video_style')} />
+                    <VideoCard src="/videos/video-12.mp4" poster="/videos/posters/video-12.jpg" label={t('video_detail')} />
                 </div>
             </div>
         </section>
