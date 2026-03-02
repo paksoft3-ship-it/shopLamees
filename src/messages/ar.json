@@ -26,7 +26,13 @@
             "categories": "التصنيفات",
             "about": "من نحن",
             "cart": "السلة",
-            "brand_name": "شوب لاميس"
+            "brand_name": "شوب لاميس",
+            "nav_all_abayas": "عبايات",
+            "nav_kraz_abaya": "عباية كرز",
+            "nav_dantel": "دانتيل",
+            "nav_eid": "كولكشن العيد",
+            "nav_winter": "تشكيلة الشتاء",
+            "nav_niqab": "نقاب"
         },
         "Hero": {
             "badge": "أفضل جودة في السوق",

@@ -28,11 +28,14 @@ export function Header() {
                 <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
 
                     {/* Desktop Navigation (Hidden on Mobile) */}
-                    <nav className="hidden lg:flex items-center gap-8">
+                    <nav className="hidden lg:flex items-center gap-6">
                         <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors" href="/">{t('home')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/latest">{t('latest_products')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/all">{t('categories')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/about">{t('about')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/dantel">{t('nav_dantel')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/eid-collection">{t('nav_eid')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/winter">{t('nav_winter')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/niqab">{t('nav_niqab')}</Link>
                     </nav>
 
                     {/* Mobile Left: Cart */}
@@ -116,10 +119,13 @@ export function Header() {
                         <div className="flex-1 overflow-y-auto py-4">
                             {[
                                 { href: '/', label: t('home'), icon: 'home' },
-                                { href: '/latest', label: t('latest_products'), icon: 'new_releases' },
-                                { href: '/category/all', label: t('categories'), icon: 'category' },
-                                { href: '/about', label: t('about'), icon: 'info' },
-                                { href: '/cart', label: t('cart') || 'Cart', icon: 'shopping_bag' },
+                                { href: '/category/all-abayas', label: t('nav_all_abayas'), icon: 'checkroom' },
+                                { href: '/category/kraz-abaya', label: t('nav_kraz_abaya'), icon: 'star' },
+                                { href: '/category/dantel', label: t('nav_dantel'), icon: 'texture' },
+                                { href: '/category/eid-collection', label: t('nav_eid'), icon: 'celebration' },
+                                { href: '/category/winter', label: t('nav_winter'), icon: 'ac_unit' },
+                                { href: '/category/niqab', label: t('nav_niqab'), icon: 'face' },
+                                { href: '/cart', label: t('cart'), icon: 'shopping_bag' },
                             ].map((link) => (
                                 <Link
                                     key={link.href}

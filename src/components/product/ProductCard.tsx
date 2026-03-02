@@ -1,3 +1,4 @@
+'use client';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
