@@ -1,5 +1,6 @@
 import { Link } from '@/i18n/navigation';
-import { MapPin, Smartphone, Mail, Diamond } from 'lucide-react';
+import { MapPin, Smartphone, Mail } from 'lucide-react';
+import Image from 'next/image';
 import { useTranslations } from 'next-intl';
 
 export function Footer() {
@@ -12,8 +13,7 @@ export function Footer() {
                     {/* Brand Info */}
                     <div>
                         <div className="flex items-center gap-2 mb-6">
-                            <Diamond className="text-primary w-8 h-8" />
-                            <h3 className="font-display text-2xl font-bold">{t('brand_name')}</h3>
+                            <Image src="/images/logo.png" alt={t('brand_name')} width={280} height={90} className="h-20 w-auto object-contain brightness-0 invert" />
                         </div>
                         <p className="text-gray-400 leading-relaxed mb-6">
                             {t('description')}

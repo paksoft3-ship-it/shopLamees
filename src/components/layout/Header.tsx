@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { Link } from '@/i18n/navigation';
-import { Menu, X, Search, ShoppingBag, Diamond } from 'lucide-react';
+import { Menu, X, Search, ShoppingBag } from 'lucide-react';
+import Image from 'next/image';
 import { useCartStore } from '@/lib/stores/cart';
 import { useTranslations } from 'next-intl';
 import { LocaleSwitcher } from './LocaleSwitcher';
@@ -25,17 +26,17 @@ export function Header() {
     return (
         <>
             <header className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-[#e5e0d8]">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-20 flex items-center justify-between">
+                <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-24 flex items-center justify-between relative">
 
                     {/* Desktop Navigation (Hidden on Mobile) */}
-                    <nav className="hidden lg:flex items-center gap-6">
-                        <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors" href="/">{t('home')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/dantel">{t('nav_dantel')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/eid-collection">{t('nav_eid')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/winter">{t('nav_winter')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors" href="/category/niqab">{t('nav_niqab')}</Link>
+                    <nav className="hidden lg:flex items-center gap-4 shrink-0">
+                        <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors whitespace-nowrap" href="/">{t('home')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/dantel">{t('nav_dantel')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/eid-collection">{t('nav_eid')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/winter">{t('nav_winter')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/niqab">{t('nav_niqab')}</Link>
                     </nav>
 
                     {/* Mobile Left: Cart */}
@@ -50,11 +51,10 @@ export function Header() {
                         )}
                     </div>
 
-                    {/* Center Logo */}
-                    <div className="flex-1 lg:flex-none flex justify-center lg:absolute lg:left-1/2 lg:-translate-x-1/2">
-                        <Link className="flex items-center gap-2" href="/">
-                            <Diamond className="text-primary w-6 h-6 lg:w-8 lg:h-8" />
-                            <h1 className="font-display text-lg lg:text-2xl font-bold tracking-tighter text-slate-900">{t('brand_name')}</h1>
+                    {/* Center Logo - Absolutely centered */}
+                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                        <Link className="flex items-center pointer-events-auto" href="/">
+                            <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-14 lg:h-20 w-auto object-contain" priority />
                         </Link>
                     </div>
 
@@ -104,8 +104,7 @@ export function Header() {
                         {/* Panel Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
                             <Link className="flex items-center gap-2" href="/" onClick={() => setMobileMenuOpen(false)}>
-                                <Diamond className="text-primary w-6 h-6" />
-                                <span className="font-display text-lg font-bold text-slate-900">{t('brand_name')}</span>
+                                <Image src="/images/logo.png" alt={t('brand_name')} width={160} height={48} className="h-10 w-auto object-contain" />
                             </Link>
                             <button
                                 onClick={() => setMobileMenuOpen(false)}
