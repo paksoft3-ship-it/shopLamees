@@ -252,7 +252,7 @@ export default function AdminDashboard() {
                         <Link href="/admin/products" className="text-xs font-bold text-accent-gold hover:text-accent-gold/80">{tc('view_all')}</Link>
                     </div>
                     <div className="flex flex-col gap-4 overflow-y-auto max-h-[300px] pr-1">
-                        {bestSellers.map((product, i) => (
+                        {bestSellers.map((product) => (
                             <div key={product.id} className="flex items-center justify-between border-b border-neutral-50 pb-3 last:border-0">
                                 <div className="flex items-center gap-3">
                                     <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-md bg-neutral-100">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 const seoPages = [
     { page: 'الرئيسية', path: '/', title: 'شوب لاميس - عبايات فاخرة من قطر', desc: 'اكتشفي أرقى العبايات والأزياء النسائية الفاخرة. شحن مجاني داخل قطر.', score: 92 },

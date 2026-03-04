@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 
 const initialCoupons = [
     { id: '1', code: 'EID2024', type: 'percent', discount: 20, minOrder: 200, maxUses: 200, used: 145, expires: '2024-06-30', active: true },

@@ -10,7 +10,6 @@ export default function AdminProductsPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
     const t = useTranslations('Admin.Products');
-    const tc = useTranslations('Admin.Common');
     const { products, updateProductStatus } = useAdminProducts();
 
     const [searchQuery, setSearchQuery] = useState('');
