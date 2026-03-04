@@ -50,6 +50,8 @@ export interface AdminOrder {
     shippingFee: number;
 }
 
+const CDN = 'https://cdn.salla.sa/DGwjPD/';
+
 const mockOrders: AdminOrder[] = [
     {
         id: '10234',
@@ -72,11 +74,11 @@ const mockOrders: AdminOrder[] = [
         items: [
             {
                 id: '1',
-                name: 'عباية حرير أسود فاخر',
-                sku: 'AB-001-BLK-M',
+                name: 'عباية كرز أسود',
+                sku: 'ABAYA-KRAZ-BLACK-M',
                 price: 450,
                 quantity: 1,
-                image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuDmX7G7BeRlHiVJ15_EvDT_2NNHfMxs6yjUUMs_XQaUE_TOCQuqH_sDeQwr4sB5OIfl9SnzdtbPF6UO8wVpFhj1ZD0QGyNmPj_-qYHvjKCNfBpVYIHVfTDhzj1jcvq8breoLjVxdoZKikilMS3YbBaFMkpsjHnIL1lH6X_Z2oBxxRMdcABnDyoydq4uuqTYt1rsOO3DbhsNQYoxnSEqbMXFfeAZqacZqFBWER_lVlT5HpzCanXHy_PC8H3hhxMGkUpCtRMs-oo2CBc',
+                image: `${CDN}a1ba197c-5a0b-463f-b801-3463a3b1906e-410x500-HN5TuleeuqGuLerFC34JzItYDxQ8saaA7sUiIthY.jpg`,
                 variant: 'المقاس: M | اللون: أسود'
             }
         ],
@@ -112,21 +114,21 @@ const mockOrders: AdminOrder[] = [
         items: [
             {
                 id: '2',
-                name: 'عباية كتان بيج صيفي',
-                sku: 'AB-005-BGE-L',
-                price: 380,
+                name: 'عباية كرز بيج',
+                sku: 'ABAYA-KRAZ-BEIGE-L',
+                price: 159,
                 quantity: 1,
-                image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuA8yId3hu9GA5qx4Ib27lKeLpSttOgDT5JUT-qQ8sefI6LNJuihqdmxjWdTANVxf2cnplwYR5ARU1nFntEoR-n26lYDMKCuXQfCJoK_-V09a2Yux83w03c99cAejrBkan7hhszSr3t2wPb9HH_AHjjvwbZuK9ooFgJpgNlB2Q5QAwH9t42huMUSTiJJodOr9gTVGjX2g2W_mstnWMjE3OqIYYHbf_Pv6ra8rAHMrC59E6DL9UsrOtqVrghAQCcCslTsfLPaZRBR2js',
+                image: `${CDN}576402a1-740a-4799-8df8-b5568af4c99f-375.87412587413x500-nmIJSN9UlZrALJ7OTpxWy937KktGtDpTLZQxDcag.jpg`,
                 variant: 'المقاس: L | اللون: بيج'
             },
             {
                 id: '3',
-                name: 'شيلة مطابقة',
-                sku: 'ACC-SH-001',
-                price: 80,
+                name: 'عباية الأنيقة دانتيل',
+                sku: 'ABAYA-ANEQA-DANTEL-M',
+                price: 179,
                 quantity: 1,
-                image: 'https://lh3.googleusercontent.com/aida-public/AB6AXuCnqn0IgIWac2y71__ctos30L0KlSqoAGXU9HQMW10v5x8_JbOCIB_nNYwB-YIQEDcF3u6px_EPbXS_FJUJ2hePUCzfW6nSlQr9erXNM6dtMZ9WTEgUk_3ud_VwpsM6LD42ICmfjsFggsYCsLGio2a_GCSRTAp2pZtVXuyYUZwnuUG_fl8vusG5iKWD6JvhVsAp3N6Mq-OheJSEjTRBZF4trO8dAX-4rQssdA4gatWS2VzfEDRCUOLcl687pOtbZXgSmLLbfE3oT3Q',
-                variant: 'المقاس: One Size | اللون: أسود'
+                image: `${CDN}a50cb699-82cb-401b-a755-b5d1de0e8c22-381.77940280317x500-gqZJcsKvQcHhrqEknzBolbiwp6uWQOvOx0HsMPwW.jpg`,
+                variant: 'المقاس: M | اللون: أسود'
             }
         ],
         timeline: [
@@ -218,6 +220,7 @@ export const useAdminOrders = create<AdminOrdersState>()(
         }),
         {
             name: 'admin-orders-storage',
+            version: 2,
         }
     )
 );

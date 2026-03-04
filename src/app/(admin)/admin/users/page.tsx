@@ -169,9 +169,9 @@ export default function AdminUsersPage() {
                                     <span className="material-symbols-outlined text-lg">edit_note</span>
                                 </div>
                                 <div className="flex flex-col pt-1">
-                                    <span className="text-sm font-medium text-gray-800">تحديث منتج #442</span>
-                                    <span className="text-xs text-gray-500 mt-0.5">سارة خليل قامت بتعديل السعر</span>
-                                    <span className="text-[10px] text-gray-400 mt-1">منذ 10 دقائق</span>
+                                    <span className="text-sm font-medium text-gray-800">{isRtl ? 'تحديث منتج #442' : 'Product #442 Updated'}</span>
+                                    <span className="text-xs text-gray-500 mt-0.5">{isRtl ? 'سارة خليل قامت بتعديل السعر' : 'Sara Khalil edited the price'}</span>
+                                    <span className="text-[10px] text-gray-400 mt-1">{isRtl ? 'منذ 10 دقائق' : '10 min ago'}</span>
                                 </div>
                             </div>
 
@@ -180,9 +180,9 @@ export default function AdminUsersPage() {
                                     <span className="material-symbols-outlined text-lg">person_add</span>
                                 </div>
                                 <div className="flex flex-col pt-1">
-                                    <span className="text-sm font-medium text-gray-800">موظف جديد</span>
-                                    <span className="text-xs text-gray-500 mt-0.5">أحمد الراشد أضاف &quot;فهد الحربي&quot;</span>
-                                    <span className="text-[10px] text-gray-400 mt-1">منذ ساعتين</span>
+                                    <span className="text-sm font-medium text-gray-800">{isRtl ? 'موظف جديد' : 'New Employee'}</span>
+                                    <span className="text-xs text-gray-500 mt-0.5">{isRtl ? 'أحمد الراشد أضاف "فهد الحربي"' : 'Ahmed Al-Rashid added "Fahad Al-Harbi"'}</span>
+                                    <span className="text-[10px] text-gray-400 mt-1">{isRtl ? 'منذ ساعتين' : '2 hours ago'}</span>
                                 </div>
                             </div>
 
@@ -191,9 +191,9 @@ export default function AdminUsersPage() {
                                     <span className="material-symbols-outlined text-lg">lock_reset</span>
                                 </div>
                                 <div className="flex flex-col pt-1">
-                                    <span className="text-sm font-medium text-gray-800">تغيير كلمة المرور</span>
-                                    <span className="text-xs text-gray-500 mt-0.5">نورة سعد طلبت إعادة تعيين</span>
-                                    <span className="text-[10px] text-gray-400 mt-1">منذ 5 ساعات</span>
+                                    <span className="text-sm font-medium text-gray-800">{isRtl ? 'تغيير كلمة المرور' : 'Password Changed'}</span>
+                                    <span className="text-xs text-gray-500 mt-0.5">{isRtl ? 'نورة سعد طلبت إعادة تعيين' : 'Noura Saad requested a reset'}</span>
+                                    <span className="text-[10px] text-gray-400 mt-1">{isRtl ? 'منذ 5 ساعات' : '5 hours ago'}</span>
                                 </div>
                             </div>
                         </div>

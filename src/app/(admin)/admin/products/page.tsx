@@ -3,12 +3,14 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAdminProducts, ProductStatus, AdminProduct, ProductVariant } from '@/lib/stores/adminProducts';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/lib/money';
 
 export default function AdminProductsPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
+    const t = useTranslations('Admin.Products');
+    const tc = useTranslations('Admin.Common');
     const { products, updateProductStatus } = useAdminProducts();
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -33,9 +35,9 @@ export default function AdminProductsPage() {
 
     const getStatusLabel = (status: ProductStatus) => {
         switch (status) {
-            case 'published': return 'منشور';
-            case 'draft': return 'مسودة';
-            case 'archived': return 'مؤرشف';
+            case 'published': return t('published');
+            case 'draft': return t('draft');
+            case 'archived': return t('archived');
             default: return status;
         }
     };
@@ -48,20 +50,20 @@ export default function AdminProductsPage() {
         <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">المنتجات</h1>
+                    <h1 className="text-3xl font-black text-gray-900 tracking-tight">{t('title')}</h1>
                     <p className="text-gray-500 mt-1 text-sm flex items-center gap-2">
-                        إدارة كتالوج المنتجات
-                        <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs font-bold">{products.length} منتج</span>
+                        {t('subtitle')}
+                        <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-xs font-bold">{products.length} {t('product_count')}</span>
                     </p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button className="flex items-center justify-center gap-2 px-4 h-10 rounded-xl bg-white border border-gray-200 text-gray-700 text-sm font-bold hover:bg-gray-50 transition-colors shadow-sm">
                         <span className="material-symbols-outlined text-[20px]">filter_list</span>
-                        <span className="hidden sm:inline">تصفية متقدمة</span>
+                        <span className="hidden sm:inline">{t('advanced_filter')}</span>
                     </button>
                     <Link href={`/${locale}/admin/products/new`} className="flex items-center justify-center gap-2 px-5 h-10 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
                         <span className="material-symbols-outlined text-[20px]">add</span>
-                        <span>إضافة منتج</span>
+                        <span>{t('add_product')}</span>
                     </Link>
                 </div>
             </div>
@@ -75,7 +77,7 @@ export default function AdminProductsPage() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className={`w-full h-11 ${isRtl ? 'pr-10 pl-4' : 'pl-10 pr-4'} rounded-xl border-gray-200 bg-gray-50 text-gray-900 text-sm focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all`}
-                            placeholder="بحث باسم المنتج، رمز SKU..."
+                            placeholder={t('search_placeholder')}
                             type="text"
                         />
                     </div>
@@ -85,10 +87,10 @@ export default function AdminProductsPage() {
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className={`appearance-none h-11 ${isRtl ? 'pr-4 pl-10' : 'pl-4 pr-10'} rounded-xl border-gray-200 bg-white text-gray-700 text-sm font-medium focus:ring-2 focus:ring-primary/50 focus:border-primary cursor-pointer min-w-[140px]`}>
-                                <option value="all">كل الحالات</option>
-                                <option value="published">منشور</option>
-                                <option value="draft">مسودة</option>
-                                <option value="archived">مؤرشف</option>
+                                <option value="all">{t('all_statuses')}</option>
+                                <option value="published">{t('published')}</option>
+                                <option value="draft">{t('draft')}</option>
+                                <option value="archived">{t('archived')}</option>
                             </select>
                             <span className={`absolute ${isRtl ? 'left-3' : 'right-3'} top-1/2 -trangray-y-1/2 text-gray-400 pointer-events-none material-symbols-outlined text-[20px]`}>expand_more</span>
                         </div>
@@ -105,12 +107,12 @@ export default function AdminProductsPage() {
                                 <th className="py-4 px-6 w-12">
                                     <input className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer" type="checkbox" />
                                 </th>
-                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-20">صورة</th>
-                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">اسم المنتج</th>
-                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">التصنيف</th>
-                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">السعر</th>
-                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">المخزون الإجمالي</th>
-                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">الحالة</th>
+                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-20">{t('image')}</th>
+                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{t('product_name')}</th>
+                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{t('category')}</th>
+                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{t('price')}</th>
+                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{t('total_stock')}</th>
+                                <th className="py-4 px-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">{t('status_label')}</th>
                                 <th className="py-4 px-6 w-16"></th>
                             </tr>
                         </thead>
@@ -159,7 +161,7 @@ export default function AdminProductsPage() {
                                                     <span className={`font-medium ${totalStock === 0 ? 'text-red-600' : totalStock < 10 ? 'text-orange-600' : 'text-gray-700'}`}>
                                                         {totalStock}
                                                     </span>
-                                                    <span className="text-gray-400 text-[10px]">{totalStock === 0 ? 'نفذت الكمية' : 'قطعة'}</span>
+                                                    <span className="text-gray-400 text-[10px]">{totalStock === 0 ? t('out_of_stock') : t('pieces')}</span>
                                                 </div>
                                                 <div className="w-full bg-gray-100 rounded-full h-1.5 overflow-hidden">
                                                     <div className={`${stockColor} h-1.5 rounded-full`} style={{ width: `${stockPercent}%` }}></div>
@@ -191,14 +193,14 @@ export default function AdminProductsPage() {
 
                     {filteredProducts.length === 0 && (
                         <div className="p-12 text-center text-gray-500">
-                            لا توجد منتجات تطابق بحثك.
+                            {t('no_products')}
                         </div>
                     )}
                 </div>
 
                 {/* Pagination */}
                 <div className="p-4 border-t border-gray-200 flex items-center justify-between">
-                    <span className="text-sm text-gray-500">عرض {filteredProducts.length} من {products.length} منتجات</span>
+                    <span className="text-sm text-gray-500">{t('showing')} {filteredProducts.length} {t('of')} {products.length}</span>
                     <div className="flex items-center gap-1">
                         <button className="flex items-center justify-center size-8 rounded-lg border border-gray-200 text-gray-400 hover:bg-gray-50 disabled:opacity-50 transition-colors">
                             <span className="material-symbols-outlined text-[18px]">chevron_right</span>
@@ -226,7 +228,7 @@ export default function AdminProductsPage() {
                                         <span className="material-symbols-outlined text-gray-400 w-full h-full justify-center flex items-center">image</span>
                                     )}
                                     {product.status === 'draft' && (
-                                        <span className="absolute top-1 right-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md">مسودة</span>
+                                        <span className="absolute top-1 right-1 bg-gray-100 text-gray-600 text-[10px] font-bold px-1.5 py-0.5 rounded-md">{t('draft')}</span>
                                     )}
                                 </div>
                                 <div className="flex-1 flex flex-col justify-between py-1">
@@ -245,7 +247,7 @@ export default function AdminProductsPage() {
                                         <div className="flex flex-col">
                                             <span className="text-gray-900 font-bold text-base">{formatMoney(product.price, locale as 'ar' | 'en')}</span>
                                             <span className={`text-xs font-medium ${totalStock === 0 ? 'text-red-500' : totalStock < 10 ? 'text-orange-500' : 'text-gray-500'}`}>
-                                                {totalStock} قطعة
+                                                {totalStock} {t('pieces')}
                                             </span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
@@ -266,7 +268,7 @@ export default function AdminProductsPage() {
 
                 {filteredProducts.length === 0 && (
                     <div className="p-8 text-center text-gray-500 bg-white rounded-2xl border border-gray-100">
-                        لا توجد منتجات تطابق بحثك.
+                        {t('no_products')}
                     </div>
                 )}
             </div>

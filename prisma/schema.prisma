@@ -231,7 +231,7 @@ model RolePermission {
 model StoreSettings {
   id              Int      @id @default(1)
   storeName       String   @default("Lamees")
-  whatsappNumber  String   @default("+966501234567")
+  whatsappNumber  String   @default("+97433114232")
   shippingQarQA   Decimal  @default(0) @db.Decimal(10, 2)
   shippingSarSA   Decimal  @default(0) @db.Decimal(10, 2)
   freeShipAbove   Decimal  @default(500) @db.Decimal(10, 2)

@@ -24,7 +24,7 @@ async function main() {
         create: {
             id: 1,
             storeName: 'Lamees',
-            whatsappNumber: '+966501234567',
+            whatsappNumber: '+97433114232',
             shippingQarQA: 0,
             shippingSarSA: 0,
             freeShipAbove: 500,

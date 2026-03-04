@@ -6,10 +6,8 @@ const notoSansArabic = Noto_Sans_Arabic({ subsets: ['arabic'], variable: '--font
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' });
 const manrope = Manrope({ subsets: ['latin'], variable: '--font-manrope' });
 
-
-import { NextIntlClientProvider } from 'next-intl';
-
 import arMessages from '../../../messages/ar.json';
+import enMessages from '../../../messages/en.json';
 
 export default function AdminLayout({
     children,
@@ -17,16 +15,14 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <html lang="ar" dir="rtl">
+        <html lang="ar" dir="rtl" suppressHydrationWarning>
             <head>
                 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
             </head>
-            <body className={`${notoSansArabic.variable} ${cairo.variable} ${manrope.variable} antialiased font-body bg-background-light text-on-surface`}>
-                <NextIntlClientProvider locale="ar" messages={arMessages}>
-                    <AdminLayoutClient>
-                        {children}
-                    </AdminLayoutClient>
-                </NextIntlClientProvider>
+            <body className={`${notoSansArabic.variable} ${cairo.variable} ${manrope.variable} antialiased font-body bg-background-light text-on-surface`} suppressHydrationWarning>
+                <AdminLayoutClient arMessages={arMessages} enMessages={enMessages}>
+                    {children}
+                </AdminLayoutClient>
             </body>
         </html>
     );

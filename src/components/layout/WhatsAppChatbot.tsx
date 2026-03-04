@@ -37,7 +37,7 @@ export function WhatsAppChatbot() {
             {/* Dedicated WhatsApp Button (from Mobile Reference) */}
             <Link
                 className="fixed bottom-24 lg:bottom-6 rtl:left-6 ltr:right-6 z-50 bg-[#25D366] text-white p-3 lg:p-4 rounded-full shadow-lg hover:bg-[#128C7E] transition-all hover:scale-110 flex items-center justify-center"
-                href="https://wa.me/966501234567"
+                href="https://wa.me/97433114232"
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => trackEvent('whatsapp_click')}

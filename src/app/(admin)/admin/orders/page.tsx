@@ -3,12 +3,14 @@
 import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import { useAdminOrders, OrderStatus } from '@/lib/stores/adminOrders';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/lib/money';
 
 export default function AdminOrdersPage() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
+    const t = useTranslations('Admin.Orders');
+    const tc = useTranslations('Admin.Common');
     const orders = useAdminOrders((state) => state.orders);
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -66,11 +68,11 @@ export default function AdminOrdersPage() {
 
     const getStatusLabel = (status: OrderStatus) => {
         switch (status) {
-            case 'pending': return 'بانتظار الدفع';
-            case 'processing': return 'جاري التجهيز';
-            case 'shipped': return 'تم الشحن';
-            case 'completed': return 'مكتمل';
-            case 'cancelled': return 'ملغي';
+            case 'pending': return t('pending');
+            case 'processing': return t('processing');
+            case 'shipped': return t('shipped');
+            case 'completed': return t('completed');
+            case 'cancelled': return t('cancelled');
             default: return status;
         }
     };
@@ -79,19 +81,19 @@ export default function AdminOrdersPage() {
         <div className="flex-1 overflow-y-auto p-4 md:p-8 space-y-6">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">إدارة الطلبات</h1>
-                    <p className="text-slate-500 mt-1 text-sm">عرض وإدارة جميع طلبات العملاء الحالية والسابقة</p>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">{t('title')}</h1>
+                    <p className="text-slate-500 mt-1 text-sm">{t('subtitle')}</p>
                 </div>
                 <div className="flex items-center gap-3">
                     <button
                         onClick={handleExportCSV}
                         className="flex items-center justify-center gap-2 px-4 h-10 rounded-xl bg-white border border-[#e7e0cf] text-slate-700 text-sm font-bold hover:bg-slate-50 transition-colors shadow-sm">
                         <span className="material-symbols-outlined text-[20px]">download</span>
-                        <span>تصدير CSV</span>
+                        <span>{tc('export_csv')}</span>
                     </button>
                     <button className="flex items-center justify-center gap-2 px-5 h-10 rounded-xl bg-[#edab1d] text-slate-900 text-sm font-bold hover:brightness-110 transition-all shadow-md shadow-[#edab1d]/20">
                         <span className="material-symbols-outlined text-[20px]">add</span>
-                        <span className="hidden sm:inline">إنشاء طلب جديد</span>
+                        <span className="hidden sm:inline">{t('new_order')}</span>
                     </button>
                 </div>
             </div>
@@ -100,7 +102,7 @@ export default function AdminOrdersPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white p-4 rounded-xl border border-[#e7e0cf] shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-slate-500 font-medium">إجمالي الطلبات</p>
+                        <p className="text-xs text-slate-500 font-medium">{t('total_orders')}</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{orders.length}</p>
                     </div>
                     <div className="h-10 w-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center">
@@ -109,7 +111,7 @@ export default function AdminOrdersPage() {
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-[#e7e0cf] shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-slate-500 font-medium">بانتظار الدفع</p>
+                        <p className="text-xs text-slate-500 font-medium">{t('pending')}</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{orders.filter(o => o.status === 'pending').length}</p>
                     </div>
                     <div className="h-10 w-10 rounded-lg bg-orange-50 text-orange-600 flex items-center justify-center">
@@ -118,7 +120,7 @@ export default function AdminOrdersPage() {
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-[#e7e0cf] shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-slate-500 font-medium">جاري التجهيز</p>
+                        <p className="text-xs text-slate-500 font-medium">{t('processing')}</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{orders.filter(o => o.status === 'processing').length}</p>
                     </div>
                     <div className="h-10 w-10 rounded-lg bg-[#edab1d]/20 text-yellow-600 flex items-center justify-center">
@@ -127,7 +129,7 @@ export default function AdminOrdersPage() {
                 </div>
                 <div className="bg-white p-4 rounded-xl border border-[#e7e0cf] shadow-sm flex items-center justify-between">
                     <div>
-                        <p className="text-xs text-slate-500 font-medium">مكتمل</p>
+                        <p className="text-xs text-slate-500 font-medium">{t('completed')}</p>
                         <p className="text-2xl font-bold text-slate-900 mt-1">{orders.filter(o => o.status === 'completed').length}</p>
                     </div>
                     <div className="h-10 w-10 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
@@ -145,7 +147,7 @@ export default function AdminOrdersPage() {
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             className={`w-full h-11 ${isRtl ? 'pr-10 pl-4' : 'pl-10 pr-4'} rounded-xl border-slate-200 bg-slate-50 text-slate-900 text-sm focus:ring-2 focus:ring-[#edab1d]/50 focus:border-[#edab1d] transition-all`}
-                            placeholder="بحث برقم الطلب أو اسم العميل / الهاتف..."
+                            placeholder={t('search_placeholder')}
                             type="text"
                         />
                     </div>
@@ -155,12 +157,12 @@ export default function AdminOrdersPage() {
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
                                 className={`appearance-none h-11 ${isRtl ? 'pr-4 pl-10' : 'pl-4 pr-10'} rounded-xl border-slate-200 bg-white text-slate-700 text-sm font-medium focus:ring-2 focus:ring-[#edab1d]/50 focus:border-[#edab1d] cursor-pointer min-w-[140px]`}>
-                                <option value="all">جميع الحالات</option>
-                                <option value="pending">بانتظار الدفع</option>
-                                <option value="processing">جاري التجهيز</option>
-                                <option value="shipped">تم الشحن</option>
-                                <option value="completed">مكتمل</option>
-                                <option value="cancelled">ملغي</option>
+                                <option value="all">{t('all_statuses')}</option>
+                                <option value="pending">{t('pending')}</option>
+                                <option value="processing">{t('processing')}</option>
+                                <option value="shipped">{t('shipped')}</option>
+                                <option value="completed">{t('completed')}</option>
+                                <option value="cancelled">{t('cancelled')}</option>
                             </select>
                             <span className={`absolute ${isRtl ? 'left-3' : 'right-3'} top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none material-symbols-outlined text-[20px]`}>expand_more</span>
                         </div>
@@ -177,13 +179,13 @@ export default function AdminOrdersPage() {
                                 <th className="py-4 px-6 w-12">
                                     <input className="w-4 h-4 text-[#edab1d] rounded border-gray-300 focus:ring-[#edab1d] cursor-pointer" type="checkbox" />
                                 </th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">رقم الطلب</th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">العميل</th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">الدولة</th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">المبلغ</th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">طريقة الدفع</th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">الحالة</th>
-                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">التاريخ</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('order_num')}</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('customer')}</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('country')}</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('amount')}</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{t('payment')}</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{tc('status')}</th>
+                                <th className="py-4 px-6 text-xs font-bold text-slate-500 uppercase tracking-wider">{tc('date')}</th>
                                 <th className="py-4 px-6 w-16"></th>
                             </tr>
                         </thead>
@@ -239,7 +241,7 @@ export default function AdminOrdersPage() {
 
                     {filteredOrders.length === 0 && (
                         <div className="p-12 text-center text-slate-500">
-                            لا توجد طلبات تطابق بحثك.
+                            {t('no_orders')}
                         </div>
                     )}
                 </div>
@@ -248,14 +250,14 @@ export default function AdminOrdersPage() {
                 <div className="p-4 border-t border-[#e7e0cf] flex items-center justify-between">
                     <button className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-slate-600 text-sm hover:bg-slate-50 disabled:opacity-50 transition-colors">
                         <span className="material-symbols-outlined text-[18px]">arrow_forward</span>
-                        <span>السابق</span>
+                        <span>{tc('previous')}</span>
                     </button>
                     <div className="flex items-center gap-1">
                         <button className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#edab1d] text-slate-900 text-sm font-bold">1</button>
                         <button className="w-8 h-8 flex items-center justify-center rounded-lg text-slate-600 hover:bg-slate-100 text-sm">2</button>
                     </div>
                     <button className="flex items-center gap-1 px-4 py-2 rounded-lg border border-slate-200 text-slate-600 text-sm hover:bg-slate-50 transition-colors">
-                        <span>التالي</span>
+                        <span>{tc('next')}</span>
                         <span className="material-symbols-outlined text-[18px]">arrow_back</span>
                     </button>
                 </div>
@@ -302,7 +304,7 @@ export default function AdminOrdersPage() {
             {/* Mobile Empty State */}
             {filteredOrders.length === 0 && (
                 <div className="md:hidden p-8 text-center text-slate-500 bg-white rounded-2xl border border-slate-100">
-                    لا توجد طلبات تطابق بحثك.
+                    {t('no_orders')}
                 </div>
             )}
         </div>
