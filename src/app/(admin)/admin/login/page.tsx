@@ -114,7 +114,15 @@ export default function AdminLogin() {
                     />
                     <p className="text-sm text-[#6b6b6b] mt-2">Admin Panel</p>
                     <h2 className="mt-3 text-xl sm:text-2xl font-black text-[#0f172a] tracking-wide">
-                        DEVELOPED BY PAKSOFT
+                        <a
+                            href="https://paksoft.com.tr"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-2 hover:text-[#edab1d] transition-colors"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">brightness_2</span>
+                            <span>DEVELOPED BY PAKSOFT</span>
+                        </a>
                     </h2>
                 </div>
 
@@ -239,10 +247,6 @@ export default function AdminLogin() {
                     )}
                 </div>
 
-                <div className="text-center mt-5">
-                    <p className="text-sm font-extrabold text-[#0f172a] tracking-wider">DEVELOPED BY PAKSOFT</p>
-                    <a href="https://paksoft.com.tr" target="_blank" rel="noopener noreferrer" className="text-xs text-neutral-500 hover:text-[#edab1d] transition-colors">paksoft.com.tr</a>
-                </div>
             </div>
         </div>
     );
