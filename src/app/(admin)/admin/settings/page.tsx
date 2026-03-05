@@ -3,6 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { AdminSettingsDTO, getAdminStoreSettings, updateAdminStoreSettings } from '@/lib/actions/adminInsights';
+import { updateAdminLoginCredentials } from '@/lib/actions/adminAuth';
+import { useAdminAuth } from '@/lib/stores/adminAuth';
 
 const emptySettings: AdminSettingsDTO = {
   storeName: '',
@@ -18,12 +20,23 @@ export default function SettingsPage() {
   const t = useTranslations('Admin.Settings');
   const locale = useLocale();
   const isRtl = locale === 'ar';
+  const { user, login } = useAdminAuth();
 
   const [activeTab, setActiveTab] = useState('general');
   const [form, setForm] = useState<AdminSettingsDTO>(emptySettings);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [credentialSaving, setCredentialSaving] = useState(false);
+  const [credentialMessage, setCredentialMessage] = useState('');
+  const [credentialError, setCredentialError] = useState('');
+  const [credentialsForm, setCredentialsForm] = useState({
+    currentEmail: '',
+    currentPassword: '',
+    newEmail: '',
+    newPassword: '',
+    confirmPassword: '',
+  });
 
   const [extras, setExtras] = useState({
     storeNameEn: 'Shop Lamees',
@@ -61,6 +74,12 @@ export default function SettingsPage() {
     });
   }, []);
 
+  useEffect(() => {
+    if (user?.email) {
+      setCredentialsForm((prev) => ({ ...prev, currentEmail: user.email, newEmail: user.email }));
+    }
+  }, [user?.email]);
+
   const handleSave = async () => {
     setSaving(true);
     await updateAdminStoreSettings({
@@ -70,6 +89,50 @@ export default function SettingsPage() {
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
+  };
+
+  const handleCredentialsSave = async () => {
+    setCredentialMessage('');
+    setCredentialError('');
+
+    if (!credentialsForm.currentEmail.trim() || !credentialsForm.currentPassword.trim()) {
+      setCredentialError(L('البريد الحالي وكلمة المرور الحالية مطلوبان', 'Current email and current password are required'));
+      return;
+    }
+
+    if (credentialsForm.newPassword && credentialsForm.newPassword !== credentialsForm.confirmPassword) {
+      setCredentialError(L('تأكيد كلمة المرور غير مطابق', 'Password confirmation does not match'));
+      return;
+    }
+
+    setCredentialSaving(true);
+    const result = await updateAdminLoginCredentials({
+      currentEmail: credentialsForm.currentEmail,
+      currentPassword: credentialsForm.currentPassword,
+      newEmail: credentialsForm.newEmail,
+      newPassword: credentialsForm.newPassword,
+    });
+    setCredentialSaving(false);
+
+    if (!result.ok) {
+      setCredentialError(result.message);
+      return;
+    }
+
+    const updatedEmail = result.email || credentialsForm.currentEmail;
+    if (user?.role) {
+      login(updatedEmail, user.role);
+    }
+
+    setCredentialsForm((prev) => ({
+      ...prev,
+      currentEmail: updatedEmail,
+      newEmail: updatedEmail,
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    }));
+    setCredentialMessage(L('تم تحديث بيانات تسجيل الدخول بنجاح', 'Login credentials updated successfully'));
   };
 
   const tabs = [
@@ -213,6 +276,24 @@ export default function SettingsPage() {
 
           {activeTab === 'notifications' && (
             <div>
+              <SettingsCard title={L('تسجيل دخول الإدارة', 'Admin Login Credentials')} description={L('تحديث بريد وكلمة مرور تسجيل دخول لوحة التحكم', 'Update admin panel login email and password')}>
+                <InputField label={L('البريد الحالي', 'Current Email')} value={credentialsForm.currentEmail} onChange={(v) => setCredentialsForm((f) => ({ ...f, currentEmail: v }))} type="email" dir="ltr" />
+                <InputField label={L('كلمة المرور الحالية', 'Current Password')} value={credentialsForm.currentPassword} onChange={(v) => setCredentialsForm((f) => ({ ...f, currentPassword: v }))} type="password" dir="ltr" />
+                <InputField label={L('البريد الجديد', 'New Email')} value={credentialsForm.newEmail} onChange={(v) => setCredentialsForm((f) => ({ ...f, newEmail: v }))} type="email" dir="ltr" />
+                <InputField label={L('كلمة المرور الجديدة', 'New Password')} value={credentialsForm.newPassword} onChange={(v) => setCredentialsForm((f) => ({ ...f, newPassword: v }))} type="password" dir="ltr" />
+                <InputField label={L('تأكيد كلمة المرور الجديدة', 'Confirm New Password')} value={credentialsForm.confirmPassword} onChange={(v) => setCredentialsForm((f) => ({ ...f, confirmPassword: v }))} type="password" dir="ltr" />
+                {credentialError && <p className="text-sm text-red-600 mb-3">{credentialError}</p>}
+                {credentialMessage && <p className="text-sm text-green-600 mb-3">{credentialMessage}</p>}
+                <button
+                  onClick={handleCredentialsSave}
+                  disabled={credentialSaving}
+                  className="inline-flex items-center gap-2 bg-[#1b170d] hover:bg-[#30291b] disabled:opacity-60 text-white px-5 py-2.5 rounded-lg text-sm font-bold transition-colors"
+                >
+                  <span className="material-symbols-outlined text-[18px]">key</span>
+                  {credentialSaving ? L('جاري التحديث...', 'Updating...') : L('تحديث بيانات الدخول', 'Update Login Credentials')}
+                </button>
+              </SettingsCard>
+
               <SettingsCard title={L('إشعارات البريد الإلكتروني', 'Email Notifications')} description={L('تحكم في الإشعارات التلقائية المرسلة', 'Control automated notification emails')}>
                 <ToggleField label={L('طلب جديد', 'New Order')} defaultChecked />
                 <ToggleField label={L('تأكيد الطلب للعميل', 'Order Confirmation')} defaultChecked />
