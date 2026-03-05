@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useAdminOrders, OrderStatus } from '@/lib/stores/adminOrders';
+import { OrderStatus, AdminOrder } from '@/lib/stores/adminOrders';
+import { getAdminOrder, updateAdminOrderStatus, updateAdminOrderNote } from '@/lib/actions/adminOrders';
 import { useLocale } from 'next-intl';
 import { formatMoney } from '@/lib/money';
 
@@ -12,16 +13,45 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
     const isRtl = locale === 'ar';
     const router = useRouter();
 
-    const orders = useAdminOrders(state => state.orders);
-    const updateOrderStatus = useAdminOrders(state => state.updateOrderStatus);
-    const updateInternalNote = useAdminOrders(state => state.updateInternalNote);
-
-    const order = orders.find(o => o.id === params.id);
+    const [order, setOrder] = useState<AdminOrder | null>(null);
+    const [loading, setLoading] = useState(true);
 
     // Local state for UI
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
-    const [noteText, setNoteText] = useState(order?.internalNote || '');
+    const [noteText, setNoteText] = useState('');
     const [isEditingNote, setIsEditingNote] = useState(false);
+
+    useEffect(() => {
+        getAdminOrder(params.id).then(data => {
+            setOrder(data);
+            if (data) {
+                setNoteText(data.internalNote || '');
+            }
+            setLoading(false);
+        });
+    }, [params.id]);
+
+    const handleStatusUpdate = async (newStatus: OrderStatus) => {
+        if (!order) return;
+        setOrder({ ...order, status: newStatus });
+        await updateAdminOrderStatus(order.id, newStatus);
+        setIsUpdatingStatus(false);
+    };
+
+    const handleSaveNote = async () => {
+        if (!order) return;
+        setOrder({ ...order, internalNote: noteText });
+        await updateAdminOrderNote(order.id, noteText);
+        setIsEditingNote(false);
+    };
+
+    if (loading) {
+        return (
+            <div className="flex flex-1 justify-center items-center p-20">
+                <span className="material-symbols-outlined animate-spin text-4xl text-slate-400">progress_activity</span>
+            </div>
+        );
+    }
 
     if (!order) {
         return (
@@ -32,16 +62,6 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             </div>
         );
     }
-
-    const handleStatusUpdate = (newStatus: OrderStatus) => {
-        updateOrderStatus(order.id, newStatus);
-        setIsUpdatingStatus(false);
-    };
-
-    const handleSaveNote = () => {
-        updateInternalNote(order.id, noteText);
-        setIsEditingNote(false);
-    };
 
     const StatusBadge = ({ status }: { status: OrderStatus }) => {
         const styles = {

@@ -1,16 +1,33 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { useAdminProducts } from '@/lib/stores/adminProducts';
+import { getAdminProduct } from '@/lib/actions/adminProducts';
+import { AdminProduct } from '@/lib/stores/adminProducts';
 import ProductForm from '../../components/ProductForm';
 
 export default function EditProductPage({ params }: { params: { id: string } }) {
     const locale = useLocale();
     const router = useRouter();
-    const { products } = useAdminProducts();
 
-    const product = products.find(p => p.id === params.id);
+    const [product, setProduct] = useState<AdminProduct | null>(null);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        getAdminProduct(params.id).then(data => {
+            setProduct(data);
+            setLoading(false);
+        });
+    }, [params.id]);
+
+    if (loading) {
+        return (
+            <div className="flex flex-1 justify-center items-center p-20">
+                <span className="material-symbols-outlined animate-spin text-4xl text-gray-400">progress_activity</span>
+            </div>
+        );
+    }
 
     if (!product) {
         return (

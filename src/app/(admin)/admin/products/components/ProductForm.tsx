@@ -3,7 +3,8 @@
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { upload } from '@vercel/blob/client';
-import { AdminProduct, ProductStatus, useAdminProducts } from '@/lib/stores/adminProducts';
+import { AdminProduct, ProductStatus } from '@/lib/stores/adminProducts';
+import { createAdminProduct, updateAdminProduct } from '@/lib/actions/adminProducts';
 
 interface ProductFormProps {
     initialData?: AdminProduct;
@@ -14,7 +15,6 @@ interface ProductFormProps {
 export default function ProductForm({ initialData, isEdit, locale }: ProductFormProps) {
     const isRtl = locale === 'ar';
     const router = useRouter();
-    const { addProduct, updateProduct } = useAdminProducts();
 
     const [formData, setFormData] = useState<Partial<AdminProduct>>(initialData || {
         titleAr: '',
@@ -41,13 +41,18 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
         setFormData(prev => ({ ...prev, [field]: value }));
     };
 
-    const handleSave = () => {
-        if (isEdit && initialData?.id) {
-            updateProduct(initialData.id, formData);
-        } else {
-            addProduct(formData as Omit<AdminProduct, 'id' | 'createdAt' | 'updatedAt'>);
+    const handleSave = async () => {
+        try {
+            if (isEdit && initialData?.id) {
+                await updateAdminProduct(initialData.id, formData);
+            } else {
+                await createAdminProduct(formData);
+            }
+            router.push(`/admin/products`);
+        } catch (error) {
+            console.error('Error saving product:', error);
+            alert('Failed to save product.');
         }
-        router.push(`/admin/products`);
     };
 
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {

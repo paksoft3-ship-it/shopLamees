@@ -1,11 +1,25 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useTranslations, useLocale } from 'next-intl';
 import { formatMoney } from '@/lib/money';
-import { useAdminOrders } from '@/lib/stores/adminOrders';
-import { useAdminProducts } from '@/lib/stores/adminProducts';
+import { getAdminDashboardStats } from '@/lib/actions/adminDashboard';
+import { AdminOrder } from '@/lib/stores/adminOrders';
+import { AdminProduct } from '@/lib/stores/adminProducts';
+
+interface AdminDashboardStats {
+    ordersCount: number;
+    completedOrders: AdminOrder[];
+    totalRevenue: number;
+    avgOrder: number;
+    recentOrders: AdminOrder[];
+    bestSellers: AdminProduct[];
+    lowStockItems: (AdminProduct & { minStock: number })[];
+    publishedCount: number;
+    pendingOrders: number;
+}
 
 export default function AdminDashboard() {
     const t = useTranslations('Admin.Dashboard');
@@ -13,26 +27,34 @@ export default function AdminDashboard() {
     const locale = useLocale();
     const isRtl = locale === 'ar';
 
-    const { orders } = useAdminOrders();
-    const { products } = useAdminProducts();
+    const [stats, setStats] = useState<AdminDashboardStats | null>(null);
 
-    // ── Real computed stats ──────────────────────────────────────────
-    const completedOrders = orders.filter(o => o.status === 'completed' || o.status === 'shipped' || o.status === 'processing');
-    const totalRevenue = orders.reduce((sum, o) => sum + o.amount, 0);
-    const avgOrder = orders.length > 0 ? Math.round(totalRevenue / orders.length) : 0;
-    const recentOrders = [...orders].sort((a, b) => b.id.localeCompare(a.id)).slice(0, 3);
-    const bestSellers = products.filter(p => p.isBestSeller).slice(0, 4);
-    const lowStockItems = products
-        .filter(p => p.variants.some(v => v.stock < 15))
-        .map(p => ({
-            ...p,
-            minStock: Math.min(...p.variants.map(v => v.stock)),
-        }))
-        .sort((a, b) => a.minStock - b.minStock)
-        .slice(0, 3);
+    useEffect(() => {
+        getAdminDashboardStats().then(setStats);
+    }, []);
 
-    const publishedCount = products.filter(p => p.status === 'published').length;
-    const pendingOrders = orders.filter(o => o.status === 'pending').length;
+    if (!stats) {
+        return (
+            <div className="flex h-[60vh] items-center justify-center p-8">
+                <div className="flex flex-col items-center gap-4">
+                    <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
+                    <p className="text-neutral-500 font-medium">جاري تحميل البيانات...</p>
+                </div>
+            </div>
+        );
+    }
+
+    const {
+        ordersCount,
+        completedOrders,
+        totalRevenue,
+        avgOrder,
+        recentOrders,
+        bestSellers,
+        lowStockItems,
+        publishedCount,
+        pendingOrders
+    } = stats;
 
     // ── Sales chart (based on real order amounts distributed across 7 days) ──
     const days = [
@@ -126,7 +148,7 @@ export default function AdminDashboard() {
                     <div className="flex items-start justify-between">
                         <div className="flex flex-col gap-1">
                             <p className="text-sm font-medium text-neutral-500">{t('order_count')}</p>
-                            <h3 className="text-2xl font-extrabold text-primary">{orders.length}</h3>
+                            <h3 className="text-2xl font-extrabold text-primary">{ordersCount}</h3>
                         </div>
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary">
                             <span className="material-symbols-outlined" style={{ fontSize: '20px' }}>shopping_bag</span>
@@ -179,7 +201,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                         <span className="flex items-center text-xs font-bold text-accent-green bg-accent-green/10 px-2 py-1 rounded-full">
-                            {products.filter(p => p.isBestSeller).length} {isRtl ? 'الأكثر مبيعاً' : 'best sellers'}
+                            {bestSellers.length} {isRtl ? 'الأكثر مبيعاً' : 'best sellers'}
                         </span>
                     </div>
                     <div className="hidden md:block absolute bottom-0 left-0 w-full h-12 opacity-10 pointer-events-none">
