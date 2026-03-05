@@ -1,5 +1,6 @@
 import { setRequestLocale, getMessages } from 'next-intl/server';
 import { NextIntlClientProvider } from 'next-intl';
+import { notFound } from 'next/navigation';
 import { TrustBar } from '@/components/layout/TrustBar';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
@@ -8,6 +9,7 @@ import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ToasterProvider } from '@/components/providers/ToasterProvider';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { Noto_Kufi_Arabic, Cairo, Inter } from 'next/font/google';
+import { routing } from '@/i18n/routing';
 import '../../globals.css';
 
 const notoKufi = Noto_Kufi_Arabic({ subsets: ['arabic'], variable: '--font-noto-kufi' });
@@ -21,6 +23,10 @@ export default async function SiteLayout({
     children: React.ReactNode;
     params: { locale: string };
 }) {
+    if (!routing.locales.includes(locale as 'ar' | 'en')) {
+        notFound();
+    }
+
     setRequestLocale(locale);
     const messages = await getMessages();
 

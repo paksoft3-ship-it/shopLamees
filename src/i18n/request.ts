@@ -3,13 +3,10 @@ import { routing } from './routing';
 
 export default getRequestConfig(async ({ requestLocale }) => {
     let currentLocale = await requestLocale;
-    console.log("NextIntl getRequestConfig received requestLocale:", currentLocale);
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (!currentLocale || !routing.locales.includes(currentLocale as any)) {
+    if (!currentLocale || !routing.locales.includes(currentLocale as 'ar' | 'en')) {
         currentLocale = routing.defaultLocale;
     }
-    console.log("NextIntl getRequestConfig loading messages for:", currentLocale);
 
     let messages;
     switch (currentLocale) {

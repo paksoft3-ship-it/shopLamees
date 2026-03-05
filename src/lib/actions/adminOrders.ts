@@ -33,7 +33,7 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
         {
             status: 'pending',
             label: 'تم إنشاء الطلب',
-            date: order.createdAt.toLocaleString('ar-SA'),
+            date: order.createdAt.toISOString(),
             isCurrent: order.status === 'NEW'
         }
     ];
@@ -42,7 +42,7 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
         timeline.push({
             status: 'processing',
             label: 'جاري التجهيز',
-            date: order.updatedAt.toLocaleString('ar-SA'),
+            date: order.updatedAt.toISOString(),
             isCurrent: true
         });
     }
@@ -50,7 +50,7 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
         timeline.push({
             status: 'shipped',
             label: 'في الطريق',
-            date: order.updatedAt.toLocaleString('ar-SA'),
+            date: order.updatedAt.toISOString(),
             isCurrent: true
         });
     }
@@ -58,7 +58,7 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
         timeline.push({
             status: 'completed',
             label: 'مكتمل',
-            date: order.updatedAt.toLocaleString('ar-SA'),
+            date: order.updatedAt.toISOString(),
             isCurrent: true
         });
     }
@@ -79,7 +79,7 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
         amount: Number(order.total),
         paymentMethod: order.paymentMethod,
         status: mappedStatus,
-        date: order.createdAt.toLocaleDateString('ar-SA'),
+        date: order.createdAt.toISOString().slice(0, 10),
         shippingAddress: {
             city: order.address?.city || '',
             zone: order.address?.zone || '',
@@ -90,7 +90,7 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         items: order.items.map((item: any) => ({
             id: item.id,
-            name: item.nameSnapshotAr,
+            name: item.nameSnapshotEn || item.nameSnapshotAr,
             sku: item.sku || '',
             price: Number(item.unitPrice),
             quantity: item.qty,

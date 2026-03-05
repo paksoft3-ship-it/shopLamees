@@ -34,7 +34,7 @@ export async function getAdminProducts(): Promise<AdminProduct[]> {
             descriptionEn: p.descEn || undefined,
             price: p.variants.length > 0 ? Number(p.variants[0].priceQar) : 0,
             compareAtPrice: undefined, // Currently not in Prisma schema directly
-            category: primaryCat?.nameAr || 'غير مصنف',
+            category: primaryCat?.nameEn || primaryCat?.nameAr || 'Uncategorized',
             categorySlug: primaryCat?.slug || 'uncategorized',
             images: p.images.map(img => img.url),
             status: p.isPublished ? 'published' : 'draft',
@@ -105,7 +105,7 @@ export async function getAdminProduct(id: string): Promise<AdminProduct | null> 
         descriptionEn: p.descEn || undefined,
         price: p.variants.length > 0 ? Number(p.variants[0].priceQar) : 0,
         compareAtPrice: undefined,
-        category: primaryCat?.nameAr || 'غير مصنف',
+        category: primaryCat?.nameEn || primaryCat?.nameAr || 'Uncategorized',
         categorySlug: primaryCat?.slug || 'uncategorized',
         images: p.images.map(img => img.url),
         status: p.isPublished ? 'published' : 'draft',

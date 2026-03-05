@@ -75,7 +75,7 @@ export default function AdminProductsPage() {
                         <span className="material-symbols-outlined text-[20px]">filter_list</span>
                         <span className="hidden sm:inline">{t('advanced_filter')}</span>
                     </button>
-                    <Link href={`/${locale}/admin/products/new`} className="flex items-center justify-center gap-2 px-5 h-10 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
+                    <Link href={`/admin/products/new`} className="flex items-center justify-center gap-2 px-5 h-10 rounded-xl bg-primary text-white text-sm font-bold hover:bg-primary/90 transition-all shadow-md shadow-primary/20">
                         <span className="material-symbols-outlined text-[20px]">add</span>
                         <span>{t('add_product')}</span>
                     </Link>
@@ -159,7 +159,7 @@ export default function AdminProductsPage() {
                                                     </td>
                                                     <td className="py-4 px-4">
                                                         <div className="flex flex-col">
-                                                            <Link href={`/${locale}/admin/products/${product.id}/edit`} className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">
+                                                            <Link href={`/admin/products/${product.id}/edit`} className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors">
                                                                 {isRtl ? product.titleAr : product.titleEn}
                                                             </Link>
                                                             <span className="text-xs text-gray-500 font-mono mt-1">{product.variants[0]?.sku || product.slug}</span>
@@ -202,7 +202,7 @@ export default function AdminProductsPage() {
                                                         <div className="mt-1 text-[10px] text-gray-500">{getStatusLabel(product.status)}</div>
                                                     </td>
                                                     <td className="py-4 px-6 text-left">
-                                                        <Link href={`/${locale}/admin/products/${product.id}/edit`} className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors inline-block">
+                                                        <Link href={`/admin/products/${product.id}/edit`} className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors inline-block">
                                                             <span className="material-symbols-outlined text-lg">edit</span>
                                                         </Link>
                                                     </td>
@@ -255,10 +255,10 @@ export default function AdminProductsPage() {
                                             <div className="flex-1 flex flex-col justify-between py-1">
                                                 <div>
                                                     <div className="flex justify-between items-start">
-                                                        <Link href={`/${locale}/admin/products/${product.id}/edit`} className="font-bold text-gray-900 text-sm leading-snug line-clamp-2 pr-4 pl-1">
+                                                        <Link href={`/admin/products/${product.id}/edit`} className="font-bold text-gray-900 text-sm leading-snug line-clamp-2 pr-4 pl-1">
                                                             {isRtl ? product.titleAr : product.titleEn}
                                                         </Link>
-                                                        <Link href={`/${locale}/admin/products/${product.id}/edit`} className="text-gray-400 hover:text-primary shrink-0">
+                                                        <Link href={`/admin/products/${product.id}/edit`} className="text-gray-400 hover:text-primary shrink-0">
                                                             <span className="material-symbols-outlined text-lg">edit</span>
                                                         </Link>
                                                     </div>

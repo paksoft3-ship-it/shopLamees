@@ -20,6 +20,45 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [noteText, setNoteText] = useState('');
     const [isEditingNote, setIsEditingNote] = useState(false);
+    const tr = {
+        orders: isRtl ? 'الطلبات' : 'Orders',
+        orderDetails: isRtl ? 'تفاصيل الطلب' : 'Order details',
+        orderNotFound: isRtl ? 'الطلب غير موجود' : 'Order not found',
+        backToOrders: isRtl ? 'العودة للطلبات' : 'Back to orders',
+        order: isRtl ? 'طلب' : 'Order',
+        createdAt: isRtl ? 'تم الإنشاء' : 'Created at',
+        print: isRtl ? 'طباعة' : 'Print',
+        updateStatus: isRtl ? 'تحديث الحالة' : 'Update status',
+        createShipment: isRtl ? 'إنشاء شحنة' : 'Create shipment',
+        items: isRtl ? 'المنتجات' : 'Items',
+        shipping: isRtl ? 'الشحن' : 'Shipping',
+        product: isRtl ? 'المنتج' : 'Product',
+        sku: isRtl ? 'رمز المنتج' : 'SKU',
+        quantity: isRtl ? 'الكمية' : 'Qty',
+        total: isRtl ? 'الإجمالي' : 'Total',
+        noItems: isRtl ? 'لا توجد منتجات مسجلة' : 'No items in this order',
+        activityLog: isRtl ? 'سجل النشاط' : 'Activity log',
+        customerNote: isRtl ? 'ملاحظة العميل' : 'Customer note',
+        internalNotes: isRtl ? 'ملاحظات داخلية' : 'Internal notes',
+        save: isRtl ? 'حفظ' : 'Save',
+        edit: isRtl ? 'تحرير' : 'Edit',
+        notePlaceholder: isRtl ? 'أضف ملاحظة للفريق...' : 'Add a note for the team...',
+        noInternalNotes: isRtl ? 'لا توجد ملاحظات داخلية...' : 'No internal notes yet...',
+        registeredCustomer: isRtl ? 'عميل مسجل' : 'Registered customer',
+        whatsapp: isRtl ? 'تواصل واتساب' : 'WhatsApp contact',
+        deliveryAddress: isRtl ? 'عنوان التوصيل' : 'Delivery address',
+        verified: isRtl ? 'تم التحقق' : 'Verified',
+        city: isRtl ? 'المدينة' : 'City',
+        zone: isRtl ? 'المنطقة' : 'Zone',
+        street: isRtl ? 'الشارع' : 'Street',
+        building: isRtl ? 'المبنى' : 'Building',
+        paymentSummary: isRtl ? 'ملخص الدفع' : 'Payment summary',
+        subtotal: isRtl ? 'المجموع الفرعي' : 'Subtotal',
+        discount: isRtl ? 'الخصم' : 'Discount',
+        shippingFee: isRtl ? 'الشحن والتوصيل' : 'Shipping',
+        free: isRtl ? 'مجاني' : 'Free',
+        paidBy: isRtl ? 'مدفوع بواسطة' : 'Paid via',
+    };
 
     useEffect(() => {
         getAdminOrder(params.id).then(data => {
@@ -57,8 +96,8 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         return (
             <div className="flex-1 flex flex-col items-center justify-center p-8">
                 <span className="material-symbols-outlined text-6xl text-slate-300 mb-4">search_off</span>
-                <h2 className="text-xl font-bold text-slate-900 mb-2">الطلب غير موجود</h2>
-                <button onClick={() => router.back()} className="text-primary hover:underline font-medium">العودة للطلبات</button>
+                <h2 className="text-xl font-bold text-slate-900 mb-2">{tr.orderNotFound}</h2>
+                <button onClick={() => router.back()} className="text-primary hover:underline font-medium">{tr.backToOrders}</button>
             </div>
         );
     }
@@ -73,11 +112,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         }[status] || 'bg-gray-100 text-gray-800 border-gray-200';
 
         const label = {
-            pending: 'بانتظار الدفع',
-            processing: 'جاري التجهيز',
-            shipped: 'تم الشحن',
-            completed: 'مكتمل',
-            cancelled: 'ملغي'
+            pending: isRtl ? 'بانتظار الدفع' : 'Pending',
+            processing: isRtl ? 'جاري التجهيز' : 'Processing',
+            shipped: isRtl ? 'تم الشحن' : 'Shipped',
+            completed: isRtl ? 'مكتمل' : 'Completed',
+            cancelled: isRtl ? 'ملغي' : 'Cancelled'
         }[status] || status;
 
         return (
@@ -95,24 +134,24 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2 text-sm text-slate-500 font-medium whitespace-nowrap overflow-x-auto pb-1">
-                        <Link href={`/${locale}/admin/orders`} className="hover:text-primary transition-colors focus:outline-none">الطلبات</Link>
+                        <Link href={`/admin/orders`} className="hover:text-primary transition-colors focus:outline-none">{tr.orders}</Link>
                         <span className={`material-symbols-outlined text-sm pt-1 ${isRtl ? '' : 'rotate-180'}`}>chevron_left</span>
-                        <span className="text-slate-900">تفاصيل الطلب</span>
+                        <span className="text-slate-900">{tr.orderDetails}</span>
                     </div>
                     <div className="flex items-center gap-4 flex-wrap">
-                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">طلب #{order.id}</h1>
+                        <h1 className="text-3xl font-black text-slate-900 tracking-tight">{tr.order} #{order.id}</h1>
                         <div className="flex items-center gap-2">
                             <StatusBadge status={order.status} />
                         </div>
                     </div>
-                    <p className="text-slate-500 text-sm">تم الإنشاء: {order.date}</p>
+                    <p className="text-slate-500 text-sm">{tr.createdAt}: {order.date}</p>
                 </div>
 
                 {/* Primary Actions */}
                 <div className="flex flex-wrap gap-3 items-center">
                     <button className="h-10 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition-colors flex items-center gap-2 shadow-sm">
                         <span className="material-symbols-outlined text-[18px]">print</span>
-                        <span className="hidden sm:inline">طباعة</span>
+                        <span className="hidden sm:inline">{tr.print}</span>
                     </button>
 
                     <div className="relative">
@@ -120,22 +159,22 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                             onClick={() => setIsUpdatingStatus(!isUpdatingStatus)}
                             className="h-10 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition-colors flex items-center gap-2 shadow-sm">
                             <span className="material-symbols-outlined text-[18px]">edit_note</span>
-                            تحديث الحالة
+                            {tr.updateStatus}
                         </button>
                         {isUpdatingStatus && (
                             <div className={`absolute top-12 ${isRtl ? 'left-0' : 'right-0'} w-48 bg-white border border-slate-200 rounded-xl shadow-lg z-50 overflow-hidden`}>
-                                {(order.status !== 'pending') && <button onClick={() => handleStatusUpdate('pending')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100">بانتظار الدفع</button>}
-                                {(order.status !== 'processing') && <button onClick={() => handleStatusUpdate('processing')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100 text-[#edab1d]">جاري التجهيز</button>}
-                                {(order.status !== 'shipped') && <button onClick={() => handleStatusUpdate('shipped')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100 text-blue-600">تم الشحن</button>}
-                                {(order.status !== 'completed') && <button onClick={() => handleStatusUpdate('completed')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100 text-emerald-600">مكتمل</button>}
-                                {(order.status !== 'cancelled') && <button onClick={() => handleStatusUpdate('cancelled')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm text-red-600">ملغي</button>}
+                                {(order.status !== 'pending') && <button onClick={() => handleStatusUpdate('pending')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100">{isRtl ? 'بانتظار الدفع' : 'Pending'}</button>}
+                                {(order.status !== 'processing') && <button onClick={() => handleStatusUpdate('processing')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100 text-[#edab1d]">{isRtl ? 'جاري التجهيز' : 'Processing'}</button>}
+                                {(order.status !== 'shipped') && <button onClick={() => handleStatusUpdate('shipped')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100 text-blue-600">{isRtl ? 'تم الشحن' : 'Shipped'}</button>}
+                                {(order.status !== 'completed') && <button onClick={() => handleStatusUpdate('completed')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm border-b border-slate-100 text-emerald-600">{isRtl ? 'مكتمل' : 'Completed'}</button>}
+                                {(order.status !== 'cancelled') && <button onClick={() => handleStatusUpdate('cancelled')} className="w-full text-right px-4 py-3 hover:bg-slate-50 font-medium text-sm text-red-600">{isRtl ? 'ملغي' : 'Cancelled'}</button>}
                             </div>
                         )}
                     </div>
 
                     <button className="h-10 px-6 rounded-xl bg-primary hover:bg-[#edab1d]/90 text-slate-900 font-bold text-sm transition-colors flex items-center gap-2 shadow-md shadow-primary/20">
                         <span className="material-symbols-outlined text-[18px]">local_shipping</span>
-                        <span className="hidden sm:inline">إنشاء شحنة</span>
+                        <span className="hidden sm:inline">{tr.createShipment}</span>
                     </button>
                 </div>
             </div>
@@ -150,23 +189,23 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         <div className="p-5 border-b border-slate-100 flex justify-between items-center">
                             <h3 className="font-bold text-lg text-slate-900 flex items-center gap-2">
                                 <span className="material-symbols-outlined text-slate-400">shopping_bag</span>
-                                {order.items.length > 0 ? `المنتجات (${order.items.length})` : 'المنتجات'}
+                                {order.items.length > 0 ? `${tr.items} (${order.items.length})` : tr.items}
                             </h3>
-                            <span className="text-sm text-slate-500 font-medium">الشحن: ارامكس</span>
+                            <span className="text-sm text-slate-500 font-medium">{tr.shipping}: Aramex</span>
                         </div>
                         <div className="overflow-x-auto">
                             <table className="w-full text-right">
                                 <thead className="bg-slate-50 text-slate-500 text-xs uppercase font-bold">
                                     <tr>
-                                        <th className="px-6 py-4">المنتج</th>
-                                        <th className="px-6 py-4">رمز المنتج</th>
-                                        <th className="px-6 py-4 text-center">الكمية</th>
-                                        <th className={`px-6 py-4 ${isRtl ? 'text-left' : 'text-right'}`}>الإجمالي</th>
+                                        <th className="px-6 py-4">{tr.product}</th>
+                                        <th className="px-6 py-4">{tr.sku}</th>
+                                        <th className="px-6 py-4 text-center">{tr.quantity}</th>
+                                        <th className={`px-6 py-4 ${isRtl ? 'text-left' : 'text-right'}`}>{tr.total}</th>
                                     </tr>
                                 </thead>
                                 <tbody className="divide-y divide-slate-100">
                                     {order.items.length === 0 ? (
-                                        <tr><td colSpan={4} className="text-center py-8 text-slate-500">لا توجد منتجات مسجلة</td></tr>
+                                        <tr><td colSpan={4} className="text-center py-8 text-slate-500">{tr.noItems}</td></tr>
                                     ) : order.items.map((item, idx) => (
                                         <tr key={idx} className="group hover:bg-slate-50 transition-colors">
                                             <td className="px-6 py-4">
@@ -196,7 +235,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-6">
                             <h3 className="font-bold text-lg text-slate-900 mb-6 flex items-center gap-2">
                                 <span className="material-symbols-outlined text-slate-400">history</span>
-                                سجل النشاط
+                                {tr.activityLog}
                             </h3>
                             <div className="relative space-y-0 before:absolute before:inset-0 before:mx-2 before:h-full before:w-0.5 before:bg-slate-100">
                                 {order.timeline.map((event, idx) => (
@@ -208,7 +247,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                         <div className={`flex flex-col ${isRtl ? 'mr-8' : 'ml-8'}`}>
                                             <p className={`text-sm font-bold ${event.isCurrent ? 'text-primary' : 'text-slate-900'}`}>{event.label}</p>
                                             <p className="text-xs text-slate-500 mt-1">
-                                                {event.date}
+                                                {new Date(event.date).toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
                                                 {event.note && <span className="text-slate-700 font-medium mr-1"> {event.note}</span>}
                                             </p>
                                         </div>
@@ -223,7 +262,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                 <div className="bg-amber-50 rounded-2xl border border-amber-100 p-5 shadow-sm">
                                     <h4 className="font-bold text-amber-900 mb-2 flex items-center gap-2 text-sm">
                                         <span className="material-symbols-outlined text-[18px]">comment</span>
-                                        ملاحظة العميل
+                                        {tr.customerNote}
                                     </h4>
                                     <p className="text-amber-800 text-sm leading-relaxed">
                                         &quot;{order.customerNote}&quot;
@@ -235,12 +274,12 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                 <div className="flex justify-between items-center mb-3">
                                     <h4 className="font-bold text-slate-900 text-sm flex items-center gap-2">
                                         <span className="material-symbols-outlined text-[18px] text-slate-400">lock</span>
-                                        ملاحظات داخلية
+                                        {tr.internalNotes}
                                     </h4>
                                     {isEditingNote ? (
-                                        <button onClick={handleSaveNote} className="text-xs text-primary font-bold hover:underline">حفظ</button>
+                                        <button onClick={handleSaveNote} className="text-xs text-primary font-bold hover:underline">{tr.save}</button>
                                     ) : (
-                                        <button onClick={() => setIsEditingNote(true)} className="text-xs text-slate-400 font-bold hover:underline">تحرير</button>
+                                        <button onClick={() => setIsEditingNote(true)} className="text-xs text-slate-400 font-bold hover:underline">{tr.edit}</button>
                                     )}
                                 </div>
                                 {isEditingNote ? (
@@ -248,11 +287,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                         value={noteText}
                                         onChange={(e) => setNoteText(e.target.value)}
                                         className="w-full bg-slate-50 border border-slate-200 rounded-lg text-sm text-slate-700 p-3 h-24 resize-none focus:ring-1 focus:ring-[#edab1d] placeholder:text-slate-400 outline-none"
-                                        placeholder="أضف ملاحظة للفريق..."
+                                        placeholder={tr.notePlaceholder}
                                     />
                                 ) : (
                                     <div className="w-full bg-slate-50 border-0 rounded-lg text-sm text-slate-700 p-3 h-24 whitespace-pre-wrap overflow-y-auto">
-                                        {order.internalNote || <span className="text-slate-400">لا توجد ملاحظات داخلية...</span>}
+                                        {order.internalNote || <span className="text-slate-400">{tr.noInternalNotes}</span>}
                                     </div>
                                 )}
                             </div>
@@ -275,7 +314,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                 <h3 className="font-bold text-lg text-slate-900">{order.customerName}</h3>
                                 <div className="flex items-center gap-1 text-xs text-slate-500">
                                     <span className="material-symbols-outlined text-[14px] text-amber-500 fill-current">star</span>
-                                    <span>عميل مسجل</span>
+                                    <span>{tr.registeredCustomer}</span>
                                 </div>
                             </div>
                         </div>
@@ -295,7 +334,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         </div>
                         <button className="w-full h-11 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2">
                             <span className="material-symbols-outlined text-[20px]">chat</span>
-                            تواصل واتساب
+                            {tr.whatsapp}
                         </button>
                     </div>
 
@@ -304,11 +343,11 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         <div className="flex justify-between items-center mb-4 border-b border-slate-50 pb-3">
                             <h3 className="font-bold text-slate-900 flex items-center gap-2">
                                 <span className="material-symbols-outlined text-slate-400">location_on</span>
-                                عنوان التوصيل
+                                {tr.deliveryAddress}
                             </h3>
                             <div className="flex items-center gap-1 text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md text-xs font-bold border border-emerald-100">
                                 <span className="material-symbols-outlined text-[14px]">verified_user</span>
-                                تم التحقق
+                                {tr.verified}
                             </div>
                         </div>
                         <div className="space-y-4">
@@ -320,19 +359,19 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                             </div>
                             <div className="grid grid-cols-2 gap-3 text-sm">
                                 <div className="bg-slate-50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-500 mb-1">المدينة</p>
+                                    <p className="text-xs text-slate-500 mb-1">{tr.city}</p>
                                     <p className="font-bold text-slate-900">{order.shippingAddress.city}</p>
                                 </div>
                                 <div className="bg-slate-50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-500 mb-1">المنطقة</p>
+                                    <p className="text-xs text-slate-500 mb-1">{tr.zone}</p>
                                     <p className="font-bold text-slate-900">{order.shippingAddress.zone}</p>
                                 </div>
                                 <div className="bg-slate-50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-500 mb-1">الشارع</p>
+                                    <p className="text-xs text-slate-500 mb-1">{tr.street}</p>
                                     <p className="font-bold text-slate-900">{order.shippingAddress.street}</p>
                                 </div>
                                 <div className="bg-slate-50 p-3 rounded-lg">
-                                    <p className="text-xs text-slate-500 mb-1">المبنى</p>
+                                    <p className="text-xs text-slate-500 mb-1">{tr.building}</p>
                                     <p className="font-bold text-slate-900">{order.shippingAddress.building}</p>
                                 </div>
                             </div>
@@ -343,33 +382,33 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                     <div className="bg-white rounded-2xl border border-slate-100 shadow-sm p-5">
                         <h3 className="font-bold text-slate-900 mb-4 flex items-center gap-2">
                             <span className="material-symbols-outlined text-slate-400">receipt_long</span>
-                            ملخص الدفع
+                            {tr.paymentSummary}
                         </h3>
                         <div className="space-y-3 mb-6">
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-500">المجموع الفرعي</span>
+                                <span className="text-slate-500">{tr.subtotal}</span>
                                 <span className="font-medium text-slate-900">{formatMoney(order.amount - order.shippingFee + (order.discount || 0))}</span>
                             </div>
                             {order.discount !== undefined && order.discount > 0 && (
                                 <div className="flex justify-between text-sm text-red-500">
                                     <span className="flex items-center gap-1">
-                                        <span>الخصم</span>
+                                        <span>{tr.discount}</span>
                                         {order.discountCode && <span className="text-xs bg-red-50 px-1 rounded border border-red-100">{order.discountCode}</span>}
                                     </span>
                                     <span className="font-medium">- {formatMoney(order.discount)}</span>
                                 </div>
                             )}
                             <div className="flex justify-between text-sm">
-                                <span className="text-slate-500">الشحن والتوصيل</span>
-                                <span className="font-medium text-slate-900">{order.shippingFee === 0 ? 'مجاني' : formatMoney(order.shippingFee)}</span>
+                                <span className="text-slate-500">{tr.shippingFee}</span>
+                                <span className="font-medium text-slate-900">{order.shippingFee === 0 ? tr.free : formatMoney(order.shippingFee)}</span>
                             </div>
                         </div>
                         <div className="border-t border-slate-100 pt-4 pb-2">
                             <div className="flex justify-between items-end">
-                                <span className="text-base font-bold text-slate-900">الإجمالي</span>
+                                <span className="text-base font-bold text-slate-900">{tr.total}</span>
                                 <span className="text-2xl font-black text-slate-900 tracking-tight">{formatMoney(order.amount)}</span>
                             </div>
-                            <p className={`text-xs text-slate-400 mt-2 ${isRtl ? 'text-right' : 'text-left'}`}>مدفوع بواسطة {order.paymentMethod}</p>
+                            <p className={`text-xs text-slate-400 mt-2 ${isRtl ? 'text-right' : 'text-left'}`}>{tr.paidBy} {order.paymentMethod}</p>
                         </div>
                     </div>
                 </div>

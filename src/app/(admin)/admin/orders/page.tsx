@@ -212,7 +212,7 @@ export default function AdminOrdersPage() {
                                                 <input className="w-4 h-4 text-[#edab1d] rounded border-gray-300 focus:ring-[#edab1d] cursor-pointer" type="checkbox" />
                                             </td>
                                             <td className="py-4 px-6">
-                                                <Link href={`/${locale}/admin/orders/${order.id}`} className="text-sm font-semibold text-[#edab1d] hover:underline">
+                                                <Link href={`/admin/orders/${order.id}`} className="text-sm font-semibold text-[#edab1d] hover:underline">
                                                     #{order.id}
                                                 </Link>
                                             </td>
@@ -246,7 +246,7 @@ export default function AdminOrdersPage() {
                                                 <span className="text-sm text-slate-500">{order.date}</span>
                                             </td>
                                             <td className="py-4 px-6 text-center">
-                                                <Link href={`/${locale}/admin/orders/${order.id}`} className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors inline-block">
+                                                <Link href={`/admin/orders/${order.id}`} className="p-1 rounded-full hover:bg-slate-200 text-slate-400 hover:text-slate-600 transition-colors inline-block">
                                                     <span className="material-symbols-outlined text-[20px]">chevron_left</span>
                                                 </Link>
                                             </td>
@@ -282,7 +282,7 @@ export default function AdminOrdersPage() {
                     {/* Mobile View */}
                     <div className="md:hidden space-y-4">
                         {filteredOrders.map(order => (
-                            <Link key={order.id} href={`/${locale}/admin/orders/${order.id}`} className="block bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
+                            <Link key={order.id} href={`/admin/orders/${order.id}`} className="block bg-white p-4 rounded-2xl shadow-sm border border-slate-100 hover:shadow-md transition-all">
                                 <div className="flex justify-between items-start mb-3">
                                     <div className="flex items-center gap-2">
                                         <span className="text-sm font-bold text-slate-900">#{order.id}</span>
