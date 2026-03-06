@@ -1,6 +1,7 @@
 import { Noto_Sans_Arabic, Cairo, Manrope } from 'next/font/google';
 import '../../globals.css';
 import { AdminLayoutClient } from '@/components/admin/AdminLayoutClient';
+import { Analytics } from '@vercel/analytics/next';
 
 const notoSansArabic = Noto_Sans_Arabic({ subsets: ['arabic'], variable: '--font-noto-sans-arabic' });
 const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' });
@@ -17,6 +18,7 @@ export default function AdminLayout({
     return (
         <html lang="ar" dir="rtl" suppressHydrationWarning>
             <body className={`${notoSansArabic.variable} ${cairo.variable} ${manrope.variable} antialiased font-body bg-background-light text-on-surface`} suppressHydrationWarning>
+                <Analytics />
                 <AdminLayoutClient arMessages={arMessages} enMessages={enMessages}>
                     {children}
                 </AdminLayoutClient>

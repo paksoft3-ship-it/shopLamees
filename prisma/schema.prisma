@@ -48,6 +48,7 @@ model Category {
 
   products ProductCategory[]
 
+  @@index([sortOrder])
   @@map("categories")
 }
 
@@ -76,6 +77,9 @@ model Product {
   categories ProductCategory[]
   orderItems OrderItem[]
 
+  @@index([isPublished, createdAt])
+  @@index([isPublished, isBestSeller])
+  @@index([createdAt])
   @@map("products")
 }
 
@@ -87,6 +91,7 @@ model ProductCategory {
   category Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@id([productId, categoryId])
+  @@index([categoryId, productId])
   @@map("product_categories")
 }
 
@@ -100,6 +105,7 @@ model ProductImage {
 
   product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
 
+  @@index([productId, sortOrder])
   @@map("product_images")
 }
 
@@ -118,6 +124,8 @@ model ProductVariant {
   product    Product     @relation(fields: [productId], references: [id], onDelete: Cascade)
   orderItems OrderItem[]
 
+  @@index([productId, createdAt])
+  @@index([productId, stock])
   @@map("product_variants")
 }
 
@@ -146,6 +154,8 @@ model Order {
   items   OrderItem[]
   address OrderAddress?
 
+  @@index([createdAt])
+  @@index([status, createdAt])
   @@map("orders")
 }
 
@@ -167,6 +177,9 @@ model OrderItem {
   product Product?        @relation(fields: [productId], references: [id], onDelete: SetNull)
   variant ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
 
+  @@index([orderId])
+  @@index([productId])
+  @@index([variantId])
   @@map("order_items")
 }
 
@@ -223,6 +236,7 @@ model RolePermission {
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@unique([adminUserId, permissionId])
+  @@index([permissionId])
   @@map("role_permissions")
 }
 

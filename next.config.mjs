@@ -20,6 +20,29 @@ const nextConfig = {
             },
         ],
     },
+    experimental: {
+        optimizePackageImports: ['lucide-react'],
+    },
+    async headers() {
+        return [
+            {
+                source: '/robots.txt',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400' }],
+            },
+            {
+                source: '/sitemap.xml',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400' }],
+            },
+            {
+                source: '/llms.txt',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400' }],
+            },
+            {
+                source: '/llms-full.txt',
+                headers: [{ key: 'Cache-Control', value: 'public, max-age=3600, s-maxage=3600, stale-while-revalidate=86400' }],
+            },
+        ];
+    },
 };
 
 export default withNextIntl(nextConfig);

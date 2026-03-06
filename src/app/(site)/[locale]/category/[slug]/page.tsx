@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import { CategoryListing } from '@/components/category/CategoryListing';
 import { Metadata } from 'next';
 import { getCategoryBySlug, getProductsByCategory, getAllProducts } from '@/lib/data/catalog';
+import { getLocalizedUrl } from '@/lib/site';
 
 type Props = {
     params: { locale: string; slug: string };
@@ -10,19 +11,42 @@ type Props = {
 
 export async function generateMetadata({ params: { locale, slug } }: Props): Promise<Metadata> {
     const t = await getTranslations({ locale, namespace: 'Category.Breadcrumbs' });
+    const path = slug === 'all' ? 'category/all' : `category/${slug}`;
 
     if (slug === 'all') {
         const title = locale === 'ar' ? 'جميع المنتجات' : 'All Products';
-        return { title: `${title} | ${t('home')} - Shop Lamees` };
+        const description = locale === 'ar' ? 'تصفح جميع منتجات لاميس عباية.' : 'Browse all products at Lamees Abaya.';
+        return {
+            title: `${title} | ${t('home')} - Shop Lamees`,
+            description,
+            alternates: {
+                canonical: getLocalizedUrl(locale as 'ar' | 'en', path),
+                languages: {
+                    ar: getLocalizedUrl('ar', path),
+                    en: getLocalizedUrl('en', path),
+                },
+            },
+        };
     }
 
     const category = await getCategoryBySlug(slug);
     if (!category) return {};
 
     const title = locale === 'ar' ? category.nameAr : category.nameEn;
+    const description = locale === 'ar'
+        ? `تسوق منتجات ${category.nameAr} من لاميس عباية.`
+        : `Shop ${category.nameEn} products from Lamees Abaya.`;
 
     return {
         title: `${title} | ${t('home')} - Shop Lamees`,
+        description,
+        alternates: {
+            canonical: getLocalizedUrl(locale as 'ar' | 'en', path),
+            languages: {
+                ar: getLocalizedUrl('ar', path),
+                en: getLocalizedUrl('en', path),
+            },
+        },
     };
 }
 

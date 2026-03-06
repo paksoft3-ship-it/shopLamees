@@ -60,6 +60,18 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
         if (!event.target.files?.length) return;
 
         const file = event.target.files[0];
+        const maxSizeBytes = 4 * 1024 * 1024;
+        const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
+
+        if (!allowedTypes.has(file.type)) {
+            alert(isRtl ? 'نوع الملف غير مدعوم. استخدم JPG/PNG/WEBP/AVIF.' : 'Unsupported file type. Use JPG/PNG/WEBP/AVIF.');
+            return;
+        }
+        if (file.size > maxSizeBytes) {
+            alert(isRtl ? 'حجم الصورة كبير جداً. الحد الأقصى 4MB.' : 'Image is too large. Max size is 4MB.');
+            return;
+        }
+
         setUploading(true);
 
         try {
