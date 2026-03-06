@@ -14,7 +14,18 @@ export async function POST(request: Request): Promise<NextResponse> {
                 // Here you can check if the user is authorized to upload
                 // e.g. using next-auth
                 return {
-                    allowedContentTypes: ['image/jpeg', 'image/png', 'image/gif', 'image/webp'],
+                    allowedContentTypes: [
+                        'image/jpeg',
+                        'image/png',
+                        'image/gif',
+                        'image/webp',
+                        'image/avif',
+                        'video/mp4',
+                        'video/webm',
+                        'video/quicktime',
+                        'video/x-m4v',
+                        'video/mpeg',
+                    ],
                     tokenPayload: JSON.stringify({
                         // optional, sent to your server on upload completion
                         // userId: session.user.id,

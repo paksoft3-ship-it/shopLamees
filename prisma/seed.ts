@@ -3,13 +3,9 @@ config({ path: '.env.local' });
 config({ path: '.env' });
 
 import { PrismaClient } from '@prisma/client';
-import { createHash } from 'crypto';
+import { hash } from 'bcryptjs';
 
 const prisma = new PrismaClient({ datasourceUrl: process.env.DATABASE_URL });
-
-function hashPassword(p: string) {
-    return createHash('sha256').update(p).digest('hex');
-}
 
 // Arabic-Indic numerals → Number
 function ar2n(s: string): number {
@@ -506,13 +502,14 @@ async function main() {
     // 2. Admin user
     const adminEmail = process.env.ADMIN_SEED_EMAIL || process.env.ADMIN_EMAIL || 'admin@lamees.qa';
     const adminPassword = process.env.ADMIN_SEED_PASSWORD || process.env.ADMIN_PASSWORD || 'Lamees2024!';
+    const adminPasswordHash = await hash(adminPassword, 10);
     const admin = await prisma.adminUser.upsert({
         where: { email: adminEmail },
-        update: {},
+        update: { passwordHash: adminPasswordHash },
         create: {
             name: 'مدير المتجر',
             email: adminEmail,
-            passwordHash: hashPassword(adminPassword),
+            passwordHash: adminPasswordHash,
             role: 'OWNER',
             isActive: true,
         },

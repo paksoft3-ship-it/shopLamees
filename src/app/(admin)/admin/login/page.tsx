@@ -75,7 +75,7 @@ export default function AdminLogin() {
 
         <div className="bg-white shadow-xl rounded-2xl border border-[#ece7da] overflow-hidden">
           <div className="p-7 sm:p-10">
-            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-5">
+            <form onSubmit={handleLoginSubmit} className="flex flex-col gap-5" dir="ltr">
               <div className="flex flex-col gap-2">
                 <label className="text-[#0f172a] text-sm font-bold">Email address</label>
                 <div className="relative">
@@ -83,7 +83,8 @@ export default function AdminLogin() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-[#e6dfcf] bg-[#fbfaf8] h-12 px-4 pl-12 text-[#0f172a] focus:outline-none focus:ring-2 focus:ring-[#edab1d]/30 focus:border-[#edab1d] text-sm"
+                    dir="ltr"
+                    className="w-full rounded-xl border border-[#e6dfcf] bg-[#fbfaf8] h-12 px-4 pl-12 text-[#0f172a] text-left placeholder:text-left focus:outline-none focus:ring-2 focus:ring-[#edab1d]/30 focus:border-[#edab1d] text-sm"
                     placeholder="name@company.com"
                     required
                   />
@@ -100,7 +101,8 @@ export default function AdminLogin() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#e6dfcf] bg-[#fbfaf8] h-12 px-4 pr-12 text-[#0f172a] focus:outline-none focus:ring-2 focus:ring-[#edab1d]/30 focus:border-[#edab1d] text-sm"
+                    dir="ltr"
+                    className="w-full rounded-xl border border-[#e6dfcf] bg-[#fbfaf8] h-12 px-4 pr-12 text-[#0f172a] text-left placeholder:text-left focus:outline-none focus:ring-2 focus:ring-[#edab1d]/30 focus:border-[#edab1d] text-sm"
                     placeholder="********"
                     required
                   />

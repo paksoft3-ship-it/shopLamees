@@ -3,7 +3,7 @@
 import { useAdminAuth } from '@/lib/stores/adminAuth';
 import { usePathname } from 'next/navigation';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NextIntlClientProvider, useTranslations } from 'next-intl';
 
 // ─── Inner component uses translations after provider is set up ───────
@@ -12,6 +12,8 @@ function AdminShell({ children, locale, onToggleLocale }: {
     locale: 'ar' | 'en';
     onToggleLocale: () => void;
 }) {
+    type NavItem = { href: string; label: string; icon: string; badge?: string };
+
     const { user, logout } = useAdminAuth();
     const pathname = usePathname();
     const t = useTranslations('AdminNav');
@@ -21,6 +23,10 @@ function AdminShell({ children, locale, onToggleLocale }: {
     const [searchQuery, setSearchQuery] = useState('');
     const [isSidebarExpanded, setIsSidebarExpanded] = useState(true);
     const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
+    const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+    const [unreadNotifications, setUnreadNotifications] = useState(2);
+    const desktopNotificationsRef = useRef<HTMLDivElement>(null);
+    const mobileNotificationsRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         setIsMounted(true);
@@ -45,7 +51,22 @@ function AdminShell({ children, locale, onToggleLocale }: {
     }, [user, pathname, isMounted]);
 
     // Close mobile drawer on route change
-    useEffect(() => { setIsMobileDrawerOpen(false); }, [pathname]);
+    useEffect(() => {
+        setIsMobileDrawerOpen(false);
+        setIsNotificationsOpen(false);
+    }, [pathname]);
+
+    useEffect(() => {
+        const onClickOutside = (event: MouseEvent) => {
+            const target = event.target as Node;
+            const inDesktop = desktopNotificationsRef.current?.contains(target);
+            const inMobile = mobileNotificationsRef.current?.contains(target);
+            if (inDesktop || inMobile) return;
+            setIsNotificationsOpen(false);
+        };
+        document.addEventListener('mousedown', onClickOutside);
+        return () => document.removeEventListener('mousedown', onClickOutside);
+    }, []);
 
     if (!isMounted) return <div className="min-h-screen bg-[#f8f7f6]" />;
 
@@ -59,9 +80,9 @@ function AdminShell({ children, locale, onToggleLocale }: {
 
     if (!user) return null;
 
-    const mainNavItems = [
+    const mainNavItems: NavItem[] = [
         { href: '/admin', label: t('dashboard'), icon: 'dashboard' },
-        { href: '/admin/orders', label: t('orders'), icon: 'shopping_bag', badge: '12' },
+        { href: '/admin/orders', label: t('orders'), icon: 'shopping_bag' },
         { href: '/admin/products', label: t('products'), icon: 'sell' },
         { href: '/admin/categories', label: t('categories'), icon: 'category' },
         { href: '/admin/customers', label: t('customers'), icon: 'group' },
@@ -75,7 +96,7 @@ function AdminShell({ children, locale, onToggleLocale }: {
         { href: '/admin/payments', label: t('payments'), icon: 'credit_card' },
     ];
 
-    const bottomNavItems = [
+    const bottomNavItems: NavItem[] = [
         { href: '/admin/settings', label: t('settings'), icon: 'settings' },
         { href: '/admin/users', label: t('users'), icon: 'manage_accounts' },
         { href: '/admin/audit', label: t('activity'), icon: 'history' },
@@ -332,10 +353,32 @@ function AdminShell({ children, locale, onToggleLocale }: {
                         <div className="w-6 h-6 rounded bg-[#edab1d] text-white flex items-center justify-center font-bold text-xs shadow-sm">S</div>
                         <h1 className="text-lg font-bold tracking-tight text-[#1b170d]">Shop Lamees</h1>
                     </div>
-                    <Link href="/admin/orders" className="p-2 text-[#1b170d] hover:bg-[#f3efe7] rounded-full transition-colors relative">
-                        <span className="material-symbols-outlined text-[24px]">notifications</span>
-                        <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white" />
-                    </Link>
+                    <div className="relative" ref={mobileNotificationsRef}>
+                        <button
+                            onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                            className="p-2 text-[#1b170d] hover:bg-[#f3efe7] rounded-full transition-colors relative"
+                            aria-label="Notifications"
+                        >
+                            <span className="material-symbols-outlined text-[24px]">notifications</span>
+                            {unreadNotifications > 0 && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full border border-white" />}
+                        </button>
+                        {isNotificationsOpen && (
+                            <div className={`absolute top-12 z-30 w-72 rounded-xl border border-neutral-200 bg-white shadow-xl p-3 ${isRTL ? 'left-0' : 'right-0'}`}>
+                                <div className="flex items-center justify-between mb-2">
+                                    <p className="text-sm font-bold text-[#1b170d]">{isRTL ? 'الإشعارات' : 'Notifications'}</p>
+                                    <button onClick={() => setUnreadNotifications(0)} className="text-xs text-[#edab1d] font-bold hover:underline">
+                                        {isRTL ? 'تحديد الكل كمقروء' : 'Mark all read'}
+                                    </button>
+                                </div>
+                                <div className="space-y-2 text-xs text-neutral-600">
+                                    <div className="rounded-lg bg-neutral-50 p-2.5">{isRTL ? 'لا توجد إشعارات جديدة' : 'No new notifications'}</div>
+                                </div>
+                                <Link href="/admin/orders" className="mt-3 block text-center text-xs font-bold text-[#edab1d] hover:underline">
+                                    {isRTL ? 'عرض الطلبات' : 'View orders'}
+                                </Link>
+                            </div>
+                        )}
+                    </div>
                 </header>
 
                 {/* Desktop Topbar */}
@@ -358,10 +401,32 @@ function AdminShell({ children, locale, onToggleLocale }: {
                         </div>
                         {/* Language toggle — in topbar too */}
                         <LangToggle />
-                        <button className="relative p-2 text-[#4c669a] hover:text-[#135bec] transition-colors rounded-lg hover:bg-neutral-100">
-                            <span className="material-symbols-outlined text-[24px]">notifications</span>
-                            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white" />
-                        </button>
+                        <div className="relative" ref={desktopNotificationsRef}>
+                            <button
+                                onClick={() => setIsNotificationsOpen((prev) => !prev)}
+                                className="relative p-2 text-[#4c669a] hover:text-[#135bec] transition-colors rounded-lg hover:bg-neutral-100"
+                                aria-label="Notifications"
+                            >
+                                <span className="material-symbols-outlined text-[24px]">notifications</span>
+                                {unreadNotifications > 0 && <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border border-white" />}
+                            </button>
+                            {isNotificationsOpen && (
+                                <div className={`absolute top-12 z-30 w-80 rounded-xl border border-neutral-200 bg-white shadow-xl p-3 ${isRTL ? 'left-0' : 'right-0'}`}>
+                                    <div className="flex items-center justify-between mb-2">
+                                        <p className="text-sm font-bold text-[#1b170d]">{isRTL ? 'الإشعارات' : 'Notifications'}</p>
+                                        <button onClick={() => setUnreadNotifications(0)} className="text-xs text-[#135bec] font-bold hover:underline">
+                                            {isRTL ? 'تحديد الكل كمقروء' : 'Mark all read'}
+                                        </button>
+                                    </div>
+                                    <div className="space-y-2 text-xs text-neutral-600">
+                                        <div className="rounded-lg bg-neutral-50 p-2.5">{isRTL ? 'لا توجد إشعارات جديدة' : 'No new notifications'}</div>
+                                    </div>
+                                    <Link href="/admin/orders" className="mt-3 block text-center text-xs font-bold text-[#135bec] hover:underline">
+                                        {isRTL ? 'عرض الطلبات' : 'View orders'}
+                                    </Link>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </header>
 

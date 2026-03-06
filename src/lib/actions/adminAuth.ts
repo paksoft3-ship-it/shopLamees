@@ -2,8 +2,27 @@
 
 import prisma from '@/lib/db';
 import { compare, hash } from 'bcryptjs';
+import { createHash } from 'crypto';
 
 export type AdminRoleClient = 'admin_owner' | 'admin_staff';
+
+async function verifyAdminPassword(plainPassword: string, storedHash: string): Promise<{
+  valid: boolean;
+  legacySha256: boolean;
+}> {
+  if (!storedHash) return { valid: false, legacySha256: false };
+
+  // Current format: bcrypt hash
+  if (storedHash.startsWith('$2')) {
+    const valid = await compare(plainPassword, storedHash);
+    return { valid, legacySha256: false };
+  }
+
+  // Legacy format: sha256 hex hash from old seed script
+  const sha256 = createHash('sha256').update(plainPassword).digest('hex');
+  const valid = sha256 === storedHash;
+  return { valid, legacySha256: valid };
+}
 
 export async function loginAdmin(email: string, password: string): Promise<{
   ok: boolean;
@@ -19,8 +38,16 @@ export async function loginAdmin(email: string, password: string): Promise<{
   if (!user) return { ok: false, message: 'Invalid email or password' };
   if (!user.isActive) return { ok: false, message: 'This admin account is disabled' };
 
-  const validPassword = await compare(password, user.passwordHash);
-  if (!validPassword) return { ok: false, message: 'Invalid email or password' };
+  const passwordCheck = await verifyAdminPassword(password, user.passwordHash);
+  if (!passwordCheck.valid) return { ok: false, message: 'Invalid email or password' };
+
+  // Seamlessly migrate old sha256 hash to bcrypt after successful login.
+  if (passwordCheck.legacySha256) {
+    await prisma.adminUser.update({
+      where: { email: normalizedEmail },
+      data: { passwordHash: await hash(password, 10) },
+    });
+  }
 
   return {
     ok: true,
@@ -60,8 +87,8 @@ export async function updateAdminLoginCredentials(input: {
 
   if (!user) return { ok: false, message: 'Current credentials are invalid' };
 
-  const passwordValid = await compare(input.currentPassword, user.passwordHash);
-  if (!passwordValid) return { ok: false, message: 'Current credentials are invalid' };
+  const passwordCheck = await verifyAdminPassword(input.currentPassword, user.passwordHash);
+  if (!passwordCheck.valid) return { ok: false, message: 'Current credentials are invalid' };
 
   if (nextEmail && nextEmail !== currentEmail) {
     const existing = await prisma.adminUser.findUnique({
