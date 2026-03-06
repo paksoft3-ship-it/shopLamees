@@ -5,6 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import { AdminSettingsDTO, getAdminStoreSettings, updateAdminStoreSettings } from '@/lib/actions/adminInsights';
 import { updateAdminLoginCredentials } from '@/lib/actions/adminAuth';
 import { useAdminAuth } from '@/lib/stores/adminAuth';
+import { buildDefaultHomeVideos } from '@/lib/homeVideos';
 
 const emptySettings: AdminSettingsDTO = {
   storeName: '',
@@ -14,6 +15,7 @@ const emptySettings: AdminSettingsDTO = {
   freeShipAbove: 0,
   defaultCurrency: 'QAR',
   vatPercent: 0,
+  homeVideos: buildDefaultHomeVideos(),
 };
 
 export default function SettingsPage() {
@@ -135,16 +137,17 @@ export default function SettingsPage() {
     setCredentialMessage(L('تم تحديث بيانات تسجيل الدخول بنجاح', 'Login credentials updated successfully'));
   };
 
+  const L = (ar: string, en: string) => (isRtl ? ar : en);
+
   const tabs = [
     { id: 'general', label: t('tab_general'), icon: 'store' },
     { id: 'contact', label: t('tab_contact'), icon: 'contact_phone' },
     { id: 'pricing', label: t('tab_pricing'), icon: 'payments' },
     { id: 'shipping', label: t('tab_shipping'), icon: 'local_shipping' },
+    { id: 'homeVideos', label: L('فيديوهات الرئيسية', 'Homepage Videos'), icon: 'movie' },
     { id: 'social', label: t('tab_social'), icon: 'share' },
     { id: 'notifications', label: t('tab_notifications'), icon: 'notifications' },
   ];
-
-  const L = (ar: string, en: string) => (isRtl ? ar : en);
 
   if (loading) {
     return <div className="p-8 text-neutral-500">{L('جاري تحميل الإعدادات...', 'Loading settings...')}</div>;
@@ -252,6 +255,92 @@ export default function SettingsPage() {
                 </div>
                 <InputField label={L('حد الشحن المجاني', 'Free Shipping Threshold')} value={String(form.freeShipAbove)} onChange={(v) => setForm((f) => ({ ...f, freeShipAbove: Number(v) }))} type="number" dir="ltr" />
                 <InputField label={L('مدة التوصيل المتوقعة (أيام)', 'Estimated Delivery Window (days)')} value={extras.deliveryWindowDays} onChange={(v) => setExtras((e) => ({ ...e, deliveryWindowDays: v }))} dir="ltr" />
+              </SettingsCard>
+            </div>
+          )}
+
+          {activeTab === 'homeVideos' && (
+            <div>
+              <SettingsCard
+                title={L('فيديوهات القسم الرئيسي', 'Homepage Video Showcase')}
+                description={L('تحكم في الفيديوهات المعروضة في الصفحة الرئيسية (الرابط، الملصق، النص).', 'Manage videos shown on homepage (URL, poster, label).')}
+              >
+                <div className="mb-4 flex flex-wrap gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setForm((f) => ({ ...f, homeVideos: buildDefaultHomeVideos() }))}
+                    className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 px-3 py-2 text-xs font-bold text-[#1b170d] hover:bg-neutral-50"
+                  >
+                    <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                    {L('استرجاع الفيديوهات الافتراضية', 'Restore Default Videos')}
+                  </button>
+                </div>
+
+                <div className="space-y-4">
+                  {form.homeVideos.map((video, index) => (
+                    <div key={index} className="rounded-lg border border-neutral-200 p-4">
+                      <div className="flex flex-wrap items-center justify-between mb-3 gap-3">
+                        <h4 className="text-sm font-bold text-[#1b170d]">
+                          {L('الفيديو', 'Video')} #{index + 1}
+                        </h4>
+                        <label className="inline-flex items-center gap-2 text-sm text-neutral-700">
+                          <input
+                            type="checkbox"
+                            checked={video.enabled}
+                            onChange={(e) =>
+                              setForm((f) => ({
+                                ...f,
+                                homeVideos: f.homeVideos.map((row, i) =>
+                                  i === index ? { ...row, enabled: e.target.checked } : row,
+                                ),
+                              }))
+                            }
+                          />
+                          {L('مفعل', 'Enabled')}
+                        </label>
+                      </div>
+
+                      <InputField
+                        label={L('رابط الفيديو', 'Video URL')}
+                        value={video.src}
+                        onChange={(v) =>
+                          setForm((f) => ({
+                            ...f,
+                            homeVideos: f.homeVideos.map((row, i) =>
+                              i === index ? { ...row, src: v } : row,
+                            ),
+                          }))
+                        }
+                        dir="ltr"
+                      />
+                      <InputField
+                        label={L('رابط صورة الغلاف', 'Poster URL')}
+                        value={video.poster}
+                        onChange={(v) =>
+                          setForm((f) => ({
+                            ...f,
+                            homeVideos: f.homeVideos.map((row, i) =>
+                              i === index ? { ...row, poster: v } : row,
+                            ),
+                          }))
+                        }
+                        dir="ltr"
+                      />
+                      <InputField
+                        label={L('النص الظاهر على الفيديو', 'Video Label')}
+                        value={video.label}
+                        onChange={(v) =>
+                          setForm((f) => ({
+                            ...f,
+                            homeVideos: f.homeVideos.map((row, i) =>
+                              i === index ? { ...row, label: v } : row,
+                            ),
+                          }))
+                        }
+                      />
+                    </div>
+                  ))}
+                </div>
               </SettingsCard>
             </div>
           )}

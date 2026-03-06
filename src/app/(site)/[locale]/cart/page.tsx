@@ -20,7 +20,7 @@ export default function CartPage() {
     }
 
     return (
-        <main className="max-w-[1200px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex-grow">
+        <main className="max-w-[1320px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex-grow">
             {/* Breadcrumb */}
             <nav aria-label="Breadcrumb" className="flex mb-8">
                 <ol className="inline-flex items-center gap-2 text-sm text-slate-500 font-display rtl:space-x-reverse">
@@ -36,19 +36,21 @@ export default function CartPage() {
                 </ol>
             </nav>
 
-            <h1 className="text-3xl md:text-4xl font-display font-bold text-slate-900 mb-8 md:mb-12">
+            <h1 className="text-xl md:text-2xl font-display font-bold text-slate-900 mb-6 md:mb-8">
                 {t('title')} <span className="text-slate-500 font-normal text-2xl">({items.length})</span>
             </h1>
 
-            <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
+            <div className="rounded-3xl bg-[#f3f3f5] p-4 md:p-6 lg:p-8">
+                <div className="flex flex-col lg:flex-row rtl:lg:flex-row-reverse gap-8 lg:gap-10">
                 {/* Left Column - Line Items */}
-                <div className="w-full lg:w-2/3">
-                    <CartList />
-                </div>
+                    <div className="w-full lg:w-[68%]">
+                        <CartList />
+                    </div>
 
                 {/* Right Column - Summary */}
-                <div className="w-full lg:w-1/3">
-                    <CartSummary />
+                    <div className="w-full lg:w-[32%]">
+                        <CartSummary />
+                    </div>
                 </div>
             </div>
         </main>

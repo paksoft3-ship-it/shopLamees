@@ -6,15 +6,17 @@ import { VideoShowcase } from "@/components/home/VideoShowcase";
 import { ValueProps } from "@/components/home/ValueProps";
 import { Newsletter } from "@/components/home/Newsletter";
 import { getCategories, getFeaturedProducts } from "@/lib/data/catalog";
+import { getHomeVideosFromSettings } from "@/lib/data/storeSettings";
 
 import { setRequestLocale } from 'next-intl/server';
 
 export default async function Home({ params: { locale } }: { params: { locale: string } }) {
     setRequestLocale(locale);
 
-    const [categories, featuredProducts] = await Promise.all([
+    const [categories, featuredProducts, homeVideos] = await Promise.all([
         getCategories(),
-        getFeaturedProducts()
+        getFeaturedProducts(),
+        getHomeVideosFromSettings(),
     ]);
 
     return (
@@ -23,7 +25,7 @@ export default async function Home({ params: { locale } }: { params: { locale: s
             <CategoriesRow categories={categories} />
             <FeaturedProducts products={featuredProducts} />
             <Lookbook />
-            <VideoShowcase />
+            <VideoShowcase videos={homeVideos} />
             <ValueProps />
             <Newsletter />
         </>

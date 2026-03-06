@@ -237,6 +237,7 @@ model StoreSettings {
   freeShipAbove   Decimal  @default(500) @db.Decimal(10, 2)
   defaultCurrency Currency @default(SAR)
   vatPercent      Decimal  @default(15) @db.Decimal(5, 2)
+  homeVideosJson  String   @default("[]") @db.Text
   updatedAt       DateTime @updatedAt
 
   @@map("store_settings")

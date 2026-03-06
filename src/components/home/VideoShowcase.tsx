@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { ArrowRight, Play, Pause } from 'lucide-react';
 import { useRef, useState } from 'react';
+import { HomeVideoItem, normalizeHomeVideos } from '@/lib/homeVideos';
 
 function VideoCard({ src, poster, label }: { src: string; poster: string; label: string }) {
     const ref = useRef<HTMLVideoElement>(null);
@@ -55,8 +56,11 @@ function VideoCard({ src, poster, label }: { src: string; poster: string; label:
     );
 }
 
-export function VideoShowcase() {
+export function VideoShowcase({ videos = [] }: { videos?: HomeVideoItem[] }) {
     const t = useTranslations('Home.VideoShowcase');
+    const configuredVideos = normalizeHomeVideos(videos).filter((item) => item.enabled);
+    const visibleVideos = configuredVideos.length > 0 ? configuredVideos : normalizeHomeVideos([]);
+    const fallbackLabels = [t('video_collection'), t('video_style'), t('video_detail')];
 
     return (
         <section className="py-16 lg:py-24 bg-surface border-y border-border">
@@ -74,18 +78,14 @@ export function VideoShowcase() {
 
                 {/* 3-column portrait grid — 9:16 cards match the video format exactly */}
                 <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    <VideoCard src="/videos/video-1.mp4"  poster="/videos/posters/video-1.jpg"  label={t('video_collection')} />
-                    <VideoCard src="/videos/video-2.mp4"  poster="/videos/posters/video-2.jpg"  label={t('video_style')} />
-                    <VideoCard src="/videos/video-3.mp4"  poster="/videos/posters/video-3.jpg"  label={t('video_detail')} />
-                    <VideoCard src="/videos/video-4.mp4"  poster="/videos/posters/video-4.jpg"  label={t('video_collection')} />
-                    <VideoCard src="/videos/video-5.mp4"  poster="/videos/posters/video-5.jpg"  label={t('video_style')} />
-                    <VideoCard src="/videos/video-6.mp4"  poster="/videos/posters/video-6.jpg"  label={t('video_detail')} />
-                    <VideoCard src="/videos/video-7.mp4"  poster="/videos/posters/video-7.jpg"  label={t('video_collection')} />
-                    <VideoCard src="/videos/video-8.mp4"  poster="/videos/posters/video-8.jpg"  label={t('video_style')} />
-                    <VideoCard src="/videos/video-9.mp4"  poster="/videos/posters/video-9.jpg"  label={t('video_detail')} />
-                    <VideoCard src="/videos/video-10.mp4" poster="/videos/posters/video-10.jpg" label={t('video_collection')} />
-                    <VideoCard src="/videos/video-11.mp4" poster="/videos/posters/video-11.jpg" label={t('video_style')} />
-                    <VideoCard src="/videos/video-12.mp4" poster="/videos/posters/video-12.jpg" label={t('video_detail')} />
+                    {visibleVideos.map((video, index) => (
+                        <VideoCard
+                            key={`${video.src}-${index}`}
+                            src={video.src}
+                            poster={video.poster}
+                            label={video.label || fallbackLabels[index % fallbackLabels.length]}
+                        />
+                    ))}
                 </div>
             </div>
         </section>

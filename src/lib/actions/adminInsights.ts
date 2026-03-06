@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/lib/db';
+import { HomeVideoItem, normalizeHomeVideos } from '@/lib/homeVideos';
 
 export interface AdminCouponInsight {
   code: string;
@@ -66,6 +67,7 @@ export interface AdminSettingsDTO {
   freeShipAbove: number;
   defaultCurrency: 'QAR' | 'SAR';
   vatPercent: number;
+  homeVideos: HomeVideoItem[];
 }
 
 function getMonthsBack(n: number): string[] {
@@ -413,6 +415,12 @@ export async function getAdminStoreSettings(): Promise<AdminSettingsDTO> {
     update: {},
     create: { id: 1 },
   });
+  let parsedHomeVideos: unknown = [];
+  try {
+    parsedHomeVideos = JSON.parse(settings.homeVideosJson || '[]');
+  } catch {
+    parsedHomeVideos = [];
+  }
 
   return {
     storeName: settings.storeName,
@@ -422,10 +430,13 @@ export async function getAdminStoreSettings(): Promise<AdminSettingsDTO> {
     freeShipAbove: Number(settings.freeShipAbove),
     defaultCurrency: settings.defaultCurrency,
     vatPercent: Number(settings.vatPercent),
+    homeVideos: normalizeHomeVideos(parsedHomeVideos),
   };
 }
 
 export async function updateAdminStoreSettings(payload: AdminSettingsDTO) {
+  const homeVideos = normalizeHomeVideos(payload.homeVideos);
+
   await prisma.storeSettings.upsert({
     where: { id: 1 },
     update: {
@@ -436,6 +447,7 @@ export async function updateAdminStoreSettings(payload: AdminSettingsDTO) {
       freeShipAbove: payload.freeShipAbove,
       defaultCurrency: payload.defaultCurrency,
       vatPercent: payload.vatPercent,
+      homeVideosJson: JSON.stringify(homeVideos),
     },
     create: {
       id: 1,
@@ -446,6 +458,7 @@ export async function updateAdminStoreSettings(payload: AdminSettingsDTO) {
       freeShipAbove: payload.freeShipAbove,
       defaultCurrency: payload.defaultCurrency,
       vatPercent: payload.vatPercent,
+      homeVideosJson: JSON.stringify(homeVideos),
     },
   });
 }
