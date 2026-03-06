@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { ProductStatus, AdminProduct, ProductVariant } from '@/lib/stores/adminProducts';
 import { getAdminProducts, updateAdminProductStatus } from '@/lib/actions/adminProducts';
 import { useLocale, useTranslations } from 'next-intl';
@@ -149,9 +150,15 @@ export default function AdminProductsPage() {
                                                         <input className="w-4 h-4 text-primary rounded border-gray-300 focus:ring-primary cursor-pointer" type="checkbox" />
                                                     </td>
                                                     <td className="py-4 px-4">
-                                                        <div className="size-12 rounded-lg bg-gray-100 overflow-hidden border border-gray-200 shrink-0">
+                                                        <div className="relative size-12 rounded-lg bg-gray-100 overflow-hidden border border-gray-200 shrink-0">
                                                             {product.images[0] ? (
-                                                                <img src={product.images[0]} alt={product.titleAr} className="w-full h-full object-cover" />
+                                                                <Image
+                                                                    src={product.images[0]}
+                                                                    alt={product.titleAr}
+                                                                    fill
+                                                                    className="w-full h-full object-cover"
+                                                                    sizes="48px"
+                                                                />
                                                             ) : (
                                                                 <span className="material-symbols-outlined text-gray-400 w-full h-full flex items-center justify-center">image</span>
                                                             )}
@@ -244,7 +251,13 @@ export default function AdminProductsPage() {
                                         <div className="flex gap-3">
                                             <div className="relative shrink-0 w-24 h-28 rounded-xl overflow-hidden bg-gray-100 border border-gray-200">
                                                 {product.images[0] ? (
-                                                    <img src={product.images[0]} alt={product.titleAr} className="w-full h-full object-cover" />
+                                                    <Image
+                                                        src={product.images[0]}
+                                                        alt={product.titleAr}
+                                                        fill
+                                                        className="w-full h-full object-cover"
+                                                        sizes="96px"
+                                                    />
                                                 ) : (
                                                     <span className="material-symbols-outlined text-gray-400 w-full h-full justify-center flex items-center">image</span>
                                                 )}

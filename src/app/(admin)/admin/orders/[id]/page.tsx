@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { OrderStatus, AdminOrder } from '@/lib/stores/adminOrders';
 import { getAdminOrder, updateAdminOrderStatus, updateAdminOrderNote } from '@/lib/actions/adminOrders';
@@ -211,7 +212,14 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                             <td className="px-6 py-4">
                                                 <div className="flex items-center gap-4">
                                                     <div className="size-16 rounded-lg bg-slate-100 overflow-hidden flex-shrink-0 border border-slate-200">
-                                                        <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                                                        <Image
+                                                            src={item.image}
+                                                            alt={item.name}
+                                                            width={64}
+                                                            height={64}
+                                                            className="w-full h-full object-cover"
+                                                            sizes="64px"
+                                                        />
                                                     </div>
                                                     <div>
                                                         <p className="font-bold text-slate-900 mb-1">{item.name}</p>
@@ -307,7 +315,14 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         <div className="flex items-center gap-4 mb-6">
                             <div className="size-14 rounded-full bg-slate-100 overflow-hidden ring-2 ring-white shadow-sm flex items-center justify-center">
                                 {order.customerAvatar ? (
-                                    <img src={order.customerAvatar} alt={order.customerName} className="w-full h-full object-cover" />
+                                    <Image
+                                        src={order.customerAvatar}
+                                        alt={order.customerName}
+                                        width={56}
+                                        height={56}
+                                        className="w-full h-full object-cover"
+                                        sizes="56px"
+                                    />
                                 ) : <span className="material-symbols-outlined text-slate-400">person</span>}
                             </div>
                             <div>

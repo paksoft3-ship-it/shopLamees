@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { CategoryDTO, ProductDTO } from '@/lib/data/types';
 import { trackEvent } from '@/lib/tracking/track';
@@ -13,7 +13,6 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
     const tFilters = useTranslations('Category.Filters');
 
     // Filtering State
-    const [products, setProducts] = useState(initialProducts);
     const [sortOption, setSortOption] = useState('suggestions');
     const [priceRange] = useState({ min: 0, max: 1000 });
     const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -28,7 +27,7 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
     }, [category, initialProducts, locale]);
 
     // Apply Sorting/Filtering Math (Mocked)
-    useEffect(() => {
+    const products = useMemo(() => {
         let result = [...initialProducts];
 
         // Mock filter logic
@@ -46,7 +45,7 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
             result.sort((a, b) => b.rating - a.rating);
         }
 
-        setProducts(result);
+        return result;
     }, [sortOption, priceRange, initialProducts]);
 
     const handleSort = (option: string) => {
@@ -102,8 +101,8 @@ export function CategoryListing({ category, initialProducts }: { category: Categ
                             <span className="material-symbols-outlined text-lg">expand_more</span>
                         </button>
 
-                        {(isMenuOpen || true) && ( // Keeping it true but handling opacity for CSS hover support like reference html
-                            <div className="absolute left-0 mt-1 w-full bg-white border border-border rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10 overflow-hidden">
+                        {isMenuOpen && (
+                            <div className="absolute left-0 mt-1 w-full bg-white border border-border rounded-lg shadow-lg transition-all duration-200 z-10 overflow-hidden">
                                 {['suggestions', 'bestseller', 'highest_rated', 'price_high_low', 'price_low_high'].map(opt => (
                                     <button
                                         key={opt}

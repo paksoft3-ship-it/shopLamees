@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { upload } from '@vercel/blob/client';
 import { AdminProduct, ProductStatus } from '@/lib/stores/adminProducts';
@@ -360,7 +361,13 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                 <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
                                     {formData.images.map((img, idx) => (
                                         <div key={idx} className="relative aspect-[3/4] rounded-xl overflow-hidden border border-gray-200 group bg-gray-50">
-                                            <img src={img} alt={`Preview ${idx}`} className="w-full h-full object-cover" />
+                                            <Image
+                                                src={img}
+                                                alt={`Preview ${idx}`}
+                                                fill
+                                                className="w-full h-full object-cover"
+                                                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 25vw, 20vw"
+                                            />
                                             <div className="absolute inset-0 bg-gray-900/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                                                 <button
                                                     onClick={() => removeImage(idx)}

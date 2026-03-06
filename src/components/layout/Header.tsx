@@ -10,6 +10,7 @@ import { LocaleSwitcher } from './LocaleSwitcher';
 export function Header() {
     const t = useTranslations('Home.Header');
     const items = useCartStore((state) => state.items);
+    const hasHydrated = useCartStore((state) => state.hasHydrated);
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -44,7 +45,7 @@ export function Header() {
                         <Link href="/cart" className="p-2 rounded-full hover:bg-black/5 transition-colors inline-block text-slate-900">
                             <ShoppingBag className="w-6 h-6" />
                         </Link>
-                        {cartCount > 0 && (
+                        {hasHydrated && cartCount > 0 && (
                             <span className="absolute top-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
                                 {cartCount}
                             </span>
@@ -80,7 +81,7 @@ export function Header() {
                             <Link href="/cart" className="p-2 text-slate-900 hover:text-primary transition-colors inline-block">
                                 <ShoppingBag className="w-6 h-6" />
                             </Link>
-                            {cartCount > 0 && (
+                            {hasHydrated && cartCount > 0 && (
                                 <span className="absolute top-1 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-slate-900">
                                     {cartCount}
                                 </span>

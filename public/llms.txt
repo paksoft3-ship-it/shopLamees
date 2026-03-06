@@ -1,0 +1,21 @@
+Site: Shop Lamees
+Primary language: Arabic (ar), English (en)
+Base URL: https://shop-lamees.com
+
+Key pages:
+- / (Home)
+- /latest
+- /category/all
+- /search
+- /privacy-policy
+- /terms
+- /return-policy
+
+Commerce entities:
+- Products: /product/{slug}
+- Categories: /category/{slug}
+
+Policies:
+- Returns: /return-policy
+- Terms: /terms
+- Privacy: /privacy-policy

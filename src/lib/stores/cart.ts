@@ -20,6 +20,7 @@ export type CartItem = {
 type CartStore = {
     items: CartItem[];
     isDrawerOpen: boolean;
+    hasHydrated: boolean;
     addItem: (item: CartItem) => void;
     removeItem: (variantId: string) => void;
     updateQuantity: (variantId: string, quantity: number) => void;
@@ -34,6 +35,7 @@ export const useCartStore = create<CartStore>()(
         (set) => ({
             items: [],
             isDrawerOpen: false,
+            hasHydrated: false,
             addItem: (item) =>
                 set((state) => {
                     const existing = state.items.find((i) => i.variantId === item.variantId);
@@ -65,6 +67,36 @@ export const useCartStore = create<CartStore>()(
             openDrawer: () => set({ isDrawerOpen: true }),
             closeDrawer: () => set({ isDrawerOpen: false }),
         }),
-        { name: 'lamees-cart', partialize: (state) => ({ items: state.items }) }
+        {
+            name: 'lamees-cart',
+            version: 2,
+            partialize: (state) => ({ items: state.items }),
+            migrate: (persistedState: unknown) => {
+                const state = (persistedState || {}) as { items?: unknown };
+                const rawItems = Array.isArray(state.items) ? state.items : [];
+                const items = rawItems
+                    .map((raw) => raw as Partial<CartItem>)
+                    .filter((raw) => typeof raw.productId === 'string' && typeof raw.slug === 'string' && typeof raw.name === 'string')
+                    .map((raw) => ({
+                        id: String(raw.id || raw.productId || ''),
+                        variantId: String(raw.variantId || `${raw.productId}-default`),
+                        productId: String(raw.productId),
+                        slug: String(raw.slug),
+                        name: String(raw.name),
+                        unitPrice: Number(raw.unitPrice || 0),
+                        currency: String(raw.currency || 'SAR'),
+                        quantity: Number(raw.quantity || 1),
+                        image: typeof raw.image === 'string' ? raw.image : undefined,
+                        size: typeof raw.size === 'string' ? raw.size : undefined,
+                        cut: typeof raw.cut === 'string' ? raw.cut : undefined,
+                        color: typeof raw.color === 'string' ? raw.color : undefined,
+                        note: typeof raw.note === 'string' ? raw.note : undefined,
+                    }));
+                return { items };
+            },
+            onRehydrateStorage: () => () => {
+                useCartStore.setState({ hasHydrated: true });
+            },
+        }
     )
 );

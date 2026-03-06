@@ -330,7 +330,14 @@ export default function AdminDashboard() {
                                             <div className="flex items-center gap-3 text-neutral-800">
                                                 <div className="w-8 h-8 rounded-full bg-neutral-200 flex items-center justify-center shrink-0 overflow-hidden">
                                                     {order.customerAvatar ? (
-                                                        <img src={order.customerAvatar} alt={order.customerName} className="w-full h-full object-cover" />
+                                                        <Image
+                                                            src={order.customerAvatar}
+                                                            alt={order.customerName}
+                                                            width={32}
+                                                            height={32}
+                                                            className="w-full h-full object-cover"
+                                                            sizes="32px"
+                                                        />
                                                     ) : (
                                                         <span className="material-symbols-outlined text-neutral-500" style={{ fontSize: '16px' }}>person</span>
                                                     )}

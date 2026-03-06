@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useLocale } from 'next-intl';
+import Image from 'next/image';
 import { useCartStore } from '@/lib/stores/cart';
 import { useFormattedMoney } from '@/lib/money';
 import { Link } from '@/i18n/navigation';
@@ -52,13 +53,8 @@ export function CartList() {
                                     </div>
 
                                     <Link href={`/product/${productSlug}`} className="block shrink-0">
-                                        <div className="bg-surface rounded-xl overflow-hidden h-24 w-24 sm:h-28 sm:w-28">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                src={productImage}
-                                                alt={item.name}
-                                                className="h-full w-full object-cover"
-                                            />
+                                        <div className="relative bg-surface rounded-xl overflow-hidden h-24 w-24 sm:h-28 sm:w-28">
+                                            <Image src={productImage} alt={item.name} fill className="h-full w-full object-cover" sizes="112px" />
                                         </div>
                                     </Link>
                                 </div>

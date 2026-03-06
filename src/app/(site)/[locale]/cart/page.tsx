@@ -9,7 +9,24 @@ import { Link } from '@/i18n/navigation';
 
 export default function CartPage() {
     const t = useTranslations('Cart');
-    const { items } = useCartStore();
+    const { items, hasHydrated } = useCartStore();
+
+    if (!hasHydrated) {
+        return (
+            <main className="max-w-[1320px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex-grow">
+                <div className="animate-pulse rounded-3xl bg-[#f3f3f5] p-4 md:p-6 lg:p-8">
+                    <div className="h-7 w-40 bg-white/80 rounded mb-6" />
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div className="lg:col-span-2 space-y-4">
+                            <div className="h-48 rounded-2xl bg-white/80" />
+                            <div className="h-48 rounded-2xl bg-white/80" />
+                        </div>
+                        <div className="h-64 rounded-2xl bg-white/80" />
+                    </div>
+                </div>
+            </main>
+        );
+    }
 
     if (items.length === 0) {
         return (

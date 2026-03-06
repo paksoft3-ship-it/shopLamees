@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/db';
 import { CategoryDTO, ProductDTO, VariantDTO } from './types';
 import { Prisma } from '@prisma/client';
+import { unstable_cache } from 'next/cache';
 
 type ProductWithRelations = Prisma.ProductGetPayload<{
     include: {
@@ -11,131 +12,173 @@ type ProductWithRelations = Prisma.ProductGetPayload<{
 }>;
 
 export async function getCategories(): Promise<CategoryDTO[]> {
-    const categories = await prisma.category.findMany({
-        orderBy: { sortOrder: 'asc' },
-    });
-    return (categories as unknown as (CategoryDTO & { nameAr: string; nameEn: string })[]).map(c => ({
-        id: c.id,
-        slug: c.slug,
-        nameAr: c.nameAr,
-        nameEn: c.nameEn,
-        image: c.image || null,
-        sortOrder: c.sortOrder,
-        createdAt: c.createdAt,
-        name: { ar: c.nameAr, en: c.nameEn }
-    }));
+    return unstable_cache(
+        async () => {
+            const categories = await prisma.category.findMany({
+                orderBy: { sortOrder: 'asc' },
+            });
+            return (categories as unknown as (CategoryDTO & { nameAr: string; nameEn: string })[]).map(c => ({
+                id: c.id,
+                slug: c.slug,
+                nameAr: c.nameAr,
+                nameEn: c.nameEn,
+                image: c.image || null,
+                sortOrder: c.sortOrder,
+                createdAt: c.createdAt,
+                name: { ar: c.nameAr, en: c.nameEn }
+            }));
+        },
+        ['catalog-categories'],
+        { revalidate: 300, tags: ['categories'] }
+    )();
 }
 
 export async function getCategoryBySlug(slug: string): Promise<CategoryDTO | null> {
-    const category = await prisma.category.findUnique({
-        where: { slug },
-    });
-    if (!category) return null;
-    return {
-        id: category.id,
-        slug: category.slug,
-        nameAr: category.nameAr,
-        nameEn: category.nameEn,
-        image: category.image || null,
-        sortOrder: category.sortOrder,
-        createdAt: category.createdAt,
-        name: { ar: category.nameAr, en: category.nameEn }
-    };
+    return unstable_cache(
+        async () => {
+            const category = await prisma.category.findUnique({
+                where: { slug },
+            });
+            if (!category) return null;
+            return {
+                id: category.id,
+                slug: category.slug,
+                nameAr: category.nameAr,
+                nameEn: category.nameEn,
+                image: category.image || null,
+                sortOrder: category.sortOrder,
+                createdAt: category.createdAt,
+                name: { ar: category.nameAr, en: category.nameEn }
+            };
+        },
+        ['catalog-category-by-slug', slug],
+        { revalidate: 300, tags: ['categories', `category:${slug}`] }
+    )();
 }
 
 export async function getFeaturedProducts(): Promise<ProductDTO[]> {
-    const dbProducts = await prisma.product.findMany({
-        where: { isPublished: true, isBestSeller: true },
-        take: 8,
-        include: {
-            images: { orderBy: { sortOrder: 'asc' } },
-            variants: { orderBy: { createdAt: 'asc' } },
-            categories: { include: { category: true } }
-        },
-    });
+    return unstable_cache(
+        async () => {
+            const dbProducts = await prisma.product.findMany({
+                where: { isPublished: true, isBestSeller: true },
+                take: 8,
+                include: {
+                    images: { orderBy: { sortOrder: 'asc' } },
+                    variants: { orderBy: { createdAt: 'asc' } },
+                    categories: { include: { category: true } }
+                },
+            });
 
-    return dbProducts.map(mapToUIProduct);
+            return dbProducts.map(mapToUIProduct);
+        },
+        ['catalog-featured-products'],
+        { revalidate: 300, tags: ['products', 'featured-products'] }
+    )();
 }
 
 export async function getProductsByCategory(categorySlug: string): Promise<ProductDTO[]> {
-    const dbProducts = await prisma.product.findMany({
-        where: {
-            isPublished: true,
-            categories: {
-                some: {
-                    category: { slug: categorySlug }
-                }
-            }
-        },
-        include: {
-            images: { orderBy: { sortOrder: 'asc' } },
-            variants: { orderBy: { createdAt: 'asc' } },
-            categories: { include: { category: true } }
-        },
-    });
+    return unstable_cache(
+        async () => {
+            const dbProducts = await prisma.product.findMany({
+                where: {
+                    isPublished: true,
+                    categories: {
+                        some: {
+                            category: { slug: categorySlug }
+                        }
+                    }
+                },
+                include: {
+                    images: { orderBy: { sortOrder: 'asc' } },
+                    variants: { orderBy: { createdAt: 'asc' } },
+                    categories: { include: { category: true } }
+                },
+            });
 
-    return dbProducts.map(mapToUIProduct);
+            return dbProducts.map(mapToUIProduct);
+        },
+        ['catalog-products-by-category', categorySlug],
+        { revalidate: 300, tags: ['products', `category:${categorySlug}`] }
+    )();
 }
 
 export async function getAllProducts(): Promise<ProductDTO[]> {
-    const dbProducts = await prisma.product.findMany({
-        where: { isPublished: true },
-        orderBy: { createdAt: 'desc' },
-        include: {
-            images: { orderBy: { sortOrder: 'asc' } },
-            variants: { orderBy: { createdAt: 'asc' } },
-            categories: { include: { category: true } }
-        },
-    });
+    return unstable_cache(
+        async () => {
+            const dbProducts = await prisma.product.findMany({
+                where: { isPublished: true },
+                orderBy: { createdAt: 'desc' },
+                include: {
+                    images: { orderBy: { sortOrder: 'asc' } },
+                    variants: { orderBy: { createdAt: 'asc' } },
+                    categories: { include: { category: true } }
+                },
+            });
 
-    return dbProducts.map(mapToUIProduct);
+            return dbProducts.map(mapToUIProduct);
+        },
+        ['catalog-all-products'],
+        { revalidate: 180, tags: ['products'] }
+    )();
 }
 
 export async function getRelatedProducts(productId: string, limit: number = 4): Promise<ProductDTO[]> {
-    const dbProducts = await prisma.product.findMany({
-        where: {
-            id: { not: productId },
-            isPublished: true,
-        },
-        take: limit,
-        include: {
-            images: { orderBy: { sortOrder: 'asc' } },
-            variants: { orderBy: { createdAt: 'asc' } },
-            categories: { include: { category: true } }
-        },
-    });
+    return unstable_cache(
+        async () => {
+            const dbProducts = await prisma.product.findMany({
+                where: {
+                    id: { not: productId },
+                    isPublished: true,
+                },
+                take: limit,
+                include: {
+                    images: { orderBy: { sortOrder: 'asc' } },
+                    variants: { orderBy: { createdAt: 'asc' } },
+                    categories: { include: { category: true } }
+                },
+            });
 
-    return dbProducts.map(mapToUIProduct);
+            return dbProducts.map(mapToUIProduct);
+        },
+        ['catalog-related-products', productId, String(limit)],
+        { revalidate: 300, tags: ['products', `product:${productId}`] }
+    )();
 }
 
 export async function getProductBySlug(slug: string): Promise<ProductDTO | null> {
-    const dbProduct = await prisma.product.findUnique({
-        where: { slug },
-        include: {
-            images: { orderBy: { sortOrder: 'asc' } },
-            variants: true,
-            categories: {
-                include: { category: true }
-            }
+    return unstable_cache(
+        async () => {
+            const dbProduct = await prisma.product.findUnique({
+                where: { slug },
+                include: {
+                    images: { orderBy: { sortOrder: 'asc' } },
+                    variants: true,
+                    categories: {
+                        include: { category: true }
+                    }
+                },
+            });
+
+            if (!dbProduct) return null;
+
+            const uiProduct = mapToUIProduct(dbProduct as unknown as ProductWithRelations);
+            return {
+                ...uiProduct,
+                categoryPaths: (dbProduct as unknown as ProductWithRelations).categories.map((c: { category: { id: string; slug: string; nameAr: string; nameEn: string; image: string | null; sortOrder: number; createdAt: Date; } }) => ({
+                    id: c.category.id,
+                    slug: c.category.slug,
+                    nameAr: c.category.nameAr,
+                    nameEn: c.category.nameEn,
+                    image: c.category.image || null,
+                    sortOrder: c.category.sortOrder,
+                    createdAt: c.category.createdAt,
+                    name: { ar: c.category.nameAr, en: c.category.nameEn }
+                })),
+            };
         },
-    });
-
-    if (!dbProduct) return null;
-
-    const uiProduct = mapToUIProduct(dbProduct as unknown as ProductWithRelations);
-    return {
-        ...uiProduct,
-        categoryPaths: (dbProduct as unknown as ProductWithRelations).categories.map((c: { category: { id: string; slug: string; nameAr: string; nameEn: string; image: string | null; sortOrder: number; createdAt: Date; } }) => ({
-            id: c.category.id,
-            slug: c.category.slug,
-            nameAr: c.category.nameAr,
-            nameEn: c.category.nameEn,
-            image: c.category.image || null,
-            sortOrder: c.category.sortOrder,
-            createdAt: c.category.createdAt,
-            name: { ar: c.category.nameAr, en: c.category.nameEn }
-        })),
-    };
+        ['catalog-product-by-slug', slug],
+        { revalidate: 300, tags: ['products', `product-slug:${slug}`] }
+    )();
 }
 
 export async function searchProducts(query: string): Promise<ProductDTO[]> {

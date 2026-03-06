@@ -1,6 +1,7 @@
 'use client';
 
 import { useLocale } from 'next-intl';
+import Image from 'next/image';
 import { useCartStore } from '@/lib/stores/cart';
 import { useFormattedMoney } from '@/lib/money';
 import { Link } from '@/i18n/navigation';
@@ -107,9 +108,14 @@ export function CartDrawer() {
 
                                 return (
                                     <li key={item.variantId} className="flex py-6">
-                                        <Link href={`/products/${productSlug}`} onClick={closeDrawer} className="h-28 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-background-light">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img src={productImage} alt={item.name} className="h-full w-full object-cover object-center" />
+                                        <Link href={`/products/${productSlug}`} onClick={closeDrawer} className="relative h-28 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-background-light">
+                                            <Image
+                                                src={productImage}
+                                                alt={item.name}
+                                                fill
+                                                className="h-full w-full object-cover object-center"
+                                                sizes="96px"
+                                            />
                                         </Link>
                                         <div className="mr-4 rtl:ml-4 rtl:mr-0 flex flex-1 flex-col font-kufi">
                                             <div>
@@ -182,9 +188,14 @@ export function CartDrawer() {
                                 <div className="flex gap-3 overflow-x-auto pb-2" style={{ scrollbarWidth: 'none' }}>
                                     {crossSell.map((p) => (
                                         <div key={p.id} className="flex-shrink-0 w-24 group">
-                                            <div className="aspect-[3/4] rounded-lg bg-surface overflow-hidden mb-2">
-                                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                                <img src={p.image} alt={p.name[locale as 'ar' | 'en']} className="h-full w-full object-cover" />
+                                            <div className="relative aspect-[3/4] rounded-lg bg-surface overflow-hidden mb-2">
+                                                <Image
+                                                    src={p.image}
+                                                    alt={p.name[locale as 'ar' | 'en']}
+                                                    fill
+                                                    className="h-full w-full object-cover"
+                                                    sizes="96px"
+                                                />
                                             </div>
                                             <p className="text-xs text-on-surface font-medium truncate font-kufi">{p.name[locale as 'ar' | 'en']}</p>
                                             <p className="text-primary font-bold text-lg mb-2 font-display">

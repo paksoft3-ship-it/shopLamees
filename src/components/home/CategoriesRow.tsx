@@ -1,6 +1,7 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { LayoutGrid } from 'lucide-react';
+import Image from 'next/image';
 
 interface Category {
     id: string;
@@ -25,7 +26,16 @@ export function CategoriesRow({ categories }: CategoriesRowProps) {
                     {categories.map((cat) => (
                         <Link href={`/category/${cat.slug}`} key={cat.id} className="group flex flex-col items-center gap-3 min-w-[100px]">
                             <div className="w-20 h-20 rounded-full bg-background-light flex items-center justify-center border border-border group-hover:border-primary transition-colors overflow-hidden">
-                                {cat.image && <img src={cat.image} alt={locale === 'ar' ? cat.nameAr : cat.nameEn} className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity" />}
+                                {cat.image && (
+                                    <Image
+                                        src={cat.image}
+                                        alt={locale === 'ar' ? cat.nameAr : cat.nameEn}
+                                        width={80}
+                                        height={80}
+                                        className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
+                                        sizes="80px"
+                                    />
+                                )}
                             </div>
                             <span className="font-bold text-on-surface group-hover:text-primary text-sm">{locale === 'ar' ? cat.nameAr : cat.nameEn}</span>
                         </Link>

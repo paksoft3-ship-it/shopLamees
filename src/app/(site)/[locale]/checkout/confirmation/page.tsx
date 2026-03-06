@@ -6,7 +6,8 @@ import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { formatPrice } from '@/lib/utils/price';
 import { trackEvent } from '@/lib/tracking/track';
-import { useEffect } from 'react';
+import { useEffect, useMemo } from 'react';
+import Image from 'next/image';
 
 export default function OrderConfirmationPage() {
     const t = useTranslations('OrderConfirmation');
@@ -18,8 +19,8 @@ export default function OrderConfirmationPage() {
     const vat = Math.round(subtotal * 0.05);
     const total = subtotal + vat;
 
-    // Generate a pseudo order number
-    const orderNumber = `SL-${Math.floor(10000 + Math.random() * 90000)}`;
+    // Keep pseudo order number stable per page mount
+    const orderNumber = useMemo(() => `SL-${Math.floor(10000 + Math.random() * 90000)}`, []);
 
     useEffect(() => {
         if (items.length > 0) {
@@ -36,7 +37,7 @@ export default function OrderConfirmationPage() {
                 }))
             });
         }
-    }, [items, total, currency, orderNumber]);
+    }, [items, total, currency, orderNumber, vat]);
 
     return (
         <section className="bg-[#FBF7F2] min-h-screen flex flex-col">
@@ -88,7 +89,14 @@ export default function OrderConfirmationPage() {
                                     <div key={item.variantId} className="flex items-center gap-4">
                                         <div className="w-16 h-20 rounded-lg overflow-hidden bg-slate-100 flex-shrink-0">
                                             {item.image && (
-                                                <img alt={item.name} className="w-full h-full object-cover" src={item.image} />
+                                                <Image
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                    src={item.image}
+                                                    width={64}
+                                                    height={80}
+                                                    sizes="64px"
+                                                />
                                             )}
                                         </div>
                                         <div className="text-start flex-1">

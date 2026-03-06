@@ -1,0 +1,27 @@
+# Shop Lamees
+
+Shop Lamees is an abaya-focused ecommerce store with Arabic and English storefront content.
+
+## Storefront scope
+- Home: `/`
+- Latest products: `/latest`
+- Category listing: `/category/{slug}`
+- Product detail: `/product/{slug}`
+- Search: `/search`
+- Cart: `/cart`
+- Checkout: `/checkout`
+
+## Legal and policy pages
+- Privacy Policy: `/privacy-policy`
+- Terms: `/terms`
+- Return Policy: `/return-policy`
+
+## Product and pricing notes
+- Product pages include size/cut options and made-to-order context where applicable.
+- Displayed prices are localized by currency preference where supported by the UI.
+
+## Language support
+- Arabic (`ar`)
+- English (`en`)
+
+No other public language variants are currently in scope.

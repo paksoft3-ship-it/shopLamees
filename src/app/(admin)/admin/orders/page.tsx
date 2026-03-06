@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { OrderStatus, AdminOrder } from '@/lib/stores/adminOrders';
 import { getAdminOrders } from '@/lib/actions/adminOrders';
 import { useLocale, useTranslations } from 'next-intl';
@@ -295,7 +296,14 @@ export default function AdminOrdersPage() {
                                 <div className="flex gap-4 items-center">
                                     <div className="size-12 rounded-full bg-slate-100 flex items-center justify-center shrink-0 overflow-hidden">
                                         {order.customerAvatar ? (
-                                            <img src={order.customerAvatar} alt={order.customerName} className="size-full object-cover" />
+                                            <Image
+                                                src={order.customerAvatar}
+                                                alt={order.customerName}
+                                                width={48}
+                                                height={48}
+                                                className="size-full object-cover"
+                                                sizes="48px"
+                                            />
                                         ) : (
                                             <span className="material-symbols-outlined text-slate-400">person</span>
                                         )}

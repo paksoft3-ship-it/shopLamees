@@ -1,13 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { formatPrice } from '@/lib/utils/price';
 import { trackEvent } from '@/lib/tracking/track';
-import { useEffect } from 'react';
+import Image from 'next/image';
 
 type Step = 'info' | 'address' | 'shipping' | 'payment';
 const STEPS: Step[] = ['info', 'address', 'shipping', 'payment'];
@@ -20,9 +20,15 @@ export default function CheckoutPage() {
     const [currentStep, setCurrentStep] = useState<Step>('address');
     const [paymentMethod, setPaymentMethod] = useState('apple_pay');
     const [coupon, setCoupon] = useState('');
+    const hasTrackedBeginCheckout = useRef(false);
+
+    const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
+    const vat = Math.round(subtotal * 0.05);
+    const total = subtotal + vat;
 
     useEffect(() => {
-        if (items.length > 0) {
+        if (!hasTrackedBeginCheckout.current && items.length > 0) {
+            hasTrackedBeginCheckout.current = true;
             trackEvent('begin_checkout', {
                 currency,
                 value: subtotal,
@@ -34,11 +40,7 @@ export default function CheckoutPage() {
                 }))
             });
         }
-    }, []);
-
-    const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-    const vat = Math.round(subtotal * 0.05);
-    const total = subtotal + vat;
+    }, [items, currency, subtotal]);
     // const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
     const stepIndex = STEPS.indexOf(currentStep);
@@ -103,7 +105,13 @@ export default function CheckoutPage() {
                                     <div key={item.variantId} className="flex gap-4">
                                         <div className="w-20 h-24 bg-slate-200 rounded-lg overflow-hidden flex-shrink-0 relative">
                                             {item.image && (
-                                                <img alt={item.name} className="w-full h-full object-cover" src={item.image} />
+                                                <Image
+                                                    alt={item.name}
+                                                    className="w-full h-full object-cover"
+                                                    src={item.image}
+                                                    fill
+                                                    sizes="80px"
+                                                />
                                             )}
                                             <span className="absolute top-0 ltr:left-0 rtl:right-0 bg-primary text-white text-xs px-1.5 py-0.5 ltr:rounded-br-lg rtl:rounded-bl-lg font-display">
                                                 {item.quantity}

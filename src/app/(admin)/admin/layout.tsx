@@ -16,9 +16,6 @@ export default function AdminLayout({
 }) {
     return (
         <html lang="ar" dir="rtl" suppressHydrationWarning>
-            <head>
-                <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap" rel="stylesheet" />
-            </head>
             <body className={`${notoSansArabic.variable} ${cairo.variable} ${manrope.variable} antialiased font-body bg-background-light text-on-surface`} suppressHydrationWarning>
                 <AdminLayoutClient arMessages={arMessages} enMessages={enMessages}>
                     {children}

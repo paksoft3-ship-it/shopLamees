@@ -7,6 +7,7 @@ import { formatPrice } from '@/lib/utils/price';
 import { ShoppingCart, Star } from 'lucide-react';
 import { toast } from 'react-hot-toast';
 import { ProductDTO } from '@/lib/data/types';
+import Image from 'next/image';
 
 export function ProductCard({ product }: { product: ProductDTO }) {
     const t = useTranslations('Home.FeaturedProducts');
@@ -40,7 +41,13 @@ export function ProductCard({ product }: { product: ProductDTO }) {
                         {product.badge[locale]}
                     </span>
                 )}
-                <img src={product.image} alt={product.name[locale]} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                <Image
+                    src={product.image}
+                    alt={product.name[locale]}
+                    fill
+                    sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                />
                 <div className="absolute inset-x-0 bottom-0 p-4 translate-y-full group-hover:translate-y-0 transition-transform duration-300">
                     <button
                         onClick={handleAddToCart}

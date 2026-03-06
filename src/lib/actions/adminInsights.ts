@@ -2,6 +2,7 @@
 
 import prisma from '@/lib/db';
 import { HomeVideoItem, normalizeHomeVideos } from '@/lib/homeVideos';
+import { revalidateTag } from 'next/cache';
 
 export interface AdminCouponInsight {
   code: string;
@@ -461,4 +462,8 @@ export async function updateAdminStoreSettings(payload: AdminSettingsDTO) {
       homeVideosJson: JSON.stringify(homeVideos),
     },
   });
+
+  revalidateTag('home-videos');
+  revalidateTag('products');
+  revalidateTag('categories');
 }
