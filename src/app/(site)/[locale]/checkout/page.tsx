@@ -2,29 +2,51 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { formatPrice } from '@/lib/utils/price';
 import { trackEvent } from '@/lib/tracking/track';
+import { createOrder } from '@/lib/actions/orders';
 import Image from 'next/image';
 
 type Step = 'info' | 'address' | 'shipping' | 'payment';
 const STEPS: Step[] = ['info', 'address', 'shipping', 'payment'];
+const VAT_RATE = 0.15;
 
 export default function CheckoutPage() {
     const t = useTranslations('Checkout');
     const locale = useLocale() as 'ar' | 'en';
-    const { items } = useCartStore();
+    const router = useRouter();
+    const { items, clearCart } = useCartStore();
     const { currency } = usePrefsStore();
-    const [currentStep, setCurrentStep] = useState<Step>('address');
-    const [paymentMethod, setPaymentMethod] = useState('eft');
-    const [coupon, setCoupon] = useState('');
+    const [currentStep, setCurrentStep] = useState<Step>('info');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [errors, setErrors] = useState<Record<string, string>>({});
     const hasTrackedBeginCheckout = useRef(false);
 
+    // ── Form State ──────────────────────────────────────────────────
+    const [name, setName] = useState('');
+    const [phone, setPhone] = useState('');
+    const [email, setEmail] = useState('');
+    const [country, setCountry] = useState('QA');
+    const [city, setCity] = useState('');
+    const [zone, setZone] = useState('');
+    const [street, setStreet] = useState('');
+    const [building, setBuilding] = useState('');
+    const [unit, setUnit] = useState('');
+    const [shippingMethod, setShippingMethod] = useState('standard');
+    const [customerNote, setCustomerNote] = useState('');
+
+    const shippingOptions = [
+        { id: 'standard', label: locale === 'ar' ? 'شحن عادي (5-7 أيام)' : 'Standard (5-7 days)', price: 0 },
+        { id: 'express', label: locale === 'ar' ? 'شحن سريع (2-3 أيام)' : 'Express (2-3 days)', price: 50 },
+    ];
+    const shippingFee = shippingOptions.find(o => o.id === shippingMethod)?.price ?? 0;
+
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-    const vat = Math.round(subtotal * 0.05);
-    const total = subtotal + vat;
+    const vat = Math.round(subtotal * VAT_RATE);
+    const total = subtotal + vat + shippingFee;
 
     useEffect(() => {
         if (!hasTrackedBeginCheckout.current && items.length > 0) {
@@ -36,15 +58,13 @@ export default function CheckoutPage() {
                     item_id: item.variantId,
                     item_name: item.name,
                     price: item.unitPrice,
-                    quantity: item.quantity
-                }))
+                    quantity: item.quantity,
+                })),
             });
         }
     }, [items, currency, subtotal]);
-    // const cartCount = items.reduce((sum, item) => sum + item.quantity, 0);
 
     const stepIndex = STEPS.indexOf(currentStep);
-
     const stepLabels: Record<Step, string> = {
         info: t('step_info'),
         address: t('step_address'),
@@ -52,16 +72,90 @@ export default function CheckoutPage() {
         payment: t('step_payment'),
     };
 
+    // ── Validation ──────────────────────────────────────────────────
+    const validate = (step: Step): boolean => {
+        const errs: Record<string, string> = {};
+        const required = locale === 'ar' ? 'هذا الحقل مطلوب' : 'This field is required';
+
+        if (step === 'info') {
+            if (!name.trim()) errs.name = required;
+            if (!phone.trim()) errs.phone = required;
+        }
+        if (step === 'address') {
+            if (!city.trim()) errs.city = required;
+            if (!street.trim()) errs.street = required;
+        }
+        setErrors(errs);
+        return Object.keys(errs).length === 0;
+    };
+
     const goNext = () => {
+        if (!validate(currentStep)) return;
         const idx = STEPS.indexOf(currentStep);
         if (idx < STEPS.length - 1) setCurrentStep(STEPS[idx + 1]);
     };
     const goBack = () => {
+        setErrors({});
         const idx = STEPS.indexOf(currentStep);
         if (idx > 0) setCurrentStep(STEPS[idx - 1]);
     };
 
-    // If cart is empty, show message
+    const handleConfirm = async () => {
+        if (!validate('payment')) return;
+        setIsSubmitting(true);
+        try {
+            const { orderNumber } = await createOrder({
+                customerName: name,
+                phone,
+                email: email || undefined,
+                country,
+                city,
+                zone: zone || undefined,
+                street,
+                building: building || undefined,
+                unit: unit || undefined,
+                shippingMethod,
+                shippingFee,
+                paymentMethod: 'EFT',
+                currency,
+                subtotal,
+                vat,
+                total,
+                customerNote: customerNote || undefined,
+                items: items.map(item => ({
+                    variantId: item.variantId,
+                    productId: item.productId,
+                    name: item.name,
+                    unitPrice: item.unitPrice,
+                    quantity: item.quantity,
+                    image: item.image,
+                    size: item.size,
+                    cut: item.cut,
+                })),
+            });
+            trackEvent('purchase', {
+                transaction_id: orderNumber,
+                currency,
+                value: total,
+                items: items.map(item => ({
+                    item_id: item.variantId,
+                    item_name: item.name,
+                    price: item.unitPrice,
+                    quantity: item.quantity,
+                })),
+            });
+            clearCart();
+            router.push(`/checkout/confirmation?order=${orderNumber}`);
+        } catch (err) {
+            console.error(err);
+            setErrors({ submit: locale === 'ar' ? 'حدث خطأ، يرجى المحاولة مجدداً' : 'Something went wrong. Please try again.' });
+            setIsSubmitting(false);
+        }
+    };
+
+    const inputCls = (field: string) =>
+        `block w-full rounded-lg py-3 px-4 text-slate-900 shadow-sm sm:text-sm placeholder:text-slate-400 border ${errors[field] ? 'border-red-400 focus:border-red-400 focus:ring-red-400' : 'border-slate-300 focus:border-primary focus:ring-primary'}`;
+
     if (items.length === 0) {
         return (
             <section className="bg-[#FBF7F2] min-h-screen flex items-center justify-center">
@@ -79,7 +173,7 @@ export default function CheckoutPage() {
 
     return (
         <section className="bg-[#f6f6f8] min-h-screen">
-            {/* Minimal Checkout Header */}
+            {/* Header */}
             <header className="w-full bg-white border-b border-slate-200 sticky top-0 z-50">
                 <div className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-center">
                     <div className="flex items-center gap-2">
@@ -95,23 +189,15 @@ export default function CheckoutPage() {
                 <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 relative">
 
                     {/* ORDER SUMMARY SIDEBAR */}
-                    <aside className="w-full lg:w-[380px] lg:flex-shrink-0 order-1 lg:order-1 h-fit lg:sticky lg:top-24">
+                    <aside className="w-full lg:w-[380px] lg:flex-shrink-0 order-2 lg:order-1 h-fit lg:sticky lg:top-24">
                         <div className="bg-[#FBF7F2] rounded-xl p-6 shadow-sm border border-slate-100">
                             <h2 className="text-lg font-bold mb-6 font-kufi">{t('order_summary')}</h2>
-
-                            {/* Cart Items */}
                             <div className="space-y-4 mb-6">
                                 {items.map((item) => (
                                     <div key={item.variantId} className="flex gap-4">
                                         <div className="w-20 h-24 bg-slate-200 rounded-lg overflow-hidden flex-shrink-0 relative">
                                             {item.image && (
-                                                <Image
-                                                    alt={item.name}
-                                                    className="w-full h-full object-cover"
-                                                    src={item.image}
-                                                    fill
-                                                    sizes="80px"
-                                                />
+                                                <Image alt={item.name} className="w-full h-full object-cover" src={item.image} fill sizes="80px" />
                                             )}
                                             <span className="absolute top-0 ltr:left-0 rtl:right-0 bg-primary text-white text-xs px-1.5 py-0.5 ltr:rounded-br-lg rtl:rounded-bl-lg font-display">
                                                 {item.quantity}
@@ -120,23 +206,16 @@ export default function CheckoutPage() {
                                         <div className="flex flex-col justify-between py-1">
                                             <div>
                                                 <h3 className="font-medium text-sm leading-tight mb-1">{item.name}</h3>
-                                                {item.size && (
-                                                    <p className="text-xs text-slate-500">
-                                                        {locale === 'ar' ? 'المقاس: ' : 'Size: '}{item.size}
-                                                    </p>
-                                                )}
+                                                {item.size && <p className="text-xs text-slate-500">{locale === 'ar' ? 'المقاس: ' : 'Size: '}{item.size} cm</p>}
+                                                {item.cut && <p className="text-xs text-slate-500">{item.cut}</p>}
                                             </div>
-                                            <p className="font-bold text-sm font-display">
-                                                {formatPrice(item.unitPrice * item.quantity, currency, locale)}
-                                            </p>
+                                            <p className="font-bold text-sm font-display">{formatPrice(item.unitPrice * item.quantity, currency, locale)}</p>
                                         </div>
                                     </div>
                                 ))}
                             </div>
 
                             <div className="h-px w-full bg-slate-200 my-4" />
-
-                            {/* Costs */}
                             <div className="space-y-3 text-sm">
                                 <div className="flex justify-between text-slate-600">
                                     <span>{t('subtotal')}</span>
@@ -148,34 +227,31 @@ export default function CheckoutPage() {
                                 </div>
                                 <div className="flex justify-between text-slate-600">
                                     <span>{t('shipping')}</span>
-                                    <span className="text-xs text-primary font-bold bg-primary/10 px-2 py-0.5 rounded">{t('shipping_next')}</span>
+                                    <span className="font-display font-medium">
+                                        {shippingFee === 0
+                                            ? <span className="text-green-600 font-bold">{locale === 'ar' ? 'مجاني' : 'Free'}</span>
+                                            : formatPrice(shippingFee, currency, locale)
+                                        }
+                                    </span>
                                 </div>
                             </div>
-
                             <div className="h-px w-full bg-slate-200 my-4" />
-
-                            {/* Total */}
                             <div className="flex justify-between items-end mb-2">
                                 <span className="font-bold text-lg">{t('total')}</span>
                                 <div className="text-end">
                                     <span className="text-xs text-slate-500 block">{t('inc_vat')}</span>
-                                    <span className="font-bold text-2xl font-display text-primary">
-                                        {formatPrice(total, currency, locale)}
-                                    </span>
+                                    <span className="font-bold text-2xl font-display text-primary">{formatPrice(total, currency, locale)}</span>
                                 </div>
                             </div>
                         </div>
-
-                        {/* Trust Badges */}
                         <div className="mt-4 flex justify-center gap-4 opacity-60">
                             <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">EFT</div>
                             <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">HAVALE</div>
                         </div>
                     </aside>
 
-                    {/* MAIN FORM COLUMN */}
-                    <div className="flex-1 order-2 lg:order-2">
-
+                    {/* MAIN FORM */}
+                    <div className="flex-1 order-1 lg:order-2">
                         {/* Stepper */}
                         <nav className="mb-8 overflow-x-auto pb-2">
                             <ol className="flex items-center min-w-max">
@@ -204,10 +280,7 @@ export default function CheckoutPage() {
                             </ol>
                         </nav>
 
-                        {/* Form Card */}
                         <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 lg:p-10">
-
-                            {/* Step Header */}
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-2xl font-bold text-slate-900 font-kufi">
                                     {currentStep === 'info' && t('title_info')}
@@ -224,16 +297,24 @@ export default function CheckoutPage() {
                             {currentStep === 'info' && (
                                 <div className="space-y-6">
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">{t('full_name')}</label>
-                                        <input type="text" placeholder={locale === 'ar' ? 'الاسم الكامل' : 'Full name'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">{t('full_name')} <span className="text-red-500">*</span></label>
+                                        <input type="text" value={name} onChange={e => setName(e.target.value)} placeholder={locale === 'ar' ? 'الاسم الكامل' : 'Full name'} className={inputCls('name')} />
+                                        {errors.name && <p className="text-xs text-red-500 mt-1 font-kufi">{errors.name}</p>}
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">{t('phone')}</label>
-                                        <input type="tel" placeholder="+974 XXXX XXXX" className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">{t('phone')} <span className="text-red-500">*</span></label>
+                                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+974 XXXX XXXX" className={inputCls('phone')} />
+                                        {errors.phone && <p className="text-xs text-red-500 mt-1 font-kufi">{errors.phone}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">{t('email')} <span className="text-slate-400 font-normal">({t('optional')})</span></label>
-                                        <input type="email" placeholder="email@example.com" className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@example.com" className={inputCls('email')} />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">
+                                            {locale === 'ar' ? 'ملاحظات إضافية' : 'Order Notes'} <span className="text-slate-400 font-normal">({t('optional')})</span>
+                                        </label>
+                                        <textarea value={customerNote} onChange={e => setCustomerNote(e.target.value)} rows={3} placeholder={locale === 'ar' ? 'أي ملاحظات خاصة بطلبك...' : 'Any special notes for your order...'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm sm:text-sm placeholder:text-slate-400 focus:border-primary focus:ring-primary resize-none" />
                                     </div>
                                 </div>
                             )}
@@ -241,9 +322,9 @@ export default function CheckoutPage() {
                             {/* STEP: Address */}
                             {currentStep === 'address' && (
                                 <div className="space-y-6">
-                                    <div className="relative">
+                                    <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">{t('country')}</label>
-                                        <select className="block w-full rounded-lg border-slate-300 py-3 pr-4 pl-10 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-base font-medium">
+                                        <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-base font-medium">
                                             <option value="QA">{locale === 'ar' ? 'قطر' : 'Qatar'}</option>
                                             <option value="SA">{locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia'}</option>
                                             <option value="AE">{locale === 'ar' ? 'الإمارات العربية المتحدة' : 'UAE'}</option>
@@ -254,26 +335,28 @@ export default function CheckoutPage() {
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('city')}</label>
-                                            <input type="text" placeholder={locale === 'ar' ? 'مثال: الدوحة' : 'e.g. Doha'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('city')} <span className="text-red-500">*</span></label>
+                                            <input type="text" value={city} onChange={e => setCity(e.target.value)} placeholder={locale === 'ar' ? 'مثال: الدوحة' : 'e.g. Doha'} className={inputCls('city')} />
+                                            {errors.city && <p className="text-xs text-red-500 mt-1 font-kufi">{errors.city}</p>}
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('zone')}</label>
-                                            <input type="text" placeholder={locale === 'ar' ? 'مثال: الدفنة' : 'e.g. Al Dafna'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('zone')} <span className="text-slate-400 font-normal">({t('optional')})</span></label>
+                                            <input type="text" value={zone} onChange={e => setZone(e.target.value)} placeholder={locale === 'ar' ? 'مثال: الدفنة' : 'e.g. Al Dafna'} className={inputCls('zone')} />
                                         </div>
                                     </div>
                                     <div>
-                                        <label className="block text-sm font-medium text-slate-700 mb-2">{t('street')}</label>
-                                        <input type="text" placeholder={locale === 'ar' ? 'اسم الشارع أو رقمه' : 'Street name or number'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                        <label className="block text-sm font-medium text-slate-700 mb-2">{t('street')} <span className="text-red-500">*</span></label>
+                                        <input type="text" value={street} onChange={e => setStreet(e.target.value)} placeholder={locale === 'ar' ? 'اسم الشارع أو رقمه' : 'Street name or number'} className={inputCls('street')} />
+                                        {errors.street && <p className="text-xs text-red-500 mt-1 font-kufi">{errors.street}</p>}
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
-                                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('building')}</label>
-                                            <input type="text" placeholder={locale === 'ar' ? 'رقم المبنى' : 'Building no.'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                            <label className="block text-sm font-medium text-slate-700 mb-2">{t('building')} <span className="text-slate-400 font-normal">({t('optional')})</span></label>
+                                            <input type="text" value={building} onChange={e => setBuilding(e.target.value)} placeholder={locale === 'ar' ? 'رقم المبنى' : 'Building no.'} className={inputCls('building')} />
                                         </div>
                                         <div>
                                             <label className="block text-sm font-medium text-slate-700 mb-2">{t('unit')} <span className="text-slate-400 font-normal">({t('optional')})</span></label>
-                                            <input type="text" placeholder={locale === 'ar' ? 'رقم الشقة' : 'Apt. no.'} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-sm placeholder:text-slate-400" />
+                                            <input type="text" value={unit} onChange={e => setUnit(e.target.value)} placeholder={locale === 'ar' ? 'رقم الشقة' : 'Apt. no.'} className={inputCls('unit')} />
                                         </div>
                                     </div>
                                 </div>
@@ -282,15 +365,14 @@ export default function CheckoutPage() {
                             {/* STEP: Shipping */}
                             {currentStep === 'shipping' && (
                                 <div className="space-y-4">
-                                    {[
-                                        { id: 'standard', label: locale === 'ar' ? 'شحن عادي (5-7 أيام)' : 'Standard (5-7 days)', price: 25 },
-                                        { id: 'express', label: locale === 'ar' ? 'شحن سريع (2-3 أيام)' : 'Express (2-3 days)', price: 50 },
-                                    ].map((opt) => (
-                                        <label key={opt.id} className="flex items-center p-4 rounded-xl border border-slate-200 hover:border-primary/30 bg-white cursor-pointer transition-all shadow-sm">
-                                            <input type="radio" name="shipping" defaultChecked={opt.id === 'standard'} className="h-5 w-5 text-primary focus:ring-primary" />
+                                    {shippingOptions.map((opt) => (
+                                        <label key={opt.id} className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all shadow-sm ${shippingMethod === opt.id ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-slate-300 bg-white'}`}>
+                                            <input type="radio" name="shipping" checked={shippingMethod === opt.id} onChange={() => setShippingMethod(opt.id)} className="h-5 w-5 text-primary focus:ring-primary" />
                                             <div className="flex justify-between items-center w-full ltr:ml-4 rtl:mr-4">
                                                 <span className="text-sm font-bold text-slate-900 font-kufi">{opt.label}</span>
-                                                <span className="font-bold text-sm font-display">{formatPrice(opt.price, currency, locale)}</span>
+                                                <span className="font-bold text-sm font-display">
+                                                    {opt.price === 0 ? <span className="text-green-600">{locale === 'ar' ? 'مجاني' : 'Free'}</span> : formatPrice(opt.price, currency, locale)}
+                                                </span>
                                             </div>
                                         </label>
                                     ))}
@@ -300,50 +382,43 @@ export default function CheckoutPage() {
                             {/* STEP: Payment */}
                             {currentStep === 'payment' && (
                                 <div className="space-y-4">
-                                    {[
-                                        { id: 'eft', label: locale === 'ar' ? 'تحويل بنكي (EFT / Havale)' : 'Bank Transfer (EFT / Havale)', sub: locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send the receipt via WhatsApp', icon: 'account_balance' },
-                                    ].map((opt) => (
-                                        <label
-                                            key={opt.id}
-                                            className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all shadow-sm ${paymentMethod === opt.id ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
-                                        >
-                                            <input type="radio" name="payment" checked={paymentMethod === opt.id} onChange={() => setPaymentMethod(opt.id)} className="sr-only" />
-                                            <div className="w-12 h-8 bg-slate-100 rounded flex items-center justify-center text-slate-600 shrink-0">
-                                                <span className="material-symbols-outlined">{opt.icon}</span>
-                                            </div>
-                                            <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
-                                                <span className="text-sm font-bold text-slate-900">{opt.label}</span>
-                                                <span className="text-xs text-slate-500">{opt.sub}</span>
-                                            </div>
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${paymentMethod === opt.id ? 'border-primary' : 'border-slate-300'}`}>
-                                                {paymentMethod === opt.id && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
-                                            </div>
-                                        </label>
-                                    ))}
-
-                                    {/* Coupon */}
-                                    <div className="mt-6 pt-6 border-t border-slate-100">
-                                        <label className="text-sm font-medium text-slate-900 mb-2 block font-kufi">{t('coupon_label')}</label>
-                                        <div className="flex gap-2 h-11">
-                                            <input
-                                                type="text"
-                                                value={coupon}
-                                                onChange={(e) => setCoupon(e.target.value)}
-                                                placeholder={t('coupon_placeholder')}
-                                                className="flex-1 rounded-lg border-slate-200 bg-white text-sm focus:border-primary focus:ring-primary"
-                                            />
-                                            <button className="bg-slate-900 text-white px-4 rounded-lg text-sm font-bold hover:bg-slate-800 transition-colors font-kufi">
-                                                {t('coupon_apply')}
-                                            </button>
+                                    <label className="flex items-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-sm">
+                                        <div className="w-12 h-8 bg-slate-100 rounded flex items-center justify-center text-slate-600 shrink-0">
+                                            <span className="material-symbols-outlined">account_balance</span>
                                         </div>
+                                        <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
+                                            <span className="text-sm font-bold text-slate-900">{locale === 'ar' ? 'تحويل بنكي (EFT / Havale)' : 'Bank Transfer (EFT / Havale)'}</span>
+                                            <span className="text-xs text-slate-500">{locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send the receipt via WhatsApp'}</span>
+                                        </div>
+                                        <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
+                                            <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                                        </div>
+                                    </label>
+
+                                    {/* Payment instructions */}
+                                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                        <p className="text-amber-800 font-kufi text-sm font-bold mb-1">
+                                            {locale === 'ar' ? 'تعليمات الدفع' : 'Payment Instructions'}
+                                        </p>
+                                        <p className="text-amber-700 font-kufi text-xs leading-relaxed">
+                                            {locale === 'ar'
+                                                ? 'بعد تأكيد طلبك، يرجى تحويل المبلغ الكامل وإرسال صورة إيصال التحويل عبر واتساب على الرقم: +974 3311 4232'
+                                                : 'After confirming your order, please transfer the full amount and send a photo of the receipt via WhatsApp to: +974 3311 4232'}
+                                        </p>
                                     </div>
+
+                                    {errors.submit && (
+                                        <div className="bg-red-50 border border-red-200 rounded-xl p-4">
+                                            <p className="text-red-700 font-kufi text-sm">{errors.submit}</p>
+                                        </div>
+                                    )}
                                 </div>
                             )}
 
                             {/* Actions */}
                             <div className="flex flex-col-reverse sm:flex-row items-center justify-between gap-4 pt-6 mt-8 border-t border-slate-100">
                                 {stepIndex > 0 ? (
-                                    <button onClick={goBack} className="text-slate-500 hover:text-slate-800 font-medium text-sm py-3 px-4 transition-colors">
+                                    <button onClick={goBack} disabled={isSubmitting} className="text-slate-500 hover:text-slate-800 font-medium text-sm py-3 px-4 transition-colors">
                                         <span className="flex items-center gap-2">
                                             <span className="material-symbols-outlined text-lg rtl:rotate-180">arrow_back</span>
                                             {t('back')}
@@ -359,10 +434,23 @@ export default function CheckoutPage() {
                                 )}
 
                                 {currentStep === 'payment' ? (
-                                    <Link href="/checkout/confirmation" className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 font-kufi">
-                                        {t('confirm_order')}
-                                        <span className="material-symbols-outlined text-lg">check_circle</span>
-                                    </Link>
+                                    <button
+                                        onClick={handleConfirm}
+                                        disabled={isSubmitting}
+                                        className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 font-kufi disabled:opacity-60 disabled:cursor-not-allowed"
+                                    >
+                                        {isSubmitting ? (
+                                            <>
+                                                <span className="animate-spin material-symbols-outlined text-lg">autorenew</span>
+                                                {locale === 'ar' ? 'جارٍ التأكيد...' : 'Placing order...'}
+                                            </>
+                                        ) : (
+                                            <>
+                                                {t('confirm_order')}
+                                                <span className="material-symbols-outlined text-lg">check_circle</span>
+                                            </>
+                                        )}
+                                    </button>
                                 ) : (
                                     <button onClick={goNext} className="w-full sm:w-auto bg-primary hover:bg-primary/90 text-white font-bold py-3.5 px-8 rounded-lg shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 font-kufi">
                                         {t('continue')}
@@ -372,7 +460,6 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
-                        {/* Footer Links */}
                         <div className="mt-8 text-center text-xs text-slate-400 flex justify-center gap-6 font-kufi">
                             <a href="#" className="hover:underline">{t('privacy')}</a>
                             <a href="#" className="hover:underline">{t('terms')}</a>

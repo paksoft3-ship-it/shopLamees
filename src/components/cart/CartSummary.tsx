@@ -12,7 +12,7 @@ export function CartSummary() {
     const { format } = useFormattedMoney();
 
     const subtotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
-    const vat = Math.round(subtotal * 0.15);
+    const vat = Math.round(subtotal * 0.15); // 15% VAT
     const total = subtotal + vat;
 
     return (
