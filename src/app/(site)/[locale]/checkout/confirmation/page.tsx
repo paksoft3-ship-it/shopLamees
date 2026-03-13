@@ -8,56 +8,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getOrderByNumber } from '@/lib/actions/orders';
 
-const ADMIN_WHATSAPP = '97433114232';
-
 type Order = Awaited<ReturnType<typeof getOrderByNumber>>;
-
-function buildAdminWhatsAppMessage(order: NonNullable<Order>, locale: string): string {
-    const flag = order.country === 'QA' ? '🇶🇦' : '🇸🇦';
-    const items = order.items.map(i =>
-        `  • ${i.nameSnapshotAr}${i.variantLabel ? ` (${i.variantLabel})` : ''} × ${i.qty} = ${Number(i.lineTotal).toFixed(0)} ${order.currency}`
-    ).join('\n');
-
-    if (locale === 'ar') {
-        return `🛍️ *طلب جديد - شوب لاميس*
-
-📋 رقم الطلب: *${order.orderNumber}*
-👤 الاسم: ${order.customerName}
-📞 الهاتف: ${order.phone}${order.email ? `\n📧 البريد: ${order.email}` : ''}
-
-🛒 *المنتجات:*
-${items}
-
-💰 المجموع الفرعي: ${Number(order.subtotal).toFixed(0)} ${order.currency}
-🚚 الشحن: ${Number(order.shippingFee).toFixed(0)} ${order.currency}
-✅ *الإجمالي: ${Number(order.total).toFixed(0)} ${order.currency}*
-
-${flag} *العنوان:*
-${order.address?.city ?? ''}${order.address?.zone ? '، ' + order.address.zone : ''}
-${order.address?.street ?? ''}${order.address?.building ? '، مبنى ' + order.address.building : ''}${order.address?.unit ? '، شقة ' + order.address.unit : ''}
-
-💳 طريقة الدفع: تحويل بنكي (EFT / Havale)${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
-    }
-
-    return `🛍️ *New Order - Shop Lamees*
-
-📋 Order: *${order.orderNumber}*
-👤 Name: ${order.customerName}
-📞 Phone: ${order.phone}${order.email ? `\n📧 Email: ${order.email}` : ''}
-
-🛒 *Items:*
-${items}
-
-💰 Subtotal: ${Number(order.subtotal).toFixed(0)} ${order.currency}
-🚚 Shipping: ${Number(order.shippingFee).toFixed(0)} ${order.currency}
-✅ *Total: ${Number(order.total).toFixed(0)} ${order.currency}*
-
-${flag} *Address:*
-${order.address?.city ?? ''}${order.address?.zone ? ', ' + order.address.zone : ''}
-${order.address?.street ?? ''}${order.address?.building ? ', Bldg ' + order.address.building : ''}${order.address?.unit ? ', Unit ' + order.address.unit : ''}
-
-💳 Payment: Bank Transfer (EFT / Havale)${order.customerNote ? `\n\n📝 Note: ${order.customerNote}` : ''}`;
-}
 
 export default function OrderConfirmationPage() {
     const t = useTranslations('OrderConfirmation');
@@ -66,7 +17,6 @@ export default function OrderConfirmationPage() {
     const searchParams = useSearchParams();
     const orderNumber = searchParams.get('order') || '';
     const hasTracked = useRef(false);
-    const hasOpenedWA = useRef(false);
 
     const [order, setOrder] = useState<Order>(null);
     const [loading, setLoading] = useState(true);
@@ -86,21 +36,6 @@ export default function OrderConfirmationPage() {
             trackEvent('purchase', { transaction_id: orderNumber, currency });
         }
     }, [orderNumber, currency]);
-
-    // Auto-open admin WhatsApp once order is loaded
-    useEffect(() => {
-        if (!order || hasOpenedWA.current) return;
-        hasOpenedWA.current = true;
-        const msg = buildAdminWhatsAppMessage(order, locale);
-        const url = `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(msg)}`;
-        // Small delay so the page renders first
-        const timer = setTimeout(() => window.open(url, '_blank'), 1200);
-        return () => clearTimeout(timer);
-    }, [order, locale]);
-
-    const adminWhatsAppUrl = order
-        ? `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(buildAdminWhatsAppMessage(order, locale))}`
-        : '#';
 
     if (loading) {
         return (
@@ -173,18 +108,18 @@ export default function OrderConfirmationPage() {
                         )}
                     </div>
 
-                    {/* WhatsApp instruction box */}
-                    <div className="w-full bg-[#e7fce8] border border-[#a8e6aa] rounded-xl p-4 mb-6 text-start">
+                    {/* Transfer reminder box */}
+                    <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-start">
                         <div className="flex items-start gap-3">
-                            <span className="material-symbols-outlined text-[#25D366] text-xl shrink-0 mt-0.5">chat</span>
+                            <span className="material-symbols-outlined text-amber-500 text-xl shrink-0 mt-0.5">account_balance</span>
                             <div>
-                                <p className="text-green-900 font-kufi text-sm font-bold mb-1">
-                                    {locale === 'ar' ? 'خطوة مهمة: أرسل تفاصيل طلبك عبر واتساب' : 'Important: Send your order via WhatsApp'}
+                                <p className="text-amber-900 font-kufi text-sm font-bold mb-1">
+                                    {locale === 'ar' ? 'الخطوة التالية: أرسل التحويل البنكي' : 'Next step: Send the bank transfer'}
                                 </p>
-                                <p className="text-green-800 font-kufi text-xs leading-relaxed">
+                                <p className="text-amber-800 font-kufi text-xs leading-relaxed">
                                     {locale === 'ar'
-                                        ? 'تم فتح واتساب تلقائياً برسالة جاهزة تحتوي على تفاصيل طلبك. اضغط إرسال حتى نتمكن من تأكيد طلبك وتجهيزه بعد استلام التحويل.'
-                                        : 'WhatsApp has been opened automatically with your order details ready to send. Press Send so we can confirm your order after receiving the transfer.'}
+                                        ? 'يرجى تحويل المبلغ وإرسال صورة الإيصال عبر واتساب على الرقم +974 3311 4232 مع ذكر رقم الطلب.'
+                                        : 'Please transfer the amount and send a photo of the receipt via WhatsApp to +974 3311 4232 with your order number.'}
                                 </p>
                             </div>
                         </div>
@@ -192,15 +127,6 @@ export default function OrderConfirmationPage() {
 
                     {/* CTAs */}
                     <div className="flex flex-col w-full gap-3">
-                        <a
-                            href={adminWhatsAppUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="w-full h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi"
-                        >
-                            <span className="material-symbols-outlined text-[20px]">chat</span>
-                            {locale === 'ar' ? 'أرسل طلبك عبر واتساب' : 'Send Order via WhatsApp'}
-                        </a>
                         <Link
                             href="/"
                             className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi"
