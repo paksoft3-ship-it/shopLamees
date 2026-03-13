@@ -108,18 +108,18 @@ export default function OrderConfirmationPage() {
                         )}
                     </div>
 
-                    {/* Transfer reminder box */}
-                    <div className="w-full bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6 text-start">
+                    {/* WhatsApp receipt instruction */}
+                    <div className="w-full bg-[#e7fce8] border border-[#a8e6aa] rounded-xl p-4 mb-6 text-start">
                         <div className="flex items-start gap-3">
-                            <span className="material-symbols-outlined text-amber-500 text-xl shrink-0 mt-0.5">account_balance</span>
+                            <span className="material-symbols-outlined text-[#25D366] text-xl shrink-0 mt-0.5">chat</span>
                             <div>
-                                <p className="text-amber-900 font-kufi text-sm font-bold mb-1">
-                                    {locale === 'ar' ? 'الخطوة التالية: أرسل التحويل البنكي' : 'Next step: Send the bank transfer'}
+                                <p className="text-green-900 font-kufi text-sm font-bold mb-1">
+                                    {locale === 'ar' ? 'أرسل إيصال التحويل عبر واتساب' : 'Send your transfer receipt via WhatsApp'}
                                 </p>
-                                <p className="text-amber-800 font-kufi text-xs leading-relaxed">
+                                <p className="text-green-800 font-kufi text-xs leading-relaxed">
                                     {locale === 'ar'
-                                        ? 'يرجى تحويل المبلغ وإرسال صورة الإيصال عبر واتساب على الرقم +974 3311 4232 مع ذكر رقم الطلب.'
-                                        : 'Please transfer the amount and send a photo of the receipt via WhatsApp to +974 3311 4232 with your order number.'}
+                                        ? 'بعد إتمام التحويل البنكي، اضغط على الزر أدناه وأرسل لنا صورة إيصال التحويل مع رقم طلبك لنتمكن من تأكيده.'
+                                        : 'After completing the bank transfer, tap the button below and send us a photo of the receipt with your order number so we can confirm it.'}
                                 </p>
                             </div>
                         </div>
@@ -127,6 +127,15 @@ export default function OrderConfirmationPage() {
 
                     {/* CTAs */}
                     <div className="flex flex-col w-full gap-3">
+                        <a
+                            href={`https://wa.me/97433114232?text=${encodeURIComponent(locale === 'ar' ? `مرحباً، أرفق إيصال التحويل البنكي لطلب رقم ${orderNumber}` : `Hello, I'm sending my bank transfer receipt for order ${orderNumber}`)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="w-full h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi"
+                        >
+                            <span className="material-symbols-outlined text-[20px]">chat</span>
+                            {locale === 'ar' ? 'أرسل إيصال التحويل عبر واتساب' : 'Send Receipt via WhatsApp'}
+                        </a>
                         <Link
                             href="/"
                             className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi"

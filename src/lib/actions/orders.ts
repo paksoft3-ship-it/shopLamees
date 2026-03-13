@@ -22,6 +22,7 @@ async function sendTelegramNotification(order: {
 }) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const chatId = process.env.TELEGRAM_CHAT_ID;
+    const chatId2 = process.env.TELEGRAM_CHAT_ID_2;
     if (!token || !chatId) return; // silently skip if not configured
 
     const flag = order.country === 'QA' ? '🇶🇦' : '🇸🇦';
@@ -55,12 +56,15 @@ ${address}
 
 💳 الدفع: تحويل بنكي (EFT / Havale)${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
 
+    const recipients = [chatId, chatId2].filter(Boolean);
     try {
-        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' }),
-        });
+        await Promise.all(recipients.map(id =>
+            fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ chat_id: id, text: message, parse_mode: 'Markdown' }),
+            })
+        ));
     } catch {
         // Don't fail the order if Telegram is down
     }
