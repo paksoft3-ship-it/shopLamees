@@ -57,7 +57,8 @@
             "title": "Featured Products",
             "subtitle": "Browse the latest collection of luxury abayas",
             "view_all": "View All",
-            "add_to_cart": "Add to Cart"
+            "add_to_cart": "Add to Cart",
+            "buy_now": "Buy Now"
         },
         "ValueProps": {
             "quality_title": "Quality Guarantee",
@@ -123,6 +124,18 @@
             "video_detail": "Lace Detail",
             "video_collection": "Full Look",
             "video_style": "In Style"
+        },
+        "Customization": {
+            "title": "Custom Tailoring",
+            "subtitle": "Get a one-of-a-kind abaya tailored to your exact measurements and style preferences. Choose your fabric, cut, and details — we craft it for you.",
+            "step1_title": "Send Your Request",
+            "step1_desc": "Contact us via WhatsApp with your design idea and measurements.",
+            "step2_title": "Confirm Details",
+            "step2_desc": "We finalize the fabric, cut, and finishing details with you.",
+            "step3_title": "Receive Your Abaya",
+            "step3_desc": "Your custom abaya is crafted and shipped directly to your door.",
+            "non_refundable_notice": "Please note: Custom and personalized orders are non-refundable and non-exchangeable, as they are made specifically for you.",
+            "cta": "Start Customizing via WhatsApp"
         }
     },
     "Product": {
@@ -131,11 +144,14 @@
             "size": "Size",
             "size_guide": "Size Guide",
             "cut": "Cut",
+            "cut_placeholder": "Choose",
             "quarter_cloche": "Quarter Cloche",
-            "half_cloche": "Half Cloche",
+            "half_cloche": "Half Cloche (Same as Model)",
+            "straight_cut": "Straight Cut",
             "lead_title": "Lead time 3-7 days",
             "lead_desc": "Order will be prepared with care & shipped via DHL Express",
             "add_to_cart": "Add to Cart",
+            "buy_now": "Buy Now",
             "return_policy": "7-day return policy",
             "notes_label": "Additional Notes",
             "notes_placeholder": "Write your note here...",

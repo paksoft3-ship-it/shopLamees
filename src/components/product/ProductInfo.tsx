@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
 import { useFormattedMoney } from '@/lib/money';
@@ -19,10 +20,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
     const { addItem } = useCartStore();
     const { currency } = usePrefsStore();
     const { format } = useFormattedMoney();
+    const router = useRouter();
 
     const [quantity, setQuantity] = useState(1);
-    const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || 'M');
-    const [selectedCut, setSelectedCut] = useState('quarter');
+    const [selectedSize, setSelectedSize] = useState(product.sizes?.[0] || '40');
+    const [selectedCut, setSelectedCut] = useState('');
 
     const productName = product.name[locale];
     const productPrice = product.variants[0]?.priceSar || product.basePriceSar;
@@ -51,7 +53,9 @@ export function ProductInfo({ product }: ProductInfoProps) {
             size: selectedSize,
             cut: selectedCut === 'quarter'
                 ? (locale === 'ar' ? 'ربع كلوش' : 'Quarter Cloche')
-                : (locale === 'ar' ? 'نص كلوش' : 'Half Cloche'),
+                : selectedCut === 'half'
+                ? (locale === 'ar' ? 'نص كلوش ( نفس المودل )' : 'Half Cloche (Same as Model)')
+                : (locale === 'ar' ? 'قصة عاديه' : 'Straight Cut'),
             color: product.color || undefined,
         });
         trackEvent('add_to_cart', {
@@ -64,6 +68,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
         toast.success(locale === 'en' ? `${productName} added to cart!` : `تمت إضافة ${productName} للسلة بنجاح!`, {
             icon: '🛍️',
         });
+    };
+
+    const handleBuyNow = () => {
+        handleAddToCart();
+        router.push('/checkout');
     };
 
     return (
@@ -123,50 +132,48 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     {/* Size Selector */}
                     <div>
                         <div className="flex justify-between items-center mb-3">
-                            <label className="text-sm font-bold text-[#0e1b12] font-kufi">{t('size')}</label>
+                            <label className="text-sm font-bold text-[#0e1b12] font-kufi">
+                                {t('size')} <span className="text-xs font-normal text-[#6b7280]">(cm)</span>
+                            </label>
                             <button className="text-xs text-[#6b7280] underline decoration-[#d1d5db] hover:text-[#0e1b12]">
                                 {t('size_guide')}
                             </button>
                         </div>
-                        <div className="grid grid-cols-4 gap-2">
-                            {(product.sizes && product.sizes.length > 0 ? product.sizes : ['52', '54', '56', '58']).map((size) => (
-                                <label key={size} className="cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="size"
-                                        className="peer sr-only"
-                                        checked={selectedSize === size}
-                                        onChange={() => setSelectedSize(size)}
-                                    />
-                                    <div className="w-full h-10 flex items-center justify-center bg-white md:bg-transparent rounded-full md:rounded-lg border border-gray-200 md:border-[#e5e7eb] text-sm font-medium text-[#0e1b12] peer-checked:bg-[#0e1b12] peer-checked:text-white peer-checked:border-[#0e1b12] hover:border-[#9ca3af] transition-all focus:ring-2 ring-primary">
-                                        {size}
-                                    </div>
-                                </label>
-                            ))}
+                        <div className="relative">
+                            <select
+                                value={selectedSize}
+                                onChange={(e) => setSelectedSize(e.target.value)}
+                                className="w-full h-11 appearance-none bg-white border border-[#e5e7eb] rounded-lg px-4 pr-10 text-sm font-medium text-[#0e1b12] focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-kufi cursor-pointer"
+                            >
+                                {Array.from({ length: 11 }, (_, i) => String(40 + i * 2)).map((size) => (
+                                    <option key={size} value={size}>{size} cm</option>
+                                ))}
+                            </select>
+                            <span className="pointer-events-none absolute inset-y-0 ltr:right-3 rtl:left-3 flex items-center text-[#6b7280]">
+                                <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                            </span>
                         </div>
                     </div>
 
                     {/* Cut Selector */}
                     <div>
-                        <label className="block text-sm font-bold text-[#0e1b12] font-kufi mb-3">{t('cut')}</label>
-                        <div className="grid grid-cols-2 gap-2">
-                            {[
-                                { id: 'quarter', label: t('quarter_cloche') },
-                                { id: 'half', label: t('half_cloche') },
-                            ].map((cut) => (
-                                <label key={cut.id} className="cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="cut"
-                                        className="peer sr-only"
-                                        checked={selectedCut === cut.id}
-                                        onChange={() => setSelectedCut(cut.id)}
-                                    />
-                                    <div className="w-full h-10 flex items-center justify-center bg-white md:bg-transparent rounded-full md:rounded-lg border border-gray-200 md:border-[#e5e7eb] text-sm font-medium text-[#0e1b12] peer-checked:bg-[#0e1b12] peer-checked:text-white peer-checked:border-[#0e1b12] hover:border-[#9ca3af] transition-all font-kufi focus:ring-2 ring-primary">
-                                        {cut.label}
-                                    </div>
-                                </label>
-                            ))}
+                        <label className="block text-sm font-bold text-[#0e1b12] font-kufi mb-3">
+                            {t('cut')} <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
+                            <select
+                                value={selectedCut}
+                                onChange={(e) => setSelectedCut(e.target.value)}
+                                className="w-full h-11 appearance-none bg-white border border-[#e5e7eb] rounded-lg px-4 pr-10 text-sm font-medium text-[#0e1b12] focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary font-kufi cursor-pointer"
+                            >
+                                <option value="">{t('cut_placeholder')}</option>
+                                <option value="quarter">{t('quarter_cloche')}</option>
+                                <option value="half">{t('half_cloche')}</option>
+                                <option value="straight">{t('straight_cut')}</option>
+                            </select>
+                            <span className="pointer-events-none absolute inset-y-0 ltr:right-3 rtl:left-3 flex items-center text-[#6b7280]">
+                                <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -223,36 +230,47 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 </div>
 
                 {/* Desktop Actions */}
-                <div className="hidden md:flex gap-4 pt-2 mt-4">
-                    {/* Quantity */}
-                    <div className="w-32 h-14 relative flex items-center rounded-lg border border-[#d1d5db]">
+                <div className="hidden md:flex flex-col gap-3 pt-2 mt-4">
+                    <div className="flex gap-3">
+                        {/* Quantity */}
+                        <div className="w-32 h-14 relative flex items-center rounded-lg border border-[#d1d5db]">
+                            <button
+                                onClick={() => setQuantity(quantity + 1)}
+                                className="w-10 h-full flex items-center justify-center text-[#6b7280] hover:bg-[#f9fafb] rounded-r-lg"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">add</span>
+                            </button>
+                            <input
+                                type="text"
+                                className="w-full text-center border-none font-medium focus:ring-0 text-[#0e1b12] bg-transparent pb-1"
+                                value={quantity}
+                                readOnly
+                            />
+                            <button
+                                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                                className="w-10 h-full flex items-center justify-center text-[#6b7280] hover:bg-[#f9fafb] rounded-l-lg"
+                            >
+                                <span className="material-symbols-outlined text-[18px]">remove</span>
+                            </button>
+                        </div>
+
+                        {/* Add to Cart */}
                         <button
-                            onClick={() => setQuantity(quantity + 1)}
-                            className="w-10 h-full flex items-center justify-center text-[#6b7280] hover:bg-[#f9fafb] rounded-r-lg"
+                            onClick={handleAddToCart}
+                            className="flex-1 h-14 bg-[#0e1b12] hover:bg-black text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 font-kufi text-base pb-1"
                         >
-                            <span className="material-symbols-outlined text-[18px]">add</span>
-                        </button>
-                        <input
-                            type="text"
-                            className="w-full text-center border-none font-medium focus:ring-0 text-[#0e1b12] bg-transparent pb-1"
-                            value={quantity}
-                            readOnly
-                        />
-                        <button
-                            onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                            className="w-10 h-full flex items-center justify-center text-[#6b7280] hover:bg-[#f9fafb] rounded-l-lg"
-                        >
-                            <span className="material-symbols-outlined text-[18px]">remove</span>
+                            <span>{t('add_to_cart')}</span>
+                            <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
                         </button>
                     </div>
 
-                    {/* Add to Cart */}
+                    {/* Buy Now */}
                     <button
-                        onClick={handleAddToCart}
-                        className="flex-1 h-14 bg-[#0e1b12] hover:bg-black text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 font-kufi text-lg pb-1"
+                        onClick={handleBuyNow}
+                        className="w-full h-14 bg-primary hover:bg-primary/90 text-[#0e1b12] font-bold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2 font-kufi text-base"
                     >
-                        <span>{t('add_to_cart')}</span>
-                        <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
+                        <span>{t('buy_now')}</span>
+                        <span className="material-symbols-outlined text-[20px]">bolt</span>
                     </button>
                 </div>
 
@@ -260,22 +278,21 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
                 {/* Mobile Add to Cart Area (Inline, NOT sticky) */}
                 <div className="md:hidden mt-6 pt-4 border-t border-border">
-                    <div className="flex items-center gap-4">
-                        {/* Add to Cart Button */}
+                    <div className="flex gap-3">
                         <button
                             onClick={handleAddToCart}
-                            className="flex-1 bg-black text-white h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-base hover:bg-primary-dark transition-colors shadow-lg pb-1"
+                            className="flex-1 bg-[#0e1b12] text-white h-13 rounded-xl flex items-center justify-center gap-2 font-bold font-kufi text-sm transition-colors shadow-lg"
                         >
-                            <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+                            <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
                             {t('add_to_cart')}
                         </button>
-                        {/* Price Summary */}
-                        <div className="flex flex-col items-end shrink-0 min-w-[80px]">
-                            <span className="text-[10px] text-subtle font-kufi uppercase">الإجمالي</span>
-                            <span className="text-xl font-bold text-on-surface leading-tight">
-                                {format(productPrice * quantity)}
-                            </span>
-                        </div>
+                        <button
+                            onClick={handleBuyNow}
+                            className="flex-1 bg-primary text-[#0e1b12] h-13 rounded-xl flex items-center justify-center gap-2 font-bold font-kufi text-sm transition-colors shadow-lg"
+                        >
+                            <span className="material-symbols-outlined text-[18px]">bolt</span>
+                            {t('buy_now')}
+                        </button>
                     </div>
                 </div>
 

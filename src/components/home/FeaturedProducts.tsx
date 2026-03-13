@@ -12,7 +12,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
     const t = useTranslations('Home.FeaturedProducts');
 
     return (
-        <section className="py-16 lg:py-24">
+        <section className="pt-6 pb-16 lg:pt-8 lg:pb-24">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex items-end justify-between mb-10">
                     <div>
@@ -24,7 +24,7 @@ export function FeaturedProducts({ products }: FeaturedProductsProps) {
                         <ArrowRight className="w-4 h-4 rtl:rotate-180" />
                     </Link>
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
                     {products.slice(0, 4).map((prod) => (
                         <ProductCard key={prod.id} product={prod} />
                     ))}

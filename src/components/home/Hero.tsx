@@ -8,7 +8,7 @@ export function Hero() {
     const locale = useLocale() as 'ar' | 'en';
 
     return (
-        <section className="relative overflow-hidden pt-12 pb-20 lg:pt-20 lg:pb-28 bg-background-light">
+        <section className="relative overflow-hidden pt-12 pb-8 lg:pt-20 lg:pb-10 bg-background-light">
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-20">
                     <div className="flex-1 text-start space-y-8">

@@ -18,7 +18,7 @@ export default function CheckoutPage() {
     const { items } = useCartStore();
     const { currency } = usePrefsStore();
     const [currentStep, setCurrentStep] = useState<Step>('address');
-    const [paymentMethod, setPaymentMethod] = useState('apple_pay');
+    const [paymentMethod, setPaymentMethod] = useState('eft');
     const [coupon, setCoupon] = useState('');
     const hasTrackedBeginCheckout = useRef(false);
 
@@ -168,9 +168,8 @@ export default function CheckoutPage() {
 
                         {/* Trust Badges */}
                         <div className="mt-4 flex justify-center gap-4 opacity-60">
-                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">VISA</div>
-                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">MASTERCARD</div>
-                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">MADA</div>
+                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">EFT</div>
+                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">HAVALE</div>
                         </div>
                     </aside>
 
@@ -302,9 +301,7 @@ export default function CheckoutPage() {
                             {currentStep === 'payment' && (
                                 <div className="space-y-4">
                                     {[
-                                        { id: 'apple_pay', label: 'Apple Pay', sub: locale === 'ar' ? 'ادفع بأمان وسرعة' : 'Pay securely & fast', icon: 'phone_iphone' },
-                                        { id: 'credit_card', label: locale === 'ar' ? 'بطاقة ائتمان' : 'Credit Card', sub: 'Visa / Mastercard', icon: 'credit_card' },
-                                        { id: 'cod', label: locale === 'ar' ? 'الدفع عند الاستلام' : 'Cash on Delivery', sub: locale === 'ar' ? 'متاح في بعض المناطق' : 'Available in select areas', icon: 'payments' },
+                                        { id: 'eft', label: locale === 'ar' ? 'تحويل بنكي (EFT / Havale)' : 'Bank Transfer (EFT / Havale)', sub: locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send the receipt via WhatsApp', icon: 'account_balance' },
                                     ].map((opt) => (
                                         <label
                                             key={opt.id}

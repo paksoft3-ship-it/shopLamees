@@ -203,7 +203,7 @@ function main() {
                                 'https://cdn.salla.sa/DGwjPD/fc75a3df-82b5-4e5b-85fe-35f80ea75e67-738.5428907168x1000-wytsxECY4TpiZ8jeB370gBy32lswuxn9IQeHTScr.jpg',
                                 'https://cdn.salla.sa/DGwjPD/7663593e-68b8-4d17-b5bc-4d61bfab3f85-832.79836591771x1000-0Y13RBibw21qkCiIf7MwSA6sNFZ0I58NpWjVPxVp.jpg',
                             ],
-                            sizes: ['S', 'M', 'L', 'XL'],
+                            sizes: ['52', '54', '56', '58', '60'],
                         },
                         {
                             slug: 'royal-niqab',
@@ -259,7 +259,7 @@ function main() {
                                 'https://cdn.salla.sa/DGwjPD/dbc353f9-d830-4840-aa70-82b16efac223-379.85865724382x500-xL5rU56nae4GpvtKXEzqGdvPzh9MDTdRO0AdtrS0.jpg',
                                 'https://cdn.salla.sa/DGwjPD/9ff27cbd-adad-443c-b653-ba8393c9de36-687.63326226013x1000-OydGQFa82WAschWXyQLT2whVAt1ky0EeJ08mxy2H.jpg',
                             ],
-                            sizes: ['S', 'M', 'L', 'XL'],
+                            sizes: ['52', '54', '56', '58', '60'],
                         },
                         {
                             slug: 'ward-embroidered-abaya',

@@ -6,6 +6,7 @@ import { Lookbook } from "@/components/home/Lookbook";
 import { VideoShowcase } from "@/components/home/VideoShowcase";
 import { ValueProps } from "@/components/home/ValueProps";
 import { Newsletter } from "@/components/home/Newsletter";
+import { CustomizationSection } from "@/components/home/CustomizationSection";
 import { getCategories, getFeaturedProducts } from "@/lib/data/catalog";
 import { getHomeVideosFromSettings } from "@/lib/data/storeSettings";
 import { getLocalizedUrl, getSiteUrl } from "@/lib/site";
@@ -91,10 +92,11 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
             />
             <Hero />
-            <CategoriesRow categories={categories} />
             <FeaturedProducts products={featuredProducts} />
+            <CategoriesRow categories={categories} />
             <Lookbook />
             <VideoShowcase videos={homeVideos} />
+            <CustomizationSection />
             <ValueProps />
             <Newsletter />
         </>
