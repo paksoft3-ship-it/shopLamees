@@ -167,7 +167,7 @@ export default function OrderConfirmationPage() {
                             <div className="flex justify-between items-center pt-2 border-t border-slate-200">
                                 <span className="font-bold text-slate-900 font-kufi">{t('total')}</span>
                                 <span className="font-bold text-lg font-display text-slate-900">
-                                    {formatPrice(Number(order.total), currency, locale)}
+                                    {Number(order.total).toFixed(0)} {order.currency}
                                 </span>
                             </div>
                         )}
