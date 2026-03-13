@@ -219,7 +219,7 @@ export function CartDrawer() {
 
                             <div className="flex flex-col gap-3">
                                 <Link
-                                    href="/cart"
+                                    href="/checkout"
                                     onClick={closeDrawer}
                                     className="flex items-center justify-center rounded-xl border border-transparent bg-primary px-6 py-3 text-base font-bold text-white shadow-sm hover:bg-primary-dark transition-all hover:shadow-md font-kufi"
                                 >

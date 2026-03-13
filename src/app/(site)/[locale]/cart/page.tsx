@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { useCartStore } from '@/lib/stores/cart';
 import { CartList } from '@/components/cart/CartList';
@@ -9,9 +10,12 @@ import { Link } from '@/i18n/navigation';
 
 export default function CartPage() {
     const t = useTranslations('Cart');
-    const { items, hasHydrated } = useCartStore();
+    const { items } = useCartStore();
+    const [mounted, setMounted] = useState(false);
 
-    if (!hasHydrated) {
+    useEffect(() => { setMounted(true); }, []);
+
+    if (!mounted) {
         return (
             <main className="max-w-[1320px] w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-12 flex-grow">
                 <div className="animate-pulse rounded-3xl bg-[#f3f3f5] p-4 md:p-6 lg:p-8">

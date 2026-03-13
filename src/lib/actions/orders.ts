@@ -2,6 +2,70 @@
 
 import prisma from '@/lib/db';
 
+async function sendTelegramNotification(order: {
+    orderNumber: string;
+    customerName: string;
+    phone: string;
+    email?: string | null;
+    country: string;
+    city: string;
+    zone?: string | null;
+    street: string;
+    building?: string | null;
+    unit?: string | null;
+    currency: string;
+    subtotal: number;
+    shippingFee: number;
+    total: number;
+    customerNote?: string | null;
+    items: Array<{ name: string; qty: number; unitPrice: number; variantLabel?: string | null }>;
+}) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID;
+    if (!token || !chatId) return; // silently skip if not configured
+
+    const flag = order.country === 'QA' ? '🇶🇦' : '🇸🇦';
+    const itemLines = order.items.map(i =>
+        `  • ${i.name}${i.variantLabel ? ` (${i.variantLabel})` : ''} × ${i.qty} = ${i.unitPrice * i.qty} ${order.currency}`
+    ).join('\n');
+
+    const address = [
+        order.city,
+        order.zone,
+        order.street,
+        order.building ? `مبنى ${order.building}` : null,
+        order.unit ? `شقة ${order.unit}` : null,
+    ].filter(Boolean).join('، ');
+
+    const message = `🛍️ *طلب جديد - شوب لاميس*
+
+📋 رقم الطلب: *${order.orderNumber}*
+👤 الاسم: ${order.customerName}
+📞 الهاتف: ${order.phone}${order.email ? `\n📧 البريد: ${order.email}` : ''}
+
+🛒 *المنتجات:*
+${itemLines}
+
+💰 المجموع: ${order.subtotal} ${order.currency}
+🚚 الشحن: ${order.shippingFee} ${order.currency}
+✅ *الإجمالي: ${order.total} ${order.currency}*
+
+${flag} *العنوان:*
+${address}
+
+💳 الدفع: تحويل بنكي (EFT / Havale)${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
+
+    try {
+        await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, text: message, parse_mode: 'Markdown' }),
+        });
+    } catch {
+        // Don't fail the order if Telegram is down
+    }
+}
+
 interface OrderCartItem {
     variantId: string;
     productId: string;
@@ -70,12 +134,12 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderNumbe
             customerNote: input.customerNote || null,
             items: {
                 create: input.items.map(item => ({
-                    productId: null,   // avoid FK constraint — IDs in cart are not real DB IDs
-                    variantId: null,   // same reason
+                    productId: null,
+                    variantId: null,
                     nameSnapshotAr: item.name,
                     nameSnapshotEn: item.name,
                     variantLabel: [item.size && `${item.size} cm`, item.cut].filter(Boolean).join(' / ') || null,
-                    sku: item.variantId || null,  // store the cart variantId as SKU reference
+                    sku: item.variantId || null,
                     imageSnapshot: item.image || null,
                     qty: item.quantity,
                     unitPrice: item.unitPrice,
@@ -93,6 +157,31 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderNumbe
                 },
             },
         },
+    });
+
+    // Send Telegram notification to admin (fire-and-forget)
+    void sendTelegramNotification({
+        orderNumber,
+        customerName: input.customerName,
+        phone: input.phone,
+        email: input.email,
+        country: input.country,
+        city: input.city,
+        zone: input.zone,
+        street: input.street,
+        building: input.building,
+        unit: input.unit,
+        currency,
+        subtotal: input.subtotal,
+        shippingFee: input.shippingFee,
+        total: input.total,
+        customerNote: input.customerNote,
+        items: input.items.map(item => ({
+            name: item.name,
+            qty: item.quantity,
+            unitPrice: item.unitPrice,
+            variantLabel: [item.size && `${item.size} cm`, item.cut].filter(Boolean).join(' / ') || null,
+        })),
     });
 
     return { orderNumber };
