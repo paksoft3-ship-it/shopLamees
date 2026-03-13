@@ -395,6 +395,26 @@ export default function CheckoutPage() {
                                         </div>
                                     </label>
 
+                                    {/* Bank details */}
+                                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                                        <p className="text-slate-800 font-kufi text-sm font-bold mb-2 flex items-center gap-2">
+                                            <span className="material-symbols-outlined text-[18px] text-primary">account_balance</span>
+                                            {locale === 'ar' ? 'بيانات الحساب البنكي' : 'Bank Account Details'}
+                                        </p>
+                                        {[
+                                            { label: locale === 'ar' ? 'اسم الحساب' : 'Account Name', value: 'MUHAMMAD OMAR FAROOQ' },
+                                            { label: locale === 'ar' ? 'رقم الحساب' : 'Account Number', value: '473010890020101' },
+                                            { label: 'IBAN', value: 'QA66CBQA000000473010890020101' },
+                                            { label: 'SWIFT', value: 'CBQAQAQA' },
+                                            { label: locale === 'ar' ? 'البنك' : 'Bank', value: 'Commercial Bank (QSC) — Doha, Qatar' },
+                                        ].map(({ label, value }) => (
+                                            <div key={label} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 text-xs border-b border-slate-100 last:border-0 py-1">
+                                                <span className="text-slate-500 font-kufi">{label}</span>
+                                                <span className="font-bold text-slate-800 font-display tracking-wide" dir="ltr">{value}</span>
+                                            </div>
+                                        ))}
+                                    </div>
+
                                     {/* Payment instructions */}
                                     <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
                                         <p className="text-amber-800 font-kufi text-sm font-bold mb-1">

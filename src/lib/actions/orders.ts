@@ -97,3 +97,10 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderNumbe
 
     return { orderNumber };
 }
+
+export async function getOrderByNumber(orderNumber: string) {
+    return prisma.order.findUnique({
+        where: { orderNumber },
+        include: { items: true, address: true },
+    });
+}
