@@ -54,7 +54,7 @@ ${itemLines}
 ${flag} *العنوان:*
 ${address}
 
-💳 الدفع: تحويل بنكي (EFT / Havale)${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
+💳 الدفع: تحويل بنكي${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
 
     const recipients = [chatId, chatId2].filter(Boolean);
     try {

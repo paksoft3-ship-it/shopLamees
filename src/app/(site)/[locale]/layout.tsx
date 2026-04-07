@@ -10,12 +10,11 @@ import { ToasterProvider } from '@/components/providers/ToasterProvider';
 import { CartDrawer } from '@/components/cart/CartDrawer';
 import { WebVitalsReporter } from '@/components/analytics/WebVitalsReporter';
 import { Analytics } from '@vercel/analytics/next';
-import { Noto_Kufi_Arabic, Cairo, Inter } from 'next/font/google';
+import { Almarai, Inter } from 'next/font/google';
 import { routing } from '@/i18n/routing';
 import '../../globals.css';
 
-const notoKufi = Noto_Kufi_Arabic({ subsets: ['arabic'], variable: '--font-noto-kufi' });
-const cairo = Cairo({ subsets: ['arabic'], variable: '--font-cairo' });
+const almarai = Almarai({ weight: ['300', '400', '700', '800'], subsets: ['arabic'], variable: '--font-almarai' });
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const WhatsAppChatbot = dynamic(
     () => import('@/components/layout/WhatsAppChatbot').then((m) => m.WhatsAppChatbot),
@@ -38,7 +37,7 @@ export default async function SiteLayout({
 
     return (
         <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-            <body className={`${notoKufi.variable} ${cairo.variable} ${inter.variable} antialiased font-body bg-background-light text-on-surface`}>
+            <body className={`${almarai.variable} ${inter.variable} antialiased font-body bg-background-light text-on-surface`}>
                 <ToasterProvider />
                 <WebVitalsReporter />
                 <Analytics />

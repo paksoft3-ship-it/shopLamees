@@ -62,8 +62,9 @@ const config: Config = {
 				}
 			},
 			fontFamily: {
-				display: ['var(--font-noto-kufi)', 'var(--font-noto-sans-arabic)', 'var(--font-inter)', 'sans-serif'],
-				body: ['var(--font-cairo)', 'var(--font-manrope)', 'var(--font-inter)', 'sans-serif'],
+				display: ['var(--font-almarai)', 'var(--font-inter)', 'sans-serif'],
+				body: ['var(--font-almarai)', 'var(--font-inter)', 'sans-serif'],
+				kufi: ['var(--font-almarai)', 'var(--font-inter)', 'sans-serif'],
 				code: ['var(--font-inter)', 'monospace'],
 			},
 			borderRadius: {

@@ -245,8 +245,7 @@ export default function CheckoutPage() {
                             </div>
                         </div>
                         <div className="mt-4 flex justify-center gap-4 opacity-60">
-                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">EFT</div>
-                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">HAVALE</div>
+                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">{locale === 'ar' ? 'تحويل بنكي' : 'BANK TRANSFER'}</div>
                         </div>
                     </aside>
 
@@ -387,7 +386,7 @@ export default function CheckoutPage() {
                                             <span className="material-symbols-outlined">account_balance</span>
                                         </div>
                                         <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
-                                            <span className="text-sm font-bold text-slate-900">{locale === 'ar' ? 'تحويل بنكي (EFT / Havale)' : 'Bank Transfer (EFT / Havale)'}</span>
+                                            <span className="text-sm font-bold text-slate-900">{locale === 'ar' ? 'تحويل بنكي' : 'Bank Transfer'}</span>
                                             <span className="text-xs text-slate-500">{locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send the receipt via WhatsApp'}</span>
                                         </div>
                                         <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">

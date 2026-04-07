@@ -92,7 +92,7 @@ export default function OrderConfirmationPage() {
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-slate-500 font-kufi">{t('payment_method')}</span>
-                            <span className="font-medium text-slate-900 font-kufi text-xs">{locale === 'ar' ? 'تحويل بنكي (EFT / Havale)' : 'Bank Transfer (EFT / Havale)'}</span>
+                            <span className="font-medium text-slate-900 font-kufi text-xs">{locale === 'ar' ? 'تحويل بنكي' : 'Bank Transfer'}</span>
                         </div>
                         <div className="flex justify-between items-center">
                             <span className="text-slate-500 font-kufi">{t('delivery_estimate')}</span>
