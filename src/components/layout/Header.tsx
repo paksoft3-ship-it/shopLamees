@@ -53,7 +53,7 @@ export function Header() {
                     </div>
 
                     {/* Center Logo - Absolutely centered */}
-                    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+                    <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none rtl:left-1/2 ltr:left-[57%]">
                         <Link className="flex items-center pointer-events-auto" href="/">
                             <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-14 lg:h-20 w-auto object-contain" priority />
                         </Link>
