@@ -29,23 +29,9 @@ export function Lookbook() {
                     </Link>
                 </div>
 
-                {/* Masonry-style grid */}
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-4">
-                    {/* Large featured image */}
-                    <div className="col-span-1 md:col-span-1 row-span-2 relative rounded-2xl overflow-hidden aspect-[3/4] group">
-                        <Image
-                            src={lookbookImages[0].src}
-                            alt={lookbookImages[0].alt}
-                            fill
-                            sizes="(max-width: 768px) 50vw, 33vw"
-                            className="object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    </div>
-
-                    {/* Remaining images */}
-                    {lookbookImages.slice(1).map((img, i) => (
-                        <div key={i} className="relative rounded-2xl overflow-hidden aspect-square group">
+                    {lookbookImages.map((img, i) => (
+                        <div key={i} className="relative rounded-2xl overflow-hidden aspect-[3/4] group">
                             <Image
                                 src={img.src}
                                 alt={img.alt}

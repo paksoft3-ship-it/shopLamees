@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { upload } from '@vercel/blob/client';
 import { AdminProduct, ProductStatus } from '@/lib/stores/adminProducts';
 import { createAdminProduct, updateAdminProduct } from '@/lib/actions/adminProducts';
+import { getAdminCategories, AdminCategory } from '@/lib/actions/adminCategories';
 
 interface ProductFormProps {
     initialData?: AdminProduct;
@@ -25,7 +26,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
         descriptionEn: '',
         price: 0,
         compareAtPrice: undefined,
-        category: 'يومي',
+        category: '',
         images: [],
         status: 'draft',
         variants: [{ id: 'v_new_1', sku: '', stock: 0 }],
@@ -36,7 +37,18 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
 
     const [activeTab, setActiveTab] = useState('general');
     const [uploading, setUploading] = useState(false);
+    const [categories, setCategories] = useState<AdminCategory[]>([]);
     const fileInputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        getAdminCategories().then(cats => {
+            setCategories(cats);
+            // Set default category for new products once categories load
+            if (!isEdit && !formData.category && cats.length > 0) {
+                handleChange('category', cats[0].nameAr);
+            }
+        });
+    }, []);
 
     const handleChange = <K extends keyof AdminProduct>(field: K, value: AdminProduct[K]) => {
         setFormData(prev => ({ ...prev, [field]: value }));
@@ -172,10 +184,14 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                     value={formData.category}
                                     onChange={(e) => handleChange('category', e.target.value)}
                                 >
-                                    <option value="يومي">يومي (Daily)</option>
-                                    <option value="سهرة">سهرة (Evening)</option>
-                                    <option value="مجموعة الشتاء">مجموعة الشتاء (Winter Collection)</option>
-                                    <option value="اكسسوارات">اكسسوارات (Accessories)</option>
+                                    {categories.length === 0 && (
+                                        <option value="">{isRtl ? 'جاري التحميل...' : 'Loading...'}</option>
+                                    )}
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.nameAr}>
+                                            {cat.nameAr} ({cat.nameEn})
+                                        </option>
+                                    ))}
                                 </select>
                             </div>
 
