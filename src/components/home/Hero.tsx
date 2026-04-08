@@ -29,8 +29,13 @@ export function Hero() {
                 priority
             />
 
-            {/* Dark gradient overlay — flips direction for RTL */}
-            <div className={`absolute inset-0 z-10 ${isRtl ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-black/88 via-black/60 to-black/10`} />
+            {/* Mobile overlay — dark center + blurred left/right edges */}
+            <div className="md:hidden absolute inset-0 z-10 bg-black/50" />
+            <div className="md:hidden absolute inset-y-0 left-0 w-16 z-10 backdrop-blur-sm bg-black/20" />
+            <div className="md:hidden absolute inset-y-0 right-0 w-16 z-10 backdrop-blur-sm bg-black/20" />
+
+            {/* Desktop gradient overlay — flips direction for RTL */}
+            <div className={`hidden md:block absolute inset-0 z-10 ${isRtl ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-black/88 via-black/60 to-black/10`} />
 
             {/* Content */}
             <div className={`absolute inset-y-0 z-20 flex items-center ${isRtl ? 'right-0' : 'left-0'}`}>

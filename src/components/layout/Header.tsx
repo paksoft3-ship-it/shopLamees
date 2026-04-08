@@ -65,10 +65,10 @@ export function Header() {
                 </div>
 
                 {/* ── DESKTOP HEADER ── */}
-                <div className="hidden lg:flex container mx-auto px-4 sm:px-6 lg:px-8 h-24 items-center justify-between relative">
+                <div className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] container mx-auto px-4 sm:px-6 lg:px-8 h-24 items-center">
 
-                    {/* Desktop Nav */}
-                    <nav className="flex items-center gap-4 shrink-0">
+                    {/* Col 1 — Nav (left) */}
+                    <nav className="flex items-center gap-3 xl:gap-4">
                         <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors whitespace-nowrap" href="/">{t('home')}</Link>
                         <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
                         <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
@@ -78,15 +78,13 @@ export function Header() {
                         <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/niqab">{t('nav_niqab')}</Link>
                     </nav>
 
-                    {/* Desktop Center Logo */}
-                    <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 pointer-events-none">
-                        <Link className="flex items-center pointer-events-auto" href="/">
-                            <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-20 w-auto object-contain" priority />
-                        </Link>
-                    </div>
+                    {/* Col 2 — Logo (always mathematically centered) */}
+                    <Link className="flex items-center justify-center" href="/">
+                        <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-20 w-auto object-contain" priority />
+                    </Link>
 
-                    {/* Desktop Right Icons */}
-                    <div className="flex items-center gap-4">
+                    {/* Col 3 — Right Icons */}
+                    <div className="flex items-center gap-4 justify-end">
                         <LocaleSwitcher />
                         <Link href="/search" className="p-2 text-slate-900 hover:text-primary transition-colors">
                             <Search className="w-6 h-6" />
