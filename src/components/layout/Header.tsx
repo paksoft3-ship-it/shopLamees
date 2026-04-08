@@ -27,40 +27,32 @@ export function Header() {
     return (
         <>
             <header className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-[#e5e0d8]">
-                <div className="container mx-auto px-4 sm:px-6 lg:px-8 h-16 lg:h-24 flex items-center justify-between relative">
+                {/* ── MOBILE HEADER (3-column grid so logo is always truly centered) ── */}
+                <div className="lg:hidden w-full px-4 sm:px-6 h-16 grid grid-cols-3 items-center">
 
-                    {/* Desktop Navigation (Hidden on Mobile) */}
-                    <nav className="hidden lg:flex items-center gap-4 shrink-0">
-                        <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors whitespace-nowrap" href="/">{t('home')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/dantel">{t('nav_dantel')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/eid-collection">{t('nav_eid')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/winter">{t('nav_winter')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/niqab">{t('nav_niqab')}</Link>
-                    </nav>
-
-                    {/* Mobile Left: Cart */}
-                    <div className="lg:hidden relative">
-                        <Link href="/cart" className="p-2 rounded-full hover:bg-black/5 transition-colors inline-block text-slate-900">
-                            <ShoppingBag className="w-6 h-6" />
-                        </Link>
-                        {hasHydrated && cartCount > 0 && (
-                            <span className="absolute top-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
-                                {cartCount}
-                            </span>
-                        )}
+                    {/* Col 1 — Cart (left) */}
+                    <div className="flex items-center justify-start">
+                        <div className="relative">
+                            <Link href="/cart" className="p-2 rounded-full hover:bg-black/5 transition-colors inline-block text-slate-900">
+                                <ShoppingBag className="w-6 h-6" />
+                            </Link>
+                            {hasHydrated && cartCount > 0 && (
+                                <span className="absolute top-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
+                                    {cartCount}
+                                </span>
+                            )}
+                        </div>
                     </div>
 
-                    {/* Center Logo - Absolutely centered */}
-                    <div className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none rtl:left-1/2 ltr:left-[57%]">
-                        <Link className="flex items-center pointer-events-auto" href="/">
-                            <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-14 lg:h-20 w-auto object-contain" priority />
+                    {/* Col 2 — Logo (center) */}
+                    <div className="flex items-center justify-center">
+                        <Link href="/">
+                            <Image src="/images/logo.png" alt={t('brand_name')} width={240} height={80} className="h-11 w-auto object-contain" priority />
                         </Link>
                     </div>
 
-                    {/* Mobile Right: Hamburger & Lang (Visible only on mobile) */}
-                    <div className="lg:hidden flex items-center gap-2">
+                    {/* Col 3 — Lang + Hamburger (right) */}
+                    <div className="flex items-center justify-end gap-1">
                         <LocaleSwitcher />
                         <button
                             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -70,9 +62,31 @@ export function Header() {
                             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
                         </button>
                     </div>
+                </div>
+
+                {/* ── DESKTOP HEADER ── */}
+                <div className="hidden lg:flex container mx-auto px-4 sm:px-6 lg:px-8 h-24 items-center justify-between relative">
+
+                    {/* Desktop Nav */}
+                    <nav className="flex items-center gap-4 shrink-0">
+                        <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors whitespace-nowrap" href="/">{t('home')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/dantel">{t('nav_dantel')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/eid-collection">{t('nav_eid')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/winter">{t('nav_winter')}</Link>
+                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/niqab">{t('nav_niqab')}</Link>
+                    </nav>
+
+                    {/* Desktop Center Logo */}
+                    <div className="absolute left-1/2 -translate-x-1/2 -translate-y-1/2 top-1/2 pointer-events-none">
+                        <Link className="flex items-center pointer-events-auto" href="/">
+                            <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-20 w-auto object-contain" priority />
+                        </Link>
+                    </div>
 
                     {/* Desktop Right Icons */}
-                    <div className="hidden lg:flex items-center gap-4">
+                    <div className="flex items-center gap-4">
                         <LocaleSwitcher />
                         <Link href="/search" className="p-2 text-slate-900 hover:text-primary transition-colors">
                             <Search className="w-6 h-6" />

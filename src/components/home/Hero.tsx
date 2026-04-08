@@ -1,75 +1,93 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
-import { ArrowRight, BadgeCheck } from 'lucide-react';
 import Image from 'next/image';
 
 export function Hero() {
     const t = useTranslations('Home.Hero');
-    const locale = useLocale() as 'ar' | 'en';
+    const locale = useLocale();
+    const isRtl = locale === 'ar';
 
     return (
-        <section className="relative overflow-hidden pt-12 pb-8 lg:pt-20 lg:pb-10 bg-background-light">
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div className="flex flex-col-reverse lg:flex-row items-center gap-12 lg:gap-20">
-                    <div className="flex-1 text-start space-y-8">
-                        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 text-primary text-sm font-medium border border-primary/20">
-                            <BadgeCheck className="w-4 h-4" />
-                            <span>{t('badge')}</span>
+        <section className="relative overflow-hidden w-full min-h-[480px] sm:min-h-[520px] lg:min-h-[580px]">
+
+            {/* Mobile image */}
+            <Image
+                alt="Hero Abaya"
+                src={isRtl ? '/images/modest_hero_banner_mobile_reversed.png' : '/images/modest_hero_banner_mobile.png'}
+                fill
+                sizes="100vw"
+                className="object-cover object-center md:hidden"
+                priority
+            />
+            {/* Desktop image */}
+            <Image
+                alt="Hero Abaya"
+                src={isRtl ? '/images/modest_hero_banner_wide_reversed.png' : '/images/modest_hero_banner_wide.png'}
+                fill
+                sizes="100vw"
+                className="object-cover object-center hidden md:block"
+                priority
+            />
+
+            {/* Dark gradient overlay — flips direction for RTL */}
+            <div className={`absolute inset-0 z-10 ${isRtl ? 'bg-gradient-to-l' : 'bg-gradient-to-r'} from-black/88 via-black/60 to-black/10`} />
+
+            {/* Content */}
+            <div className={`absolute inset-y-0 z-20 flex items-center ${isRtl ? 'right-0' : 'left-0'}`}>
+                <div className="w-[90vw] max-w-[520px] lg:max-w-[560px] px-6 sm:px-10 lg:px-16 xl:px-20 py-14">
+
+                    {/* Heading */}
+                    <h1 className="font-display text-[2.6rem] sm:text-5xl lg:text-[3.4rem] font-black text-white leading-[1.1] mb-4">
+                        {t('title_1')}<br />
+                        {t('title_2')}
+                    </h1>
+
+                    {/* Description */}
+                    <p className="text-[#b0a99f] text-sm sm:text-base leading-relaxed mb-7 max-w-[380px]">
+                        {t('description')}
+                    </p>
+
+                    {/* Buttons */}
+                    <div className="flex items-center gap-3 mb-10 flex-wrap">
+                        <Link
+                            href="/category/all"
+                            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-[#e8ddd0] text-[#1a1a1a] font-bold text-sm hover:bg-[#f0e8dc] transition-colors"
+                        >
+                            {t('shop_now')}
+                            <span className="text-[15px] leading-none">↗</span>
+                        </Link>
+                        <Link
+                            href="/latest"
+                            className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-lg bg-white/10 border border-white/20 text-white font-bold text-sm hover:bg-white/15 transition-colors"
+                        >
+                            {t('latest_products')}
+                        </Link>
+                    </div>
+
+                    {/* Stats card */}
+                    <div className="inline-flex items-center gap-0 bg-white/10 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm">
+                        <div className="flex flex-col items-center gap-1 px-5 py-3.5">
+                            <span className="material-symbols-outlined text-[#b0a99f] text-[18px]">group</span>
+                            <p className="text-white font-black text-base leading-none">5k+</p>
+                            <p className="text-[#b0a99f] text-[11px] whitespace-nowrap">{t('stats_customers')}</p>
                         </div>
-                        <h1 className="font-display text-4xl lg:text-6xl font-black text-on-surface leading-[1.2]">
-                            {t('title_1')} <br />
-                            <span className="text-subtle">{t('title_2')}</span>
-                        </h1>
-                        <p className="text-lg text-subtle max-w-lg leading-relaxed">
-                            {t('description')}
-                        </p>
-                        <div className="flex flex-wrap gap-4 pt-4">
-                            <Link href="/category/all" className="bg-primary hover:bg-primary-dark text-on-surface px-8 py-4 rounded-full font-bold text-lg transition-all hover:scale-105 flex items-center gap-2 shadow-soft hover:shadow-card">
-                                <span>{t('shop_now')}</span>
-                                <ArrowRight className="w-5 h-5 rtl:rotate-180" />
-                            </Link>
-                            <Link href="/latest" className="bg-surface border border-border text-on-surface px-8 py-4 rounded-full font-bold text-lg transition-colors hover:bg-background-light">
-                                {t('latest_products')}
-                            </Link>
+                        <div className="w-px self-stretch bg-white/10" />
+                        <div className="flex flex-col items-center gap-1 px-5 py-3.5">
+                            <span className="material-symbols-outlined text-[#b0a99f] text-[18px]">description</span>
+                            <p className="text-white font-black text-base leading-none">200+</p>
+                            <p className="text-[#b0a99f] text-[11px] whitespace-nowrap">{t('stats_models')}</p>
                         </div>
-                        <div className="flex items-center gap-8 pt-8 border-t border-border mt-8">
-                            <div>
-                                <p className="text-2xl font-bold font-display text-on-surface">5k+</p>
-                                <p className="text-sm text-subtle">{t('stats_customers')}</p>
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold font-display text-on-surface">200+</p>
-                                <p className="text-sm text-subtle">{t('stats_models')}</p>
-                            </div>
-                            <div>
-                                <p className="text-2xl font-bold font-display text-on-surface">4.9</p>
-                                <p className="text-sm text-subtle">{t('stats_rating')}</p>
-                            </div>
+                        <div className="w-px self-stretch bg-white/10" />
+                        <div className="flex flex-col items-center gap-1 px-5 py-3.5">
+                            <span className="material-symbols-outlined text-[#b0a99f] text-[18px]">star</span>
+                            <p className="text-white font-black text-base leading-none">4.9</p>
+                            <p className="text-[#b0a99f] text-[11px] whitespace-nowrap">{t('stats_rating')}</p>
                         </div>
                     </div>
-                    <div className="flex-1 w-full relative">
-                        <div className="relative z-10 rounded-[3rem] overflow-hidden shadow-card xl:aspect-[4/5] aspect-[3/4] group border border-border">
-                            <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent z-20"></div>
-                            <Image
-                                alt="Hero Abaya"
-                                src="/images/products/product-8.jpg"
-                                fill
-                                sizes="(max-width: 768px) 100vw, 50vw"
-                                className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                priority
-                            />
-                            <div className="absolute bottom-6 rtl:right-6 ltr:left-6 z-30 bg-surface/90 backdrop-blur p-4 rounded-2xl shadow-soft max-w-[200px] border border-border/50">
-                                <p className="text-xs text-subtle mb-1">{t('bestseller')}</p>
-                                <p className="font-bold text-on-surface text-sm">{t('abaya_name')}</p>
-                                <p className="text-primary font-bold mt-1">
-                                    {new Intl.NumberFormat(locale === 'ar' ? 'ar-QA' : 'en-QA', { style: 'currency', currency: 'QAR', maximumFractionDigits: 0 }).format(450)}
-                                </p>
-                            </div>
-                        </div>
-                        <div className="absolute -top-10 rtl:-right-10 ltr:-left-10 w-full h-full border-2 border-primary/20 rounded-[3rem] -z-0 hidden lg:block"></div>
-                    </div>
+
                 </div>
             </div>
+
         </section>
     );
 }
