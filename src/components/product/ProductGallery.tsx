@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, MouseEvent } from 'react';
 import Image from 'next/image';
 
 interface ProductGalleryProps {
@@ -10,24 +10,55 @@ interface ProductGalleryProps {
 
 export function ProductGallery({ images, productName }: ProductGalleryProps) {
     const [activeIndex, setActiveIndex] = useState(0);
+    const [isHovered, setIsHovered] = useState(false);
+    const [bgPosition, setBgPosition] = useState('0% 0%');
+
+    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+        const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+        const x = ((e.clientX - left) / width) * 100;
+        const y = ((e.clientY - top) / height) * 100;
+        setBgPosition(`${x}% ${y}%`);
+    };
 
     if (!images || images.length === 0) return null;
 
     return (
-        <div className="lg:col-span-7 flex flex-col lg:flex-row gap-4 h-fit">
-            {/* Main Image */}
-            <div className="relative flex-1 bg-gray-100 aspect-[3/4] lg:aspect-auto lg:h-[600px] group cursor-zoom-in md:rounded-lg overflow-hidden order-1">
-                <Image
-                    src={images[activeIndex]}
-                    alt={`${productName} main view`}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 1024px) 100vw, 60vw"
-                    priority
-                />
+        <div className="lg:col-span-7 flex flex-col lg:flex-row gap-4 h-fit relative z-20">
+            <div 
+                className="relative flex-1 aspect-[3/4] lg:aspect-auto lg:h-[600px] cursor-zoom-in order-1 group"
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={() => setIsHovered(false)}
+                onMouseMove={handleMouseMove}
+            >
+                {/* Default Main Image Container */}
+                <div className="absolute inset-0 bg-gray-100 md:rounded-lg overflow-hidden">
+                    <Image
+                        src={images[activeIndex]}
+                        alt={`${productName} main view`}
+                        fill
+                        className="object-cover transition-opacity duration-200"
+                        sizes="(max-width: 1024px) 100vw, 60vw"
+                        priority
+                    />
+                </div>
+
+                {/* Hover Zoom Center Popup (Desktop Only) */}
+                {isHovered && (
+                    <div className="hidden md:block fixed inset-0 z-[100] pointer-events-none transition-opacity duration-300">
+                        <div 
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] lg:w-[400px] lg:h-[400px] bg-white border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-2xl pointer-events-none overflow-hidden"
+                            style={{
+                                backgroundImage: `url(${images[activeIndex]})`,
+                                backgroundPosition: bgPosition,
+                                backgroundSize: '300%',
+                                backgroundRepeat: 'no-repeat',
+                            }}
+                        />
+                    </div>
+                )}
 
                 {/* Desktop Zoom Icon */}
-                <div className="hidden md:block absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className={`hidden md:block absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full p-2 shadow-sm transition-opacity ${isHovered ? 'opacity-0' : 'opacity-100 pointer-events-none'}`}>
                     <span className="material-symbols-outlined text-[#374151]">zoom_in</span>
                 </div>
             </div>
