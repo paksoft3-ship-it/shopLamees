@@ -277,21 +277,21 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <p className="hidden md:block text-center text-xs text-[#9ca3af] font-kufi mt-2">{t('return_policy')}</p>
 
                 {/* Mobile Add to Cart Area (Inline, NOT sticky) */}
-                <div className="md:hidden mt-6 pt-4 border-t border-border">
-                    <div className="flex gap-3">
+                <div className="md:hidden mt-8 pt-6 border-t border-slate-200">
+                    <div className="flex gap-4">
                         <button
                             onClick={handleAddToCart}
-                            className="flex-1 bg-[#0e1b12] text-white h-13 rounded-xl flex items-center justify-center gap-2 font-bold font-kufi text-sm transition-colors shadow-lg"
+                            className="flex-1 bg-[#0e1b12] text-white py-3.5 h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-[15px] transition-all shadow-md active:scale-[0.98]"
                         >
-                            <span className="material-symbols-outlined text-[18px]">shopping_cart</span>
-                            {t('add_to_cart')}
+                            <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
+                            <span>{t('add_to_cart')}</span>
                         </button>
                         <button
                             onClick={handleBuyNow}
-                            className="flex-1 bg-primary text-[#0e1b12] h-13 rounded-xl flex items-center justify-center gap-2 font-bold font-kufi text-sm transition-colors shadow-lg"
+                            className="flex-1 bg-primary text-[#0e1b12] py-3.5 h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-[15px] transition-all shadow-md active:scale-[0.98]"
                         >
-                            <span className="material-symbols-outlined text-[18px]">bolt</span>
-                            {t('buy_now')}
+                            <span className="material-symbols-outlined text-[20px]">bolt</span>
+                            <span>{t('buy_now')}</span>
                         </button>
                     </div>
                 </div>

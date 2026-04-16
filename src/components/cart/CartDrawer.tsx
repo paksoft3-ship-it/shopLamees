@@ -107,7 +107,7 @@ export function CartDrawer() {
                                 const productSlug = item.slug;
 
                                 return (
-                                    <li key={item.variantId} className="flex py-6">
+                                    <li key={item.variantId} className="flex gap-4 sm:gap-5 py-6">
                                         <Link href={`/products/${productSlug}`} onClick={closeDrawer} className="relative h-28 w-24 flex-shrink-0 overflow-hidden rounded-xl border border-border bg-background-light">
                                             <Image
                                                 src={productImage}
@@ -117,11 +117,11 @@ export function CartDrawer() {
                                                 sizes="96px"
                                             />
                                         </Link>
-                                        <div className="mr-4 rtl:ml-4 rtl:mr-0 flex flex-1 flex-col font-kufi">
+                                        <div className="flex flex-1 flex-col font-kufi">
                                             <div>
-                                                <div className="flex justify-between text-base font-bold text-on-surface">
+                                                <div className="flex justify-between gap-3 text-base font-bold text-on-surface">
                                                     <Link href={`/products/${productSlug}`} onClick={closeDrawer} className="leading-tight">{item.name}</Link>
-                                                    <p className="mr-4 font-display">{format(item.unitPrice)}</p>
+                                                    <p className="font-display">{format(item.unitPrice)}</p>
                                                 </div>
                                                 {item.size && (
                                                     <div className="flex items-center gap-1 mt-1 text-xs text-subtle">

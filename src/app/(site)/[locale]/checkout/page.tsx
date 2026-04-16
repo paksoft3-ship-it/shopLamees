@@ -92,12 +92,18 @@ export default function CheckoutPage() {
     const goNext = () => {
         if (!validate(currentStep)) return;
         const idx = STEPS.indexOf(currentStep);
-        if (idx < STEPS.length - 1) setCurrentStep(STEPS[idx + 1]);
+        if (idx < STEPS.length - 1) {
+            setCurrentStep(STEPS[idx + 1]);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
     const goBack = () => {
         setErrors({});
         const idx = STEPS.indexOf(currentStep);
-        if (idx > 0) setCurrentStep(STEPS[idx - 1]);
+        if (idx > 0) {
+            setCurrentStep(STEPS[idx - 1]);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
     };
 
     const handleConfirm = async () => {
@@ -244,9 +250,6 @@ export default function CheckoutPage() {
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-4 flex justify-center gap-4 opacity-60">
-                            <div className="h-8 flex items-center justify-center bg-white rounded px-3 shadow-sm text-xs font-bold font-display tracking-widest text-slate-600">{locale === 'ar' ? 'تحويل بنكي' : 'BANK TRANSFER'}</div>
-                        </div>
                     </aside>
 
                     {/* MAIN FORM */}
@@ -323,14 +326,19 @@ export default function CheckoutPage() {
                                 <div className="space-y-6">
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">{t('country')}</label>
-                                        <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full rounded-lg border-slate-300 py-3 px-4 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-base font-medium">
-                                            <option value="QA">{locale === 'ar' ? 'قطر' : 'Qatar'}</option>
-                                            <option value="SA">{locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia'}</option>
-                                            <option value="AE">{locale === 'ar' ? 'الإمارات العربية المتحدة' : 'UAE'}</option>
-                                            <option value="KW">{locale === 'ar' ? 'الكويت' : 'Kuwait'}</option>
-                                            <option value="BH">{locale === 'ar' ? 'البحرين' : 'Bahrain'}</option>
-                                            <option value="OM">{locale === 'ar' ? 'عُمان' : 'Oman'}</option>
-                                        </select>
+                                        <div className="relative">
+                                            <select value={country} onChange={e => setCountry(e.target.value)} className="block w-full appearance-none bg-white bg-none rounded-lg border-slate-300 py-3 px-4 ltr:pr-10 rtl:pl-10 text-slate-900 shadow-sm focus:border-primary focus:ring-primary sm:text-base font-medium">
+                                                <option value="QA">{locale === 'ar' ? 'قطر' : 'Qatar'}</option>
+                                                <option value="SA">{locale === 'ar' ? 'المملكة العربية السعودية' : 'Saudi Arabia'}</option>
+                                                <option value="AE">{locale === 'ar' ? 'الإمارات العربية المتحدة' : 'UAE'}</option>
+                                                <option value="KW">{locale === 'ar' ? 'الكويت' : 'Kuwait'}</option>
+                                                <option value="BH">{locale === 'ar' ? 'البحرين' : 'Bahrain'}</option>
+                                                <option value="OM">{locale === 'ar' ? 'عُمان' : 'Oman'}</option>
+                                            </select>
+                                            <span className="pointer-events-none absolute inset-y-0 ltr:right-3 rtl:left-3 flex items-center text-slate-500">
+                                                <span className="material-symbols-outlined text-[20px]">expand_more</span>
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                         <div>
@@ -478,13 +486,13 @@ export default function CheckoutPage() {
                                 )}
                             </div>
                         </div>
-
-                        <div className="mt-8 text-center text-xs text-slate-400 flex justify-center gap-6 font-kufi">
-                            <a href="#" className="hover:underline">{t('privacy')}</a>
-                            <a href="#" className="hover:underline">{t('terms')}</a>
-                            <a href="#" className="hover:underline">{t('returns')}</a>
-                        </div>
                     </div>
+                </div>
+
+                <div className="mt-12 text-center text-xs text-slate-400 flex justify-center gap-6 font-kufi pb-8">
+                    <a href="#" className="hover:underline">{t('privacy')}</a>
+                    <a href="#" className="hover:underline">{t('terms')}</a>
+                    <a href="#" className="hover:underline">{t('returns')}</a>
                 </div>
             </main>
         </section>
