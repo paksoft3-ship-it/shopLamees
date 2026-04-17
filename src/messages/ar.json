@@ -401,7 +401,15 @@
             "status_processing": "قيد التنفيذ",
             "status_shipping": "جاري الشحن",
             "status_new": "جديد",
-            "status_delivering": "جاري التوصيل"
+            "status_delivering": "جاري التوصيل",
+            "status_cancelled": "ملغي",
+            "loading": "جاري تحميل البيانات...",
+            "completed_badge": "طلب مكتمل",
+            "pending_badge": "معلق",
+            "avg_order_desc": "متوسط قيمة الطلب",
+            "published_products": "المنتجات المنشورة",
+            "best_seller_badge": "الأكثر مبيعاً",
+            "stock_good": "المخزون بحالة جيدة"
         },
         "Orders": {
             "title": "إدارة الطلبات",

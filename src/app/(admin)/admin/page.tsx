@@ -25,7 +25,6 @@ export default function AdminDashboard() {
     const t = useTranslations('Admin.Dashboard');
     const tc = useTranslations('Admin.Common');
     const locale = useLocale();
-    const isRtl = locale === 'ar';
 
     const [stats, setStats] = useState<AdminDashboardStats | null>(null);
 
@@ -38,7 +37,7 @@ export default function AdminDashboard() {
             <div className="flex h-[60vh] items-center justify-center p-8">
                 <div className="flex flex-col items-center gap-4">
                     <span className="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
-                    <p className="text-neutral-500 font-medium">جاري تحميل البيانات...</p>
+                    <p className="text-neutral-500 font-medium">{t('loading')}</p>
                 </div>
             </div>
         );
@@ -80,7 +79,7 @@ export default function AdminDashboard() {
         shipped: t('status_shipping'),
         processing: t('status_processing'),
         pending: t('status_new'),
-        cancelled: t('status_cancelled') ?? 'ملغي',
+        cancelled: t('status_cancelled'),
     };
 
     return (
@@ -111,7 +110,7 @@ export default function AdminDashboard() {
                     <div className="flex justify-between items-start mb-2">
                         <p className="text-white/80 text-sm font-medium">{t('today_sales')}</p>
                         <span className="bg-white/20 px-2 py-1 rounded text-xs font-bold backdrop-blur-sm">
-                            {pendingOrders > 0 ? `${pendingOrders} ${isRtl ? 'جديد' : 'new'}` : '✓'}
+                            {pendingOrders > 0 ? `${pendingOrders} ${tc('new')}` : '✓'}
                         </span>
                     </div>
                     <h2 className="text-4xl font-bold tracking-tight mb-1" dir="ltr">{formatMoney(totalRevenue)}</h2>
@@ -134,7 +133,7 @@ export default function AdminDashboard() {
                     <div className="mt-4 flex items-center gap-2">
                         <span className="flex items-center text-xs font-bold text-accent-green bg-accent-green/10 px-2 py-1 rounded-full">
                             <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>trending_up</span>
-                            {completedOrders.length} {isRtl ? 'طلب مكتمل' : 'completed'}
+                            {completedOrders.length} {t('completed_badge')}
                         </span>
                     </div>
                     <div className="hidden md:block absolute bottom-0 left-0 w-full h-12 opacity-10 pointer-events-none">
@@ -158,7 +157,7 @@ export default function AdminDashboard() {
                         {pendingOrders > 0 && (
                             <span className="flex items-center text-xs font-bold text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
                                 <span className="material-symbols-outlined" style={{ fontSize: '14px' }}>schedule</span>
-                                {pendingOrders} {isRtl ? 'معلق' : 'pending'}
+                                {pendingOrders} {t('pending_badge')}
                             </span>
                         )}
                     </div>
@@ -180,7 +179,7 @@ export default function AdminDashboard() {
                         </div>
                     </div>
                     <div className="mt-4 flex items-center gap-2">
-                        <span className="text-xs text-neutral-400">{isRtl ? 'متوسط قيمة الطلب' : 'per order average'}</span>
+                        <span className="text-xs text-neutral-400">{t('avg_order_desc')}</span>
                     </div>
                     <div className="hidden md:block absolute bottom-0 left-0 w-full h-12 opacity-10 pointer-events-none">
                         <svg className="w-full h-full fill-accent-amber" preserveAspectRatio="none" viewBox="0 0 200 100">
@@ -192,7 +191,7 @@ export default function AdminDashboard() {
                 <div className="min-w-[150px] md:min-w-0 group flex flex-col justify-between rounded-lg border border-neutral-100 bg-white p-6 shadow-sm transition-all hover:shadow-md shrink-0 snap-center md:snap-align-none relative overflow-hidden">
                     <div className="flex items-start justify-between">
                         <div className="flex flex-col gap-1">
-                            <p className="text-sm font-medium text-neutral-500">{isRtl ? 'المنتجات المنشورة' : 'Published Products'}</p>
+                            <p className="text-sm font-medium text-neutral-500">{t('published_products')}</p>
                             <h3 className="text-2xl font-extrabold text-primary">{publishedCount}</h3>
                         </div>
                         <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent-blue/10 text-accent-blue">
@@ -201,7 +200,7 @@ export default function AdminDashboard() {
                     </div>
                     <div className="mt-4 flex items-center gap-2">
                         <span className="flex items-center text-xs font-bold text-accent-green bg-accent-green/10 px-2 py-1 rounded-full">
-                            {bestSellers.length} {isRtl ? 'الأكثر مبيعاً' : 'best sellers'}
+                            {bestSellers.length} {t('best_seller_badge')}
                         </span>
                     </div>
                     <div className="hidden md:block absolute bottom-0 left-0 w-full h-12 opacity-10 pointer-events-none">
@@ -290,7 +289,7 @@ export default function AdminDashboard() {
                                     </div>
                                 </div>
                                 <span className="text-xs font-bold bg-amber-100 text-amber-700 px-2 py-1 rounded-full whitespace-nowrap">
-                                    {isRtl ? 'الأكثر مبيعاً' : 'Best Seller'}
+                                    {t('best_seller_badge')}
                                 </span>
                             </div>
                         ))}
@@ -422,7 +421,7 @@ export default function AdminDashboard() {
                         {lowStockItems.length === 0 && (
                             <div className="text-center py-6">
                                 <span className="material-symbols-outlined text-green-400 text-4xl">inventory_2</span>
-                                <p className="text-sm text-neutral-400 mt-2">{isRtl ? 'المخزون بحالة جيدة' : 'Stock levels look good'}</p>
+                                <p className="text-sm text-neutral-400 mt-2">{t('stock_good')}</p>
                             </div>
                         )}
                     </div>

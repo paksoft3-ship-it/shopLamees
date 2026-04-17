@@ -253,7 +253,7 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                                                 : (event.isFuture ? 'bg-slate-200' : 'bg-slate-300 shadow-sm')}
                                         `}></div>
                                         <div className={`flex flex-col ${isRtl ? 'mr-8' : 'ml-8'}`}>
-                                            <p className={`text-sm font-bold ${event.isCurrent ? 'text-primary' : 'text-slate-900'}`}>{event.label}</p>
+                                            <p className={`text-sm font-bold ${event.isCurrent ? 'text-primary' : 'text-slate-900'}`}>{isRtl && event.labelAr ? event.labelAr : event.label}</p>
                                             <p className="text-xs text-slate-500 mt-1">
                                                 {new Date(event.date).toLocaleString(isRtl ? 'ar-SA' : 'en-US')}
                                                 {event.note && <span className="text-slate-700 font-medium mr-1"> {event.note}</span>}

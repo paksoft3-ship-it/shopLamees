@@ -401,7 +401,15 @@
             "status_processing": "Processing",
             "status_shipping": "Shipping",
             "status_new": "New",
-            "status_delivering": "Delivering"
+            "status_delivering": "Delivering",
+            "status_cancelled": "Cancelled",
+            "loading": "Loading data...",
+            "completed_badge": "completed",
+            "pending_badge": "pending",
+            "avg_order_desc": "per order average",
+            "published_products": "Published Products",
+            "best_seller_badge": "Best Seller",
+            "stock_good": "Stock levels look good"
         },
         "Orders": {
             "title": "Orders Management",

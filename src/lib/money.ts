@@ -8,7 +8,7 @@ import { useLocale } from 'next-intl';
  * Non-hook formatter — reads currency from store snapshot.
  * Safe in event handlers and non-React code.
  */
-export function formatMoney(amount: number, locale: 'ar' | 'en' = 'ar', currencyOverride?: 'QAR' | 'SAR' | null): string {
+export function formatMoney(amount: number, locale: 'ar' | 'en' = 'en', currencyOverride?: 'QAR' | 'SAR' | null): string {
     const defaultCurrency = usePrefsStore.getState().currency;
     const activeCurrency = currencyOverride || defaultCurrency;
     return formatPrice(amount, activeCurrency, locale);

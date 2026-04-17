@@ -32,7 +32,8 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
     const timeline: OrderTimelineEvent[] = [
         {
             status: 'pending',
-            label: 'تم إنشاء الطلب',
+            label: 'Order Created',
+            labelAr: 'تم إنشاء الطلب',
             date: order.createdAt.toISOString(),
             isCurrent: order.status === 'NEW'
         }
@@ -41,7 +42,8 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
     if (order.status === 'PROCESSING') {
         timeline.push({
             status: 'processing',
-            label: 'جاري التجهيز',
+            label: 'Processing',
+            labelAr: 'جاري التجهيز',
             date: order.updatedAt.toISOString(),
             isCurrent: true
         });
@@ -49,7 +51,8 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
     if (order.status === 'SHIPPED') {
         timeline.push({
             status: 'shipped',
-            label: 'في الطريق',
+            label: 'Shipped',
+            labelAr: 'في الطريق',
             date: order.updatedAt.toISOString(),
             isCurrent: true
         });
@@ -57,7 +60,8 @@ function mapOrderToAdminOrder(order: any): AdminOrder {
     if (order.status === 'COMPLETED') {
         timeline.push({
             status: 'completed',
-            label: 'مكتمل',
+            label: 'Completed',
+            labelAr: 'مكتمل',
             date: order.updatedAt.toISOString(),
             isCurrent: true
         });

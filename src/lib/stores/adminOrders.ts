@@ -13,6 +13,7 @@ export interface OrderItem {
 export interface OrderTimelineEvent {
     status: string;
     label: string;
+    labelAr?: string;
     date: string;
     note?: string;
     isCurrent?: boolean;

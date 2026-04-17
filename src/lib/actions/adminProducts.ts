@@ -2,7 +2,7 @@
 
 import prisma from '@/lib/db';
 import { ProductStatus, AdminProduct } from '@/lib/stores/adminProducts';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 // Mapping of Arabic category name → stable slug + English name
 const CATEGORY_MAP: Record<string, { slug: string; nameEn: string }> = {
@@ -86,8 +86,9 @@ export async function updateAdminProductStatus(id: string, status: ProductStatus
         }
     });
 
+    revalidateTag('products');
+    revalidateTag('featured-products');
     revalidatePath('/admin/products');
-    revalidatePath('/[locale]/products', 'layout');
 }
 
 export async function deleteAdminProduct(id: string) {
@@ -95,8 +96,10 @@ export async function deleteAdminProduct(id: string) {
         where: { id }
     });
 
+    revalidateTag('products');
+    revalidateTag('featured-products');
+    revalidateTag('categories');
     revalidatePath('/admin/products');
-    revalidatePath('/[locale]/products', 'layout');
 }
 
 export async function getAdminProduct(id: string): Promise<AdminProduct | null> {
@@ -194,8 +197,9 @@ export async function createAdminProduct(data: Partial<AdminProduct>) {
         }
     });
 
+    revalidateTag('products');
+    revalidateTag('featured-products');
     revalidatePath('/admin/products');
-    revalidatePath('/[locale]/products', 'layout');
 }
 
 export async function updateAdminProduct(id: string, data: Partial<AdminProduct>) {
@@ -252,7 +256,10 @@ export async function updateAdminProduct(id: string, data: Partial<AdminProduct>
         }
     });
 
+    revalidateTag('products');
+    revalidateTag('featured-products');
+    revalidateTag(`product:${id}`);
+    revalidateTag('categories');
     revalidatePath('/admin/products');
     revalidatePath(`/admin/products/${id}`);
-    revalidatePath('/[locale]/products', 'layout');
 }

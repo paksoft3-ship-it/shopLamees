@@ -1,5 +1,5 @@
-export const formatPrice = (price: number, currency: 'QAR' | 'SAR', locale: 'ar' | 'en' = 'ar') => {
-    return new Intl.NumberFormat(locale === 'ar' ? 'ar-QA' : 'en-QA', {
+export const formatPrice = (price: number, currency: 'QAR' | 'SAR', locale: 'ar' | 'en' = 'en') => {
+    return new Intl.NumberFormat(locale === 'ar' ? 'ar-QA-u-nu-latn' : 'en-QA', {
         style: 'currency',
         currency: currency,
         maximumFractionDigits: 0

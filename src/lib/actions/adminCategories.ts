@@ -1,7 +1,7 @@
 'use server';
 
 import prisma from '@/lib/db';
-import { revalidatePath } from 'next/cache';
+import { revalidatePath, revalidateTag } from 'next/cache';
 
 export interface AdminCategory {
   id: string;
@@ -68,8 +68,8 @@ export async function createAdminCategory(data: {
     },
   });
 
+  revalidateTag('categories');
   revalidatePath('/admin/categories');
-  revalidatePath('/[locale]/category', 'layout');
 }
 
 export async function updateAdminCategory(
@@ -93,12 +93,13 @@ export async function updateAdminCategory(
     },
   });
 
+  revalidateTag('categories');
+  revalidateTag(`category:${data.slug}`);
   revalidatePath('/admin/categories');
-  revalidatePath('/[locale]/category', 'layout');
 }
 
 export async function deleteAdminCategory(id: string) {
   await prisma.category.delete({ where: { id } });
+  revalidateTag('categories');
   revalidatePath('/admin/categories');
-  revalidatePath('/[locale]/category', 'layout');
 }
