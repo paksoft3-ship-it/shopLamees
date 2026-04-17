@@ -4,7 +4,7 @@ import { useState, useMemo, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ProductStatus, AdminProduct, ProductVariant } from '@/lib/stores/adminProducts';
-import { getAdminProducts, updateAdminProductStatus } from '@/lib/actions/adminProducts';
+import { getAdminProducts, updateAdminProductStatus, deleteAdminProduct } from '@/lib/actions/adminProducts';
 import { useLocale, useTranslations } from 'next-intl';
 import { formatMoney } from '@/lib/money';
 
@@ -26,6 +26,12 @@ export default function AdminProductsPage() {
     const updateProductStatus = async (id: string, status: ProductStatus) => {
         setProducts(prev => prev.map(p => p.id === id ? { ...p, status } : p));
         await updateAdminProductStatus(id, status);
+    };
+
+    const handleDelete = async (id: string, name: string) => {
+        if (!window.confirm(isRtl ? `هل تريد حذف "${name}" نهائياً؟ لا يمكن التراجع.` : `Permanently delete "${name}"? This cannot be undone.`)) return;
+        setProducts(prev => prev.filter(p => p.id !== id));
+        await deleteAdminProduct(id);
     };
 
     const [searchQuery, setSearchQuery] = useState('');
@@ -209,9 +215,14 @@ export default function AdminProductsPage() {
                                                         <div className="mt-1 text-[10px] text-gray-500">{getStatusLabel(product.status)}</div>
                                                     </td>
                                                     <td className="py-4 px-6 text-left">
-                                                        <Link href={`/admin/products/${product.id}/edit`} className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors inline-block">
-                                                            <span className="material-symbols-outlined text-lg">edit</span>
-                                                        </Link>
+                                                        <div className="flex items-center gap-1">
+                                                            <Link href={`/admin/products/${product.id}/edit`} className="p-1.5 rounded-lg text-gray-400 hover:text-primary hover:bg-primary/10 transition-colors inline-block">
+                                                                <span className="material-symbols-outlined text-lg">edit</span>
+                                                            </Link>
+                                                            <button onClick={() => handleDelete(product.id, isRtl ? product.titleAr : product.titleEn)} className="p-1.5 rounded-lg text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors">
+                                                                <span className="material-symbols-outlined text-lg">delete</span>
+                                                            </button>
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             );
@@ -271,9 +282,14 @@ export default function AdminProductsPage() {
                                                         <Link href={`/admin/products/${product.id}/edit`} className="font-bold text-gray-900 text-sm leading-snug line-clamp-2 pr-4 pl-1">
                                                             {isRtl ? product.titleAr : product.titleEn}
                                                         </Link>
-                                                        <Link href={`/admin/products/${product.id}/edit`} className="text-gray-400 hover:text-primary shrink-0">
-                                                            <span className="material-symbols-outlined text-lg">edit</span>
-                                                        </Link>
+                                                        <div className="flex items-center gap-1 shrink-0">
+                                                            <Link href={`/admin/products/${product.id}/edit`} className="text-gray-400 hover:text-primary">
+                                                                <span className="material-symbols-outlined text-lg">edit</span>
+                                                            </Link>
+                                                            <button onClick={() => handleDelete(product.id, isRtl ? product.titleAr : product.titleEn)} className="text-gray-400 hover:text-red-500">
+                                                                <span className="material-symbols-outlined text-lg">delete</span>
+                                                            </button>
+                                                        </div>
                                                     </div>
                                                     <p className="text-gray-500 text-xs mt-1">{product.category} • {product.variants[0]?.sku || product.slug}</p>
                                                 </div>

@@ -93,10 +93,11 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
         const uploadedUrls: string[] = [];
         for (const file of files) {
             try {
-                const blob = await upload(file.name, file, {
+                const ext = file.name.split('.').pop();
+                const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+                const blob = await upload(uniqueName, file, {
                     access: 'public',
                     handleUploadUrl: '/api/upload',
-                    addRandomSuffix: true,
                 });
                 uploadedUrls.push(blob.url);
                 setUploadProgress(p => ({ ...p, done: p.done + 1 }));

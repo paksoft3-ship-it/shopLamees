@@ -174,10 +174,11 @@ export default function MediaPage() {
 
     setVideoUploading(true);
     try {
-      const blob = await upload(file.name, file, {
+      const ext = file.name.split('.').pop();
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const blob = await upload(uniqueName, file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
-        addRandomSuffix: true,
       });
 
       setHomeVideos((prev) => [
@@ -226,10 +227,11 @@ export default function MediaPage() {
 
     setPosterUploadingIndex(targetIndex);
     try {
-      const blob = await upload(file.name, file, {
+      const ext = file.name.split('.').pop();
+      const uniqueName = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
+      const blob = await upload(uniqueName, file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
-        addRandomSuffix: true,
       });
       setVideoField(targetIndex, { poster: blob.url });
       setVideoMessage(L('تم رفع صورة الغلاف. اضغط حفظ التغييرات.', 'Poster uploaded. Click Save Changes.'));
