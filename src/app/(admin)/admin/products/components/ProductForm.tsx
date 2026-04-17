@@ -67,39 +67,50 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
         }
     };
 
-    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-        if (!event.target.files?.length) return;
+    const [uploadProgress, setUploadProgress] = useState({ done: 0, total: 0 });
 
-        const file = event.target.files[0];
+    const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = Array.from(event.target.files || []);
+        if (!files.length) return;
+
         const maxSizeBytes = 4 * 1024 * 1024;
         const allowedTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif']);
 
-        if (!allowedTypes.has(file.type)) {
+        const invalid = files.find(f => !allowedTypes.has(f.type));
+        if (invalid) {
             alert(isRtl ? 'نوع الملف غير مدعوم. استخدم JPG/PNG/WEBP/AVIF.' : 'Unsupported file type. Use JPG/PNG/WEBP/AVIF.');
             return;
         }
-        if (file.size > maxSizeBytes) {
-            alert(isRtl ? 'حجم الصورة كبير جداً. الحد الأقصى 4MB.' : 'Image is too large. Max size is 4MB.');
+        const tooBig = files.find(f => f.size > maxSizeBytes);
+        if (tooBig) {
+            alert(isRtl ? `"${tooBig.name}" كبير جداً. الحد الأقصى 4MB لكل صورة.` : `"${tooBig.name}" is too large. Max 4MB per image.`);
             return;
         }
 
         setUploading(true);
+        setUploadProgress({ done: 0, total: files.length });
 
-        try {
-            const newBlob = await upload(file.name, file, {
-                access: 'public',
-                handleUploadUrl: '/api/upload',
-            });
-
-            const newImages = [...(formData.images || []), newBlob.url];
-            handleChange('images', newImages);
-        } catch (error) {
-            console.error('Error uploading image:', error);
-            alert('Failed to upload image. Please check your connection and configuration.');
-        } finally {
-            setUploading(false);
-            if (fileInputRef.current) fileInputRef.current.value = '';
+        const uploadedUrls: string[] = [];
+        for (const file of files) {
+            try {
+                const blob = await upload(file.name, file, {
+                    access: 'public',
+                    handleUploadUrl: '/api/upload',
+                });
+                uploadedUrls.push(blob.url);
+                setUploadProgress(p => ({ ...p, done: p.done + 1 }));
+            } catch {
+                alert(isRtl ? `فشل رفع "${file.name}"` : `Failed to upload "${file.name}"`);
+            }
         }
+
+        if (uploadedUrls.length) {
+            handleChange('images', [...(formData.images || []), ...uploadedUrls]);
+        }
+
+        setUploading(false);
+        setUploadProgress({ done: 0, total: 0 });
+        if (fileInputRef.current) fileInputRef.current.value = '';
     };
 
     const removeImage = (index: number) => {
@@ -377,6 +388,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                 ref={fileInputRef}
                                 onChange={handleUpload}
                                 accept="image/*"
+                                multiple
                                 className="hidden"
                             />
 
@@ -385,16 +397,22 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                 className={`border-2 border-dashed border-gray-300 rounded-2xl p-8 flex flex-col items-center justify-center text-center transition-colors cursor-pointer ${uploading ? 'bg-gray-100 opacity-50 cursor-not-allowed' : 'bg-gray-50 hover:bg-gray-100'}`}
                             >
                                 <div className="size-12 rounded-full bg-primary/10 text-primary flex items-center justify-center mb-3">
-                                    <span className="material-symbols-outlined text-[24px]">
+                                    <span className={`material-symbols-outlined text-[24px] ${uploading ? 'animate-spin' : ''}`}>
                                         {uploading ? 'sync' : 'cloud_upload'}
                                     </span>
                                 </div>
                                 <h4 className="font-bold text-gray-900">
                                     {uploading
-                                        ? (isRtl ? 'جاري الرفع...' : 'Uploading...')
+                                        ? (isRtl
+                                            ? `جاري الرفع... ${uploadProgress.done}/${uploadProgress.total}`
+                                            : `Uploading... ${uploadProgress.done}/${uploadProgress.total}`)
                                         : (isRtl ? 'انقر لرفع صور المنتج' : 'Click to upload product images')}
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1">{isRtl ? 'PNG، JPG، أو WEBP (الحد الأقصى 4MB)' : 'PNG, JPG, or WEBP (max 4MB)'}</p>
+                                <p className="text-sm text-gray-500 mt-1">
+                                    {isRtl
+                                        ? 'يمكنك اختيار أكثر من صورة في نفس الوقت • PNG، JPG، WEBP (الحد الأقصى 4MB لكل صورة)'
+                                        : 'Select multiple images at once • PNG, JPG, WEBP (max 4MB each)'}
+                                </p>
                             </div>
 
                             {formData.images && formData.images.length > 0 && (

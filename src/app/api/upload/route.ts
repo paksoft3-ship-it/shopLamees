@@ -32,20 +32,6 @@ export async function POST(request: Request): Promise<NextResponse> {
                     }),
                 };
             },
-            onUploadCompleted: async ({ blob, tokenPayload }) => {
-                // Get notified of client upload completion
-                // ❌ This will not work on localhost, see 'Implementation Details' for more
-                console.log('blob upload completed', blob, tokenPayload);
-
-                try {
-                    // You can update your database here
-                    // const { userId } = JSON.parse(tokenPayload);
-                    // await db.update({ avatar: blob.url, userId });
-                } catch (updateError) {
-                    console.error('Database update failed:', updateError);
-                    throw new Error('Could not update user');
-                }
-            },
         });
 
         return NextResponse.json(jsonResponse);
