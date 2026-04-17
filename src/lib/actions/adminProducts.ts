@@ -4,21 +4,10 @@ import prisma from '@/lib/db';
 import { ProductStatus, AdminProduct } from '@/lib/stores/adminProducts';
 import { revalidatePath, revalidateTag } from 'next/cache';
 
-// Mapping of Arabic category name → stable slug + English name
-const CATEGORY_MAP: Record<string, { slug: string; nameEn: string }> = {
-    'يومي': { slug: 'daily', nameEn: 'Daily' },
-    'سهرة': { slug: 'evening', nameEn: 'Evening' },
-    'مجموعة الشتاء': { slug: 'winter-collection', nameEn: 'Winter Collection' },
-    'اكسسوارات': { slug: 'accessories', nameEn: 'Accessories' },
-};
-
-async function findOrCreateCategory(nameAr: string) {
-    const meta = CATEGORY_MAP[nameAr] || { slug: nameAr.toLowerCase().replace(/\s+/g, '-'), nameEn: nameAr };
-    return prisma.category.upsert({
-        where: { slug: meta.slug },
-        update: {},
-        create: { nameAr, nameEn: meta.nameEn, slug: meta.slug },
-    });
+async function findCategoryBySlug(slug: string) {
+    const cat = await prisma.category.findUnique({ where: { slug } });
+    if (cat) return cat;
+    return prisma.category.findFirst({ orderBy: { sortOrder: 'asc' } });
 }
 
 export async function getAdminProducts(): Promise<AdminProduct[]> {
@@ -51,8 +40,8 @@ export async function getAdminProducts(): Promise<AdminProduct[]> {
             descriptionEn: p.descEn || undefined,
             price: p.variants.length > 0 ? Number(p.variants[0].priceQar) : 0,
             compareAtPrice: undefined, // Currently not in Prisma schema directly
-            category: primaryCat?.nameAr || primaryCat?.nameEn || 'يومي',
-            categorySlug: primaryCat?.slug || 'uncategorized',
+            category: primaryCat?.slug || '',
+            categorySlug: primaryCat?.slug || '',
             images: p.images.map(img => img.url),
             status: p.isPublished ? 'published' : 'draft',
             variants: p.variants.map(v => ({
@@ -125,7 +114,7 @@ export async function getAdminProduct(id: string): Promise<AdminProduct | null> 
         descriptionEn: p.descEn || undefined,
         price: p.variants.length > 0 ? Number(p.variants[0].priceQar) : 0,
         compareAtPrice: undefined,
-        category: primaryCat?.nameAr || primaryCat?.nameEn || 'يومي',
+        category: primaryCat?.slug || '',
         categorySlug: primaryCat?.slug || 'uncategorized',
         images: p.images.map(img => img.url),
         status: p.isPublished ? 'published' : 'draft',
@@ -156,7 +145,7 @@ export async function createAdminProduct(data: Partial<AdminProduct>) {
         images = [], variants = [], category
     } = data;
 
-    const catRecord = await findOrCreateCategory(category || 'يومي');
+    const catRecord = await findCategoryBySlug(category || '');
 
     const priceQar = (variants.length > 0 && variants[0].price != null && variants[0].price > 0)
         ? variants[0].price
@@ -173,11 +162,13 @@ export async function createAdminProduct(data: Partial<AdminProduct>) {
             isCustom: isCustom || false,
             madeToOrder: isMadeToOrder || false,
             leadTimeDays: leadTimeDays || 0,
-            categories: {
-                create: {
-                    category: { connect: { id: catRecord.id } }
+            ...(catRecord ? {
+                categories: {
+                    create: {
+                        category: { connect: { id: catRecord.id } }
+                    }
                 }
-            },
+            } : {}),
             images: {
                 create: images.map((url, idx) => ({
                     url,
@@ -214,7 +205,7 @@ export async function updateAdminProduct(id: string, data: Partial<AdminProduct>
     await prisma.productImage.deleteMany({ where: { productId: id } });
     await prisma.productCategory.deleteMany({ where: { productId: id } });
 
-    const catRecord = await findOrCreateCategory(category || 'يومي');
+    const catRecord = await findCategoryBySlug(category || '');
 
     const priceQar = (variants.length > 0 && variants[0].price != null && variants[0].price > 0)
         ? variants[0].price
@@ -232,11 +223,13 @@ export async function updateAdminProduct(id: string, data: Partial<AdminProduct>
             isCustom: isCustom,
             madeToOrder: isMadeToOrder,
             leadTimeDays: leadTimeDays,
-            categories: {
-                create: {
-                    category: { connect: { id: catRecord.id } }
+            ...(catRecord ? {
+                categories: {
+                    create: {
+                        category: { connect: { id: catRecord.id } }
+                    }
                 }
-            },
+            } : {}),
             images: {
                 create: images.map((url, idx) => ({
                     url,

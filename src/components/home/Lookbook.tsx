@@ -2,18 +2,21 @@ import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 import { ArrowRight } from 'lucide-react';
+import { ProductDTO } from '@/lib/data/types';
 
-const lookbookImages = [
-    { src: '/images/products/product-9.jpg', alt: 'Abaya Collection' },
-    { src: '/images/products/product-10.jpg', alt: 'Elegant Abaya' },
-    { src: '/images/products/product-2.jpg', alt: 'Lace Detail Abaya' },
-    { src: '/images/products/product-3.jpg', alt: 'Classic Abaya' },
-    { src: '/images/products/product-5.jpg', alt: 'Premium Abaya' },
-    { src: '/images/products/product-6.jpg', alt: 'Luxury Abaya' },
-];
+interface LookbookProps {
+    products: ProductDTO[];
+}
 
-export function Lookbook() {
+export function Lookbook({ products }: LookbookProps) {
     const t = useTranslations('Home.Lookbook');
+
+    const images = products
+        .filter(p => p.image && p.image !== '/placeholder.png')
+        .slice(0, 6)
+        .map(p => ({ src: p.image, alt: p.titleEn || p.titleAr }));
+
+    if (images.length === 0) return null;
 
     return (
         <section className="py-16 lg:py-24 bg-background-light">
@@ -30,7 +33,7 @@ export function Lookbook() {
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-3 lg:gap-4">
-                    {lookbookImages.map((img, i) => (
+                    {images.map((img, i) => (
                         <div key={i} className="relative rounded-2xl overflow-hidden aspect-[3/4] group">
                             <Image
                                 src={img.src}

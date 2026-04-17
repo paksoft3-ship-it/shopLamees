@@ -4,17 +4,28 @@ import { Link } from '@/i18n/navigation';
 import { Menu, X, Search, ShoppingBag } from 'lucide-react';
 import Image from 'next/image';
 import { useCartStore } from '@/lib/stores/cart';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { LocaleSwitcher } from './LocaleSwitcher';
 
-export function Header() {
+interface NavCategory {
+    id: string;
+    slug: string;
+    nameAr: string;
+    nameEn: string;
+}
+
+interface HeaderProps {
+    categories: NavCategory[];
+}
+
+export function Header({ categories }: HeaderProps) {
     const t = useTranslations('Home.Header');
+    const locale = useLocale() as 'ar' | 'en';
     const items = useCartStore((state) => state.items);
     const hasHydrated = useCartStore((state) => state.hasHydrated);
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    // Lock body scroll when menu is open
     useEffect(() => {
         if (mobileMenuOpen) {
             document.body.style.overflow = 'hidden';
@@ -24,13 +35,13 @@ export function Header() {
         return () => { document.body.style.overflow = ''; };
     }, [mobileMenuOpen]);
 
+    const catName = (cat: NavCategory) => locale === 'ar' ? cat.nameAr : cat.nameEn;
+
     return (
         <>
             <header className="sticky top-0 z-50 bg-background-light/95 backdrop-blur-md border-b border-[#e5e0d8]">
-                {/* ── MOBILE HEADER (3-column grid so logo is always truly centered) ── */}
+                {/* ── MOBILE HEADER ── */}
                 <div className="lg:hidden w-full px-4 sm:px-6 h-16 grid grid-cols-3 items-center">
-
-                    {/* Col 1 — Cart (left) */}
                     <div className="flex items-center justify-start">
                         <div className="relative">
                             <Link href="/cart" className="p-2 rounded-full hover:bg-black/5 transition-colors inline-block text-slate-900">
@@ -43,15 +54,11 @@ export function Header() {
                             )}
                         </div>
                     </div>
-
-                    {/* Col 2 — Logo (center) */}
                     <div className="flex items-center justify-center">
                         <Link href="/">
                             <Image src="/images/logo.png" alt={t('brand_name')} width={240} height={80} className="h-11 w-auto object-contain" priority />
                         </Link>
                     </div>
-
-                    {/* Col 3 — Lang + Hamburger (right) */}
                     <div className="flex items-center justify-end gap-1">
                         <LocaleSwitcher />
                         <button
@@ -66,24 +73,25 @@ export function Header() {
 
                 {/* ── DESKTOP HEADER ── */}
                 <div className="hidden lg:grid lg:grid-cols-[1fr_auto_1fr] container mx-auto px-4 sm:px-6 lg:px-8 h-24 items-center">
-
-                    {/* Col 1 — Nav (left) */}
                     <nav className="flex items-center gap-3 xl:gap-4">
-                        <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors whitespace-nowrap" href="/">{t('home')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/all-abayas">{t('nav_all_abayas')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/kraz-abaya">{t('nav_kraz_abaya')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/dantel">{t('nav_dantel')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/eid-collection">{t('nav_eid')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/winter">{t('nav_winter')}</Link>
-                        <Link className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap" href="/category/niqab">{t('nav_niqab')}</Link>
+                        <Link className="text-sm font-bold text-slate-900 hover:text-primary transition-colors whitespace-nowrap" href="/">
+                            {t('home')}
+                        </Link>
+                        {categories.slice(0, 6).map(cat => (
+                            <Link
+                                key={cat.id}
+                                className="text-sm font-medium text-slate-600 hover:text-primary transition-colors whitespace-nowrap"
+                                href={`/category/${cat.slug}`}
+                            >
+                                {catName(cat)}
+                            </Link>
+                        ))}
                     </nav>
 
-                    {/* Col 2 — Logo (always mathematically centered) */}
                     <Link className="flex items-center justify-center" href="/">
                         <Image src="/images/logo.png" alt={t('brand_name')} width={320} height={100} className="h-20 w-auto object-contain" priority />
                     </Link>
 
-                    {/* Col 3 — Right Icons */}
                     <div className="flex items-center gap-4 justify-end">
                         <LocaleSwitcher />
                         <Link href="/search" className="p-2 text-slate-900 hover:text-primary transition-colors">
@@ -106,15 +114,11 @@ export function Header() {
             {/* Mobile Menu Overlay */}
             {mobileMenuOpen && (
                 <>
-                    {/* Backdrop */}
                     <div
                         className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm lg:hidden"
                         onClick={() => setMobileMenuOpen(false)}
                     />
-
-                    {/* Slide-in Panel */}
                     <nav className="fixed inset-y-0 ltr:right-0 rtl:left-0 z-50 w-72 bg-white shadow-2xl lg:hidden flex flex-col">
-                        {/* Panel Header */}
                         <div className="flex items-center justify-between px-6 py-5 border-b border-slate-100">
                             <Link className="flex items-center gap-2" href="/" onClick={() => setMobileMenuOpen(false)}>
                                 <Image src="/images/logo.png" alt={t('brand_name')} width={160} height={48} className="h-10 w-auto object-contain" />
@@ -127,31 +131,36 @@ export function Header() {
                             </button>
                         </div>
 
-                        {/* Nav Links */}
                         <div className="flex-1 overflow-y-auto py-4">
-                            {[
-                                { href: '/', label: t('home'), icon: 'home' },
-                                { href: '/category/all-abayas', label: t('nav_all_abayas'), icon: 'checkroom' },
-                                { href: '/category/kraz-abaya', label: t('nav_kraz_abaya'), icon: 'star' },
-                                { href: '/category/dantel', label: t('nav_dantel'), icon: 'texture' },
-                                { href: '/category/eid-collection', label: t('nav_eid'), icon: 'celebration' },
-                                { href: '/category/winter', label: t('nav_winter'), icon: 'ac_unit' },
-                                { href: '/category/niqab', label: t('nav_niqab'), icon: 'face' },
-                                { href: '/cart', label: t('cart'), icon: 'shopping_bag' },
-                            ].map((link) => (
+                            <Link
+                                href="/"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-3 px-6 py-3.5 text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors font-kufi"
+                            >
+                                <span className="material-symbols-outlined text-[20px] text-slate-400">home</span>
+                                <span className="text-sm font-medium">{t('home')}</span>
+                            </Link>
+                            {categories.map(cat => (
                                 <Link
-                                    key={link.href}
-                                    href={link.href}
+                                    key={cat.id}
+                                    href={`/category/${cat.slug}`}
                                     onClick={() => setMobileMenuOpen(false)}
                                     className="flex items-center gap-3 px-6 py-3.5 text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors font-kufi"
                                 >
-                                    <span className="material-symbols-outlined text-[20px] text-slate-400">{link.icon}</span>
-                                    <span className="text-sm font-medium">{link.label}</span>
+                                    <span className="material-symbols-outlined text-[20px] text-slate-400">checkroom</span>
+                                    <span className="text-sm font-medium">{catName(cat)}</span>
                                 </Link>
                             ))}
+                            <Link
+                                href="/cart"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="flex items-center gap-3 px-6 py-3.5 text-slate-700 hover:bg-slate-50 hover:text-primary transition-colors font-kufi"
+                            >
+                                <span className="material-symbols-outlined text-[20px] text-slate-400">shopping_bag</span>
+                                <span className="text-sm font-medium">{t('cart')}</span>
+                            </Link>
                         </div>
 
-                        {/* Panel Footer */}
                         <div className="border-t border-slate-100 p-6">
                             <LocaleSwitcher />
                         </div>

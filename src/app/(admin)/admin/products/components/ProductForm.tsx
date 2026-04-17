@@ -43,9 +43,8 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
     useEffect(() => {
         getAdminCategories().then(cats => {
             setCategories(cats);
-            // Set default category for new products once categories load
             if (!isEdit && !formData.category && cats.length > 0) {
-                handleChange('category', cats[0].nameAr);
+                handleChange('category', cats[0].slug);
             }
         });
     }, []);
@@ -188,8 +187,8 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                         <option value="">{isRtl ? 'جاري التحميل...' : 'Loading...'}</option>
                                     )}
                                     {categories.map(cat => (
-                                        <option key={cat.id} value={cat.nameAr}>
-                                            {cat.nameAr} ({cat.nameEn})
+                                        <option key={cat.id} value={cat.slug}>
+                                            {isRtl ? cat.nameAr : cat.nameEn}
                                         </option>
                                     ))}
                                 </select>
@@ -199,8 +198,21 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                 <label className="block text-sm font-bold text-gray-700 mb-2">{isRtl ? 'الوصف (عربي)' : 'Description (Arabic)'}</label>
                                 <textarea
                                     className="w-full rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:border-primary focus:ring-primary px-4 py-3 h-32 resize-none"
+                                    dir="rtl"
                                     value={formData.descriptionAr}
                                     onChange={(e) => handleChange('descriptionAr', e.target.value)}
+                                    placeholder={isRtl ? 'أدخل وصف المنتج بالعربية...' : 'Enter product description in Arabic...'}
+                                ></textarea>
+                            </div>
+
+                            <div className="col-span-2">
+                                <label className="block text-sm font-bold text-gray-700 mb-2">{isRtl ? 'الوصف (إنجليزي)' : 'Description (English)'}</label>
+                                <textarea
+                                    className="w-full rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:border-primary focus:ring-primary px-4 py-3 h-32 resize-none"
+                                    dir="ltr"
+                                    value={formData.descriptionEn}
+                                    onChange={(e) => handleChange('descriptionEn', e.target.value)}
+                                    placeholder="Enter product description in English..."
                                 ></textarea>
                             </div>
                         </div>
@@ -235,7 +247,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                         className="text-xs font-bold text-primary hover:underline flex items-center gap-1"
                                     >
                                         <span className="material-symbols-outlined text-[16px]">add</span>
-                                        إضافة خيار
+                                        {isRtl ? 'إضافة خيار' : 'Add Variant'}
                                     </button>
                                 </div>
                                 <div className="space-y-4">
@@ -254,7 +266,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                                 />
                                             </div>
                                             <div className="w-24 shrink-0">
-                                                <label className="block text-xs font-bold text-gray-600 mb-1">المقاس</label>
+                                                <label className="block text-xs font-bold text-gray-600 mb-1">{isRtl ? 'المقاس' : 'Size'}</label>
                                                 <input
                                                     className="w-full rounded-lg border-gray-200 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
                                                     value={variant.size || ''}
@@ -267,7 +279,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                                 />
                                             </div>
                                             <div className="w-24 shrink-0">
-                                                <label className="block text-xs font-bold text-gray-600 mb-1">اللون</label>
+                                                <label className="block text-xs font-bold text-gray-600 mb-1">{isRtl ? 'اللون' : 'Color'}</label>
                                                 <input
                                                     className="w-full rounded-lg border-gray-200 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
                                                     value={variant.color || ''}
@@ -279,7 +291,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                                 />
                                             </div>
                                             <div className="w-24 shrink-0">
-                                                <label className="block text-xs font-bold text-gray-600 mb-1">المخزون</label>
+                                                <label className="block text-xs font-bold text-gray-600 mb-1">{isRtl ? 'المخزون' : 'Stock'}</label>
                                                 <input
                                                     type="number"
                                                     className="w-full rounded-lg border-gray-200 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
@@ -322,11 +334,11 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-bold text-gray-900 mb-1">{isRtl ? 'صنع حسب الطلب (Made to Order)' : 'Made to Order'}</h4>
-                                    <p className="text-sm text-gray-500">هذا المنتج لا يتوفر في المخزون المباشر ويحتاج لفترة تصنيع بعد الطلب.</p>
+                                    <p className="text-sm text-gray-500">{isRtl ? 'هذا المنتج لا يتوفر في المخزون المباشر ويحتاج لفترة تصنيع بعد الطلب.' : 'This product is not kept in stock and requires a production period after ordering.'}</p>
 
                                     {formData.isMadeToOrder && (
                                         <div className="mt-4">
-                                            <label className="block text-xs font-bold text-gray-700 mb-1">فترة التصنيع (أيام)</label>
+                                            <label className="block text-xs font-bold text-gray-700 mb-1">{isRtl ? 'فترة التصنيع (أيام)' : 'Lead Time (days)'}</label>
                                             <input
                                                 className="w-32 rounded-lg border-gray-200 bg-white px-3 py-2 text-sm focus:border-primary focus:ring-primary"
                                                 type="number"
@@ -352,7 +364,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                 </div>
                                 <div className="flex-1">
                                     <h4 className="font-bold text-gray-900 mb-1">{isRtl ? 'يقبل التفصيل الخاص (Custom Measurements)' : 'Accepts Custom Measurements'}</h4>
-                                    <p className="text-sm text-gray-500">السماح للعميل بإدخال مقاساته الخاصة بدلاً من المقاسات الجاهزة.</p>
+                                    <p className="text-sm text-gray-500">{isRtl ? 'السماح للعميل بإدخال مقاساته الخاصة بدلاً من المقاسات الجاهزة.' : 'Allow customers to enter their own measurements instead of standard sizes.'}</p>
                                 </div>
                             </div>
                         </div>
@@ -382,7 +394,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                         ? (isRtl ? 'جاري الرفع...' : 'Uploading...')
                                         : (isRtl ? 'انقر لرفع صور المنتج' : 'Click to upload product images')}
                                 </h4>
-                                <p className="text-sm text-gray-500 mt-1">PNG, JPG, أو WEBP (الحد الأقصى 4MB)</p>
+                                <p className="text-sm text-gray-500 mt-1">{isRtl ? 'PNG، JPG، أو WEBP (الحد الأقصى 4MB)' : 'PNG, JPG, or WEBP (max 4MB)'}</p>
                             </div>
 
                             {formData.images && formData.images.length > 0 && (
@@ -418,15 +430,15 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                 <div className="flex items-center gap-4">
                     <label className="flex items-center gap-2 cursor-pointer font-bold text-sm text-gray-700">
                         <span className="material-symbols-outlined text-[20px] text-gray-400">visibility</span>
-                        الحالة:
+                        {isRtl ? 'الحالة:' : 'Status:'}
                         <select
                             className="bg-transparent border-none text-primary font-black focus:ring-0 p-0 pr-6"
                             value={formData.status}
                             onChange={(e) => handleChange('status', e.target.value as ProductStatus)}
                         >
-                            <option value="published">منشور</option>
-                            <option value="draft">مسودة</option>
-                            <option value="archived">مؤرشف</option>
+                            <option value="published">{isRtl ? 'منشور' : 'Published'}</option>
+                            <option value="draft">{isRtl ? 'مسودة' : 'Draft'}</option>
+                            <option value="archived">{isRtl ? 'مؤرشف' : 'Archived'}</option>
                         </select>
                     </label>
                 </div>
@@ -435,13 +447,13 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                         onClick={() => router.back()}
                         className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-700 font-bold hover:bg-gray-50 transition-colors text-sm"
                     >
-                        إلغاء
+                        {isRtl ? 'إلغاء' : 'Cancel'}
                     </button>
                     <button
                         onClick={handleSave}
                         className="px-6 py-2.5 rounded-xl bg-primary text-white font-bold hover:bg-primary/90 transition-colors shadow-md shadow-primary/20 text-sm"
                     >
-                        حفظ التغييرات
+                        {isRtl ? 'حفظ التغييرات' : 'Save Changes'}
                     </button>
                 </div>
             </div>

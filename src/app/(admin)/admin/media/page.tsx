@@ -7,22 +7,11 @@ import { useTranslations, useLocale } from 'next-intl';
 import { buildDefaultHomeVideos, type HomeVideoItem } from '@/lib/homeVideos';
 import {
   getAdminStoreSettings,
+  getAdminProductImages,
   type AdminSettingsDTO,
+  type AdminMediaImage,
   updateAdminStoreSettings,
 } from '@/lib/actions/adminInsights';
-
-const images = [
-  { id: '1', name: 'product-1.jpg', size: '92 KB', type: 'image/jpeg', url: '/images/products/product-1.jpg', used: 3 },
-  { id: '2', name: 'product-2.jpg', size: '108 KB', type: 'image/jpeg', url: '/images/products/product-2.jpg', used: 2 },
-  { id: '3', name: 'product-3.jpg', size: '136 KB', type: 'image/jpeg', url: '/images/products/product-3.jpg', used: 1 },
-  { id: '4', name: 'product-4.jpg', size: '95 KB', type: 'image/jpeg', url: '/images/products/product-4.jpg', used: 4 },
-  { id: '5', name: 'product-5.jpg', size: '112 KB', type: 'image/jpeg', url: '/images/products/product-5.jpg', used: 2 },
-  { id: '6', name: 'product-6.jpg', size: '98 KB', type: 'image/jpeg', url: '/images/products/product-6.jpg', used: 1 },
-  { id: '7', name: 'product-7.jpg', size: '124 KB', type: 'image/jpeg', url: '/images/products/product-7.jpg', used: 5 },
-  { id: '8', name: 'product-8.jpg', size: '130 KB', type: 'image/jpeg', url: '/images/products/product-8.jpg', used: 3 },
-  { id: '9', name: 'product-9.jpg', size: '118 KB', type: 'image/jpeg', url: '/images/products/product-9.jpg', used: 2 },
-  { id: '10', name: 'product-10.jpg', size: '105 KB', type: 'image/jpeg', url: '/images/products/product-10.jpg', used: 1 },
-];
 
 const MAX_VIDEO_BYTES = 100 * 1024 * 1024;
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024;
@@ -69,9 +58,11 @@ export default function MediaPage() {
   const isRtl = locale === 'ar';
   const L = (ar: string, en: string) => (isRtl ? ar : en);
 
+  const [images, setImages] = useState<AdminMediaImage[]>([]);
+  const [imagesLoading, setImagesLoading] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [preview, setPreview] = useState<typeof images[0] | null>(null);
+  const [preview, setPreview] = useState<AdminMediaImage | null>(null);
 
   const [activeTab, setActiveTab] = useState<'images' | 'homeVideos'>('images');
   const [videoSelected, setVideoSelected] = useState<number[]>([]);
@@ -92,6 +83,13 @@ export default function MediaPage() {
   const videoInputRef = useRef<HTMLInputElement>(null);
   const posterInputRef = useRef<HTMLInputElement>(null);
   const posterTargetIndexRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    getAdminProductImages().then((data) => {
+      setImages(data);
+      setImagesLoading(false);
+    });
+  }, []);
 
   useEffect(() => {
     getAdminStoreSettings()
@@ -268,7 +266,7 @@ export default function MediaPage() {
     setVideoSelected((prev) => (prev.includes(index) ? prev.filter((i) => i !== index) : [...prev, index]));
   };
 
-  const totalSize = images.reduce((sum, img) => sum + parseFloat(img.size), 0);
+  const totalSize = images.length;
   const videoRows = useMemo(
     () =>
       homeVideos
@@ -555,7 +553,7 @@ export default function MediaPage() {
           <div className="grid grid-cols-3 gap-4">
             {[
               { label: t('total_images'), value: images.length, icon: 'image', color: 'text-blue-600', bg: 'bg-blue-50' },
-              { label: t('total_size'), value: `${(totalSize / 1024).toFixed(1)} MB`, icon: 'storage', color: 'text-amber-500', bg: 'bg-amber-50' },
+              { label: t('total_size'), value: `${totalSize} files`, icon: 'storage', color: 'text-amber-500', bg: 'bg-amber-50' },
               { label: t('selected'), value: selected.length, icon: 'check_box', color: 'text-green-600', bg: 'bg-green-50' },
             ].map((m, i) => (
               <div key={i} className="bg-white rounded-xl border border-neutral-100 shadow-sm p-4 flex items-center gap-3">
@@ -591,7 +589,9 @@ export default function MediaPage() {
             </div>
           </div>
 
-          {viewMode === 'grid' ? (
+          {imagesLoading ? (
+            <div className="text-center py-12 text-neutral-400">{L('جاري تحميل الصور...', 'Loading images...')}</div>
+          ) : viewMode === 'grid' ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {images.map((img) => (
                 <div
@@ -608,10 +608,7 @@ export default function MediaPage() {
                       </div>
                     )}
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setPreview(img);
-                      }}
+                      onClick={(e) => { e.stopPropagation(); setPreview(img); }}
                       className="absolute bottom-2 left-2 p-1.5 bg-white/90 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                     >
                       <span className="material-symbols-outlined text-[16px] text-[#1b170d]">open_in_full</span>
@@ -619,16 +616,17 @@ export default function MediaPage() {
                   </div>
                   <div className="p-2 bg-white">
                     <p className="text-xs font-medium text-[#1b170d] truncate">{img.name}</p>
-                    <p className="text-[10px] text-neutral-400">{img.size}</p>
+                    <p className="text-[10px] text-neutral-400 truncate">{locale === 'ar' ? img.productNameAr : img.productNameEn}</p>
                   </div>
                 </div>
               ))}
 
-              <label className="aspect-square rounded-xl border-2 border-dashed border-neutral-300 hover:border-[#edab1d] hover:bg-[#edab1d]/5 transition-all flex flex-col items-center justify-center gap-2 cursor-pointer">
-                <span className="material-symbols-outlined text-neutral-400 text-3xl group-hover:text-[#edab1d]">add_photo_alternate</span>
-                <span className="text-xs text-neutral-400">{t('upload_image')}</span>
-                <input type="file" multiple accept="image/*" className="hidden" />
-              </label>
+              {images.length === 0 && (
+                <div className="col-span-5 text-center py-12 text-neutral-400">
+                  <span className="material-symbols-outlined text-5xl mb-2 block">image_not_supported</span>
+                  {L('لا توجد صور منتجات بعد', 'No product images yet')}
+                </div>
+              )}
             </div>
           ) : (
             <div className="bg-white rounded-xl border border-neutral-100 shadow-sm overflow-hidden">
@@ -637,8 +635,7 @@ export default function MediaPage() {
                   <tr>
                     <th className="px-5 py-3">{t('col_image')}</th>
                     <th className="px-5 py-3">{t('col_name')}</th>
-                    <th className="px-5 py-3">{t('col_size')}</th>
-                    <th className="px-5 py-3">{t('col_used_in')}</th>
+                    <th className="px-5 py-3">{L('المنتج', 'Product')}</th>
                     <th className="px-5 py-3">{t('col_action')}</th>
                   </tr>
                 </thead>
@@ -651,8 +648,7 @@ export default function MediaPage() {
                         </div>
                       </td>
                       <td className="px-5 py-3 font-medium text-[#1b170d] text-sm">{img.name}</td>
-                      <td className="px-5 py-3 text-sm text-neutral-400">{img.size}</td>
-                      <td className="px-5 py-3"><span className="text-xs bg-neutral-100 px-2.5 py-1 rounded-full">{t('used_in_products', { count: img.used })}</span></td>
+                      <td className="px-5 py-3 text-sm text-neutral-500">{locale === 'ar' ? img.productNameAr : img.productNameEn}</td>
                       <td className="px-5 py-3">
                         <div className="flex gap-2">
                           <button onClick={() => setPreview(img)} className="p-1.5 text-blue-400 hover:bg-blue-50 rounded-lg">
@@ -660,9 +656,6 @@ export default function MediaPage() {
                           </button>
                           <button onClick={() => navigator.clipboard?.writeText(img.url)} className="p-1.5 text-neutral-400 hover:bg-neutral-100 rounded-lg">
                             <span className="material-symbols-outlined text-[16px]">content_copy</span>
-                          </button>
-                          <button className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg">
-                            <span className="material-symbols-outlined text-[16px]">delete</span>
                           </button>
                         </div>
                       </td>
@@ -684,7 +677,7 @@ export default function MediaPage() {
             <div className="p-4 flex items-center justify-between">
               <div>
                 <p className="font-bold text-[#1b170d]">{preview.name}</p>
-                <p className="text-xs text-neutral-400">{preview.size} • {preview.type} • {t('used_in_products', { count: preview.used })}</p>
+                <p className="text-xs text-neutral-400">{locale === 'ar' ? preview.productNameAr : preview.productNameEn}</p>
               </div>
               <div className="flex gap-2">
                 <button onClick={() => navigator.clipboard?.writeText(preview.url)} className="text-xs bg-neutral-100 hover:bg-neutral-200 text-neutral-700 px-3 py-2 rounded-lg font-medium flex items-center gap-1">

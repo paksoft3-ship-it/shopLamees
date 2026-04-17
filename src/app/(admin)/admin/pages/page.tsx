@@ -4,19 +4,14 @@ import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 
 const cmsPages = [
-    { id: '1', title: 'من نحن', titleEn: 'About Us', slug: '/about', status: 'published', updatedAt: '10 مايو 2024', updatedAtEn: '10 May 2024' },
-    { id: '2', title: 'سياسة الخصوصية', titleEn: 'Privacy Policy', slug: '/privacy-policy', status: 'published', updatedAt: '1 مارس 2024', updatedAtEn: '1 March 2024' },
-    { id: '3', title: 'شروط الاستخدام', titleEn: 'Terms of Use', slug: '/terms', status: 'published', updatedAt: '1 مارس 2024', updatedAtEn: '1 March 2024' },
-    { id: '4', title: 'سياسة الإرجاع', titleEn: 'Return Policy', slug: '/return-policy', status: 'published', updatedAt: '15 أبريل 2024', updatedAtEn: '15 April 2024' },
-    { id: '5', title: 'دليل المقاسات', titleEn: 'Size Guide', slug: '/size-guide', status: 'draft', updatedAt: '5 مايو 2024', updatedAtEn: '5 May 2024' },
-    { id: '6', title: 'الأسئلة الشائعة', titleEn: 'FAQ', slug: '/faq', status: 'draft', updatedAt: '8 مايو 2024', updatedAtEn: '8 May 2024' },
-    { id: '7', title: 'سياسة الشحن', titleEn: 'Shipping Policy', slug: '/shipping', status: 'published', updatedAt: '20 أبريل 2024', updatedAtEn: '20 April 2024' },
+    { id: '1', title: 'من نحن', titleEn: 'About Us', slug: '/about', status: 'published' },
+    { id: '2', title: 'سياسة الخصوصية', titleEn: 'Privacy Policy', slug: '/privacy-policy', status: 'published' },
+    { id: '3', title: 'شروط الاستخدام', titleEn: 'Terms of Use', slug: '/terms', status: 'published' },
+    { id: '4', title: 'سياسة الإرجاع', titleEn: 'Return Policy', slug: '/return-policy', status: 'published' },
+    { id: '5', title: 'دليل المقاسات', titleEn: 'Size Guide', slug: '/size-guide', status: 'published' },
+    { id: '6', title: 'الأسئلة الشائعة', titleEn: 'FAQ', slug: '/faq', status: 'published' },
+    { id: '7', title: 'سياسة الشحن', titleEn: 'Shipping Policy', slug: '/shipping', status: 'published' },
 ];
-
-const sampleContent: Record<string, string> = {
-    '1': 'شوب لاميس هو متجر إلكتروني متخصص في العبايات والأزياء النسائية الفاخرة. تأسسنا عام 2020 بهدف تقديم أرقى التصاميم العصرية الملتزمة بالأصالة العربية. نحرص على اختيار أفخر الأقمشة وأحدث التصاميم لنقدم لكِ تجربة تسوق استثنائية...',
-    '4': 'نقبل إرجاع المنتجات خلال 14 يوماً من تاريخ الاستلام بشرط أن تكون بحالتها الأصلية غير المستخدمة. يتحمل العميل رسوم الشحن في حالة الإرجاع ما لم يكن المنتج معيباً...',
-};
 
 export default function PagesPage() {
     const t = useTranslations('Admin.Pages');
@@ -24,7 +19,7 @@ export default function PagesPage() {
     const isRtl = locale === 'ar';
 
     const [editingId, setEditingId] = useState<string | null>(null);
-    const [content, setContent] = useState(sampleContent);
+    const [content, setContent] = useState<Record<string, string>>({});
     const [showNew, setShowNew] = useState(false);
 
     const editing = cmsPages.find(p => p.id === editingId);
@@ -66,7 +61,7 @@ export default function PagesPage() {
                                             {page.status === 'published' ? t('status_published') : t('status_draft')}
                                         </span>
                                     </td>
-                                    <td className="px-5 py-4 text-xs text-neutral-400">{isRtl ? page.updatedAt : page.updatedAtEn}</td>
+                                    <td className="px-5 py-4 text-xs text-neutral-400">—</td>
                                     <td className="px-5 py-4">
                                         <div className="flex items-center gap-2">
                                             <button onClick={() => setEditingId(page.id)} className="flex items-center gap-1.5 text-xs bg-[#edab1d]/10 text-[#d49511] px-3 py-1.5 rounded-lg font-bold hover:bg-[#edab1d]/20 transition-colors">

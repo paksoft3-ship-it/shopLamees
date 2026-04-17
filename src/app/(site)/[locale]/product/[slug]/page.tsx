@@ -148,7 +148,18 @@ export default async function ProductPage({
                 <ProductInfo product={product} />
             </div>
 
-            <div className="mt-20 grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-border pt-16 px-4 sm:px-8 lg:px-12">
+            {(product.description.ar || product.description.en) && (
+                <div className="mt-12 border-t border-border pt-10 px-4 sm:px-8 lg:px-12">
+                    <h2 className="text-xl font-bold font-kufi text-[#0e1b12] mb-4">
+                        {locale === 'ar' ? 'وصف المنتج' : 'Product Description'}
+                    </h2>
+                    <p className="text-[#4b5563] leading-relaxed font-kufi text-sm md:text-base max-w-3xl whitespace-pre-line">
+                        {product.description[locale as 'ar' | 'en'] || product.description.ar || product.description.en}
+                    </p>
+                </div>
+            )}
+
+            <div className="mt-12 grid grid-cols-1 lg:grid-cols-12 gap-12 border-t border-border pt-16 px-4 sm:px-8 lg:px-12">
                 <ProductSpecs product={product} />
                 <RelatedProducts products={relatedProducts} />
             </div>

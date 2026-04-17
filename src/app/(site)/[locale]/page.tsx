@@ -7,8 +7,8 @@ import { VideoShowcase } from "@/components/home/VideoShowcase";
 import { ValueProps } from "@/components/home/ValueProps";
 import { Newsletter } from "@/components/home/Newsletter";
 import { CustomizationSection } from "@/components/home/CustomizationSection";
-import { getCategories, getFeaturedProducts } from "@/lib/data/catalog";
-import { getHomeVideosFromSettings } from "@/lib/data/storeSettings";
+import { getCategories, getFeaturedProducts, getAllProducts } from "@/lib/data/catalog";
+import { getHomeVideosFromSettings, getStoreStats } from "@/lib/data/storeSettings";
 import { getLocalizedUrl, getSiteUrl } from "@/lib/site";
 
 import { setRequestLocale } from 'next-intl/server';
@@ -52,10 +52,12 @@ export default async function Home({ params: { locale } }: { params: { locale: s
     setRequestLocale(locale);
     const isAr = locale === 'ar';
 
-    const [categories, featuredProducts, homeVideos] = await Promise.all([
+    const [categories, featuredProducts, allProducts, homeVideos, storeStats] = await Promise.all([
         getCategories(),
         getFeaturedProducts(),
+        getAllProducts(),
         getHomeVideosFromSettings(),
+        getStoreStats(),
     ]);
 
     const baseUrl = getSiteUrl();
@@ -91,10 +93,10 @@ export default async function Home({ params: { locale } }: { params: { locale: s
                 type="application/ld+json"
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
             />
-            <Hero />
+            <Hero stats={storeStats} />
             <FeaturedProducts products={featuredProducts} />
             <CategoriesRow categories={categories} />
-            <Lookbook />
+            <Lookbook products={allProducts} />
             <VideoShowcase videos={homeVideos} />
             <CustomizationSection />
             <ValueProps />

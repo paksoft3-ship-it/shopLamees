@@ -37,6 +37,7 @@ export default function CategoriesPage() {
   const [showModal, setShowModal] = useState(false);
   const [editCat, setEditCat] = useState<AdminCategory | null>(null);
   const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
   const [form, setForm] = useState<CategoryForm>(emptyForm);
 
   const loadCategories = async () => {
@@ -59,11 +60,13 @@ export default function CategoriesPage() {
 
   const openNew = () => {
     setEditCat(null);
+    setSaveError('');
     setForm({ ...emptyForm, sortOrder: categories.length + 1 });
     setShowModal(true);
   };
 
   const openEdit = (cat: AdminCategory) => {
+    setSaveError('');
     setEditCat(cat);
     setForm({
       nameAr: cat.nameAr,
@@ -79,11 +82,15 @@ export default function CategoriesPage() {
     if (!form.nameAr.trim() || !form.nameEn.trim() || !form.slug.trim()) return;
 
     setSaving(true);
+    setSaveError('');
     try {
-      if (editCat) {
-        await updateAdminCategory(editCat.id, form);
-      } else {
-        await createAdminCategory(form);
+      const result = editCat
+        ? await updateAdminCategory(editCat.id, form)
+        : await createAdminCategory(form);
+
+      if (result.error) {
+        setSaveError(result.error);
+        return;
       }
       setShowModal(false);
       await loadCategories();
@@ -219,7 +226,12 @@ export default function CategoriesPage() {
                 <input type="number" value={form.sortOrder} onChange={(e) => setForm((f) => ({ ...f, sortOrder: Number(e.target.value) }))} className="w-full border border-neutral-200 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#edab1d]/30 focus:border-[#edab1d]" />
               </div>
             </div>
-            <div className="flex gap-3 mt-6">
+            {saveError && (
+              <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600 font-medium">
+                {saveError}
+              </div>
+            )}
+            <div className="flex gap-3 mt-4">
               <button onClick={() => setShowModal(false)} className="flex-1 border border-neutral-200 text-neutral-700 py-2.5 rounded-xl text-sm font-medium hover:bg-neutral-50">{t('cancel')}</button>
               <button disabled={saving} onClick={handleSave} className="flex-1 bg-[#edab1d] hover:bg-[#d49511] disabled:opacity-60 text-white py-2.5 rounded-xl text-sm font-bold transition-colors">{saving ? (isRtl ? 'جاري الحفظ...' : 'Saving...') : t('save')}</button>
             </div>

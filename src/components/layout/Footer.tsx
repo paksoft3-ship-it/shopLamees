@@ -1,10 +1,23 @@
 import { Link } from '@/i18n/navigation';
 import { MapPin, Smartphone, Mail } from 'lucide-react';
 import Image from 'next/image';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 
-export function Footer() {
+interface NavCategory {
+    id: string;
+    slug: string;
+    nameAr: string;
+    nameEn: string;
+}
+
+interface FooterProps {
+    categories: NavCategory[];
+    phone: string;
+}
+
+export function Footer({ categories, phone }: FooterProps) {
     const t = useTranslations('Home.Layout.Footer');
+    const locale = useLocale() as 'ar' | 'en';
 
     return (
         <footer className="bg-[#111] text-white pt-16 pb-32 lg:pb-8 border-t border-slate-800">
@@ -27,6 +40,7 @@ export function Footer() {
                             </a>
                         </div>
                     </div>
+
                     {/* Quick Links */}
                     <div>
                         <h4 className="font-display font-bold text-lg mb-6 text-white">{t('quick_links')}</h4>
@@ -40,18 +54,22 @@ export function Footer() {
                             <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/faq">{t('faq')}</Link></li>
                         </ul>
                     </div>
-                    {/* Categories */}
+
+                    {/* Categories — dynamic from DB */}
                     <div>
                         <h4 className="font-display font-bold text-lg mb-6 text-white">{t('categories')}</h4>
                         <ul className="space-y-3">
-                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/category/black">{t('black_abayas')}</Link></li>
-                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/category/color">{t('color_abayas')}</Link></li>
-                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/category/niqab">{t('niqabs')}</Link></li>
-                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/category/occasion">{t('occasion_abayas')}</Link></li>
-                            <li><Link className="text-gray-400 hover:text-primary transition-colors" href="/category/luxury">{t('luxury_sets')}</Link></li>
+                            {categories.map(cat => (
+                                <li key={cat.id}>
+                                    <Link className="text-gray-400 hover:text-primary transition-colors" href={`/category/${cat.slug}`}>
+                                        {locale === 'ar' ? cat.nameAr : cat.nameEn}
+                                    </Link>
+                                </li>
+                            ))}
                         </ul>
                     </div>
-                    {/* Contact */}
+
+                    {/* Contact — phone from DB */}
                     <div>
                         <h4 className="font-display font-bold text-lg mb-6 text-white">{t('contact_us')}</h4>
                         <ul className="space-y-4">
@@ -61,7 +79,7 @@ export function Footer() {
                             </li>
                             <li className="flex items-center gap-3">
                                 <Smartphone className="text-primary w-5 h-5" />
-                                <span className="text-gray-400 dir-ltr text-right">+974 3311 4232</span>
+                                <span className="text-gray-400 dir-ltr text-right">{phone}</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail className="text-primary w-5 h-5" />
@@ -70,11 +88,9 @@ export function Footer() {
                         </ul>
                     </div>
                 </div>
-                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-sm">
-                    {/* Left: Copyright */}
-                    <p>&copy; {new Date().getFullYear()} {t('brand_name')}. {t('copyright')}</p>
 
-                    {/* Center: Developed by */}
+                <div className="border-t border-gray-800 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-gray-500 text-sm">
+                    <p>&copy; {new Date().getFullYear()} {t('brand_name')}. {t('copyright')}</p>
                     <a
                         href="https://paksoft.com.tr"
                         target="_blank"
@@ -87,23 +103,18 @@ export function Footer() {
                         </svg>
                         <span className="font-bold text-primary">PakSoft</span>
                     </a>
-
-                    {/* Right: Payment Icons */}
                     <div className="flex items-center gap-3 opacity-50">
-                        {/* Visa */}
                         <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="48" height="32" rx="4" fill="#fff" />
                             <path d="M19.5 21h-2.7l1.7-10.5h2.7L19.5 21zm11.1-10.2c-.5-.2-1.4-.4-2.4-.4-2.7 0-4.5 1.4-4.5 3.4 0 1.5 1.4 2.3 2.4 2.8 1 .5 1.4.8 1.4 1.3 0 .7-.8 1-1.6 1-1.1 0-1.6-.2-2.5-.5l-.3-.2-.4 2.2c.6.3 1.8.5 3 .5 2.8 0 4.7-1.4 4.7-3.5 0-1.2-.7-2-2.3-2.8-.9-.5-1.5-.8-1.5-1.3 0-.4.5-.9 1.5-.9.9 0 1.5.2 2 .4l.2.1.3-2.1zm6.8-.3h-2.1c-.6 0-1.1.2-1.4.8L30 21h2.8l.6-1.5h3.5l.3 1.5H40l-2.3-10.5h-2.3zm-2.5 6.8l1.1-3 .3-.8.2.7.6 3.1h-2.2zM16.3 10.5L13.6 18l-.3-1.4c-.5-1.7-2.1-3.6-3.8-4.5l2.4 8.9h2.9l4.3-10.5h-2.8z" fill="#1A1F71" />
                             <path d="M11.5 10.5H7.1l0 .2c3.4.9 5.6 2.9 6.5 5.4l-.9-4.7c-.2-.7-.7-.9-1.2-.9z" fill="#F9A533" />
                         </svg>
-                        {/* Mastercard */}
                         <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="48" height="32" rx="4" fill="#fff" />
                             <circle cx="19" cy="16" r="8" fill="#EB001B" />
                             <circle cx="29" cy="16" r="8" fill="#F79E1B" />
                             <path d="M24 9.8a8 8 0 0 1 0 12.4 8 8 0 0 1 0-12.4z" fill="#FF5F00" />
                         </svg>
-                        {/* Apple Pay */}
                         <svg className="h-6 w-10" viewBox="0 0 48 32" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <rect width="48" height="32" rx="4" fill="#fff" />
                             <path d="M16.2 11.5c-.6.7-1.5 1.2-2.4 1.1-.1-.9.3-1.9.9-2.5.6-.7 1.6-1.2 2.3-1.2.1 1-.3 1.9-.8 2.6zm.8 1.3c-1.3-.1-2.5.8-3.1.8-.6 0-1.6-.7-2.7-.7-1.4 0-2.7.8-3.4 2.1-1.4 2.5-.4 6.2 1 8.2.7 1 1.5 2.1 2.6 2 1-.1 1.4-.7 2.7-.7 1.2 0 1.6.7 2.7.7 1.1 0 1.8-.9 2.5-2 .8-1.1 1.1-2.2 1.1-2.3 0 0-2.2-.8-2.2-3.2 0-2 1.6-3 1.7-3-1-1.4-2.4-1.6-2.9-1.6zm10.5-1.3v11.8h1.8v-4h2.5c2.3 0 3.9-1.6 3.9-3.9s-1.6-3.9-3.9-3.9h-4.3zm1.8 1.5h2.1c1.6 0 2.5.8 2.5 2.4s-.9 2.4-2.5 2.4h-2.1v-4.8z" fill="#000" />

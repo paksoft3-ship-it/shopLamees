@@ -2,10 +2,16 @@ import { useTranslations, useLocale } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import Image from 'next/image';
 
-export function Hero() {
+interface HeroProps {
+    stats: { productCount: number; orderCount: number; avgRating: number };
+}
+
+export function Hero({ stats }: HeroProps) {
     const t = useTranslations('Home.Hero');
     const locale = useLocale();
     const isRtl = locale === 'ar';
+
+    const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(n % 1000 === 0 ? 0 : 1)}k+` : `${n}+`;
 
     return (
         <section className="relative overflow-hidden w-full min-h-[480px] sm:min-h-[520px] lg:min-h-[580px]">
@@ -73,19 +79,19 @@ export function Hero() {
                     <div className="inline-flex items-center gap-0 bg-white/10 border border-white/10 rounded-xl overflow-hidden backdrop-blur-sm">
                         <div className="flex flex-col items-center gap-1 px-5 py-3.5">
                             <span className="material-symbols-outlined text-[#b0a99f] text-[18px]">group</span>
-                            <p className="text-white font-black text-base leading-none">5k+</p>
+                            <p className="text-white font-black text-base leading-none">{fmt(stats.orderCount)}</p>
                             <p className="text-[#b0a99f] text-[11px] whitespace-nowrap">{t('stats_customers')}</p>
                         </div>
                         <div className="w-px self-stretch bg-white/10" />
                         <div className="flex flex-col items-center gap-1 px-5 py-3.5">
                             <span className="material-symbols-outlined text-[#b0a99f] text-[18px]">description</span>
-                            <p className="text-white font-black text-base leading-none">200+</p>
+                            <p className="text-white font-black text-base leading-none">{fmt(stats.productCount)}</p>
                             <p className="text-[#b0a99f] text-[11px] whitespace-nowrap">{t('stats_models')}</p>
                         </div>
                         <div className="w-px self-stretch bg-white/10" />
                         <div className="flex flex-col items-center gap-1 px-5 py-3.5">
                             <span className="material-symbols-outlined text-[#b0a99f] text-[18px]">star</span>
-                            <p className="text-white font-black text-base leading-none">4.9</p>
+                            <p className="text-white font-black text-base leading-none">{stats.avgRating}</p>
                             <p className="text-[#b0a99f] text-[11px] whitespace-nowrap">{t('stats_rating')}</p>
                         </div>
                     </div>

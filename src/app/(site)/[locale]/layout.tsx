@@ -5,6 +5,8 @@ import dynamic from 'next/dynamic';
 import { TrustBar } from '@/components/layout/TrustBar';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { getCategories } from '@/lib/data/catalog';
+import { getStoreContact } from '@/lib/data/storeSettings';
 import { MobileBottomNav } from '@/components/layout/MobileBottomNav';
 import { ToasterProvider } from '@/components/providers/ToasterProvider';
 import { CartDrawer } from '@/components/cart/CartDrawer';
@@ -33,7 +35,11 @@ export default async function SiteLayout({
     }
 
     setRequestLocale(locale);
-    const messages = await getMessages();
+    const [messages, navCategories, storeContact] = await Promise.all([
+        getMessages(),
+        getCategories(),
+        getStoreContact(),
+    ]);
 
     return (
         <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
@@ -45,9 +51,9 @@ export default async function SiteLayout({
                     <CartDrawer />
                     <div className="flex flex-col min-h-screen">
                         <TrustBar />
-                        <Header />
+                        <Header categories={navCategories} />
                         <main className="flex-1 pb-20 lg:pb-0">{children}</main>
-                        <Footer />
+                        <Footer categories={navCategories} phone={storeContact.phone} />
                         <MobileBottomNav />
                         <WhatsAppChatbot />
                     </div>

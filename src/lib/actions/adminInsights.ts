@@ -435,6 +435,118 @@ export async function getAdminStoreSettings(): Promise<AdminSettingsDTO> {
   };
 }
 
+export interface AdminAuditEntry {
+  id: string;
+  type: 'order' | 'product' | 'settings';
+  actionEn: string;
+  actionAr: string;
+  detailEn: string;
+  detailAr: string;
+  time: string;
+  user: string;
+}
+
+export async function getAdminAuditLog(): Promise<AdminAuditEntry[]> {
+  const [orders, products] = await Promise.all([
+    prisma.order.findMany({
+      orderBy: { updatedAt: 'desc' },
+      take: 30,
+      select: {
+        id: true,
+        orderNumber: true,
+        status: true,
+        customerName: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+    prisma.product.findMany({
+      orderBy: { updatedAt: 'desc' },
+      take: 20,
+      select: {
+        id: true,
+        titleAr: true,
+        titleEn: true,
+        isPublished: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  const statusLabels: Record<string, { en: string; ar: string }> = {
+    NEW: { en: 'New', ar: 'جديد' },
+    PROCESSING: { en: 'Processing', ar: 'قيد التنفيذ' },
+    SHIPPED: { en: 'Shipped', ar: 'تم الشحن' },
+    COMPLETED: { en: 'Completed', ar: 'مكتمل' },
+    CANCELLED: { en: 'Cancelled', ar: 'ملغي' },
+  };
+
+  const entries: AdminAuditEntry[] = [];
+
+  for (const o of orders) {
+    const statusEn = statusLabels[o.status]?.en ?? o.status;
+    const statusAr = statusLabels[o.status]?.ar ?? o.status;
+    const isNew = Math.abs(o.updatedAt.getTime() - o.createdAt.getTime()) < 2000;
+    entries.push({
+      id: `order-${o.id}`,
+      type: 'order',
+      actionEn: isNew ? 'New Order' : 'Order Updated',
+      actionAr: isNew ? 'طلب جديد' : 'تحديث طلب',
+      detailEn: `Order #${o.orderNumber} — ${o.customerName} — Status: ${statusEn}`,
+      detailAr: `طلب #${o.orderNumber} — ${o.customerName} — الحالة: ${statusAr}`,
+      time: o.updatedAt.toISOString(),
+      user: 'system',
+    });
+  }
+
+  for (const p of products) {
+    const isNew = Math.abs(p.updatedAt.getTime() - p.createdAt.getTime()) < 2000;
+    entries.push({
+      id: `product-${p.id}`,
+      type: 'product',
+      actionEn: isNew ? 'Product Added' : 'Product Updated',
+      actionAr: isNew ? 'إضافة منتج' : 'تحديث منتج',
+      detailEn: `${p.titleEn || p.titleAr} — ${p.isPublished ? 'Published' : 'Draft'}`,
+      detailAr: `${p.titleAr} — ${p.isPublished ? 'منشور' : 'مسودة'}`,
+      time: p.updatedAt.toISOString(),
+      user: 'system',
+    });
+  }
+
+  return entries.sort((a, b) => b.time.localeCompare(a.time)).slice(0, 40);
+}
+
+export interface AdminMediaImage {
+  id: string;
+  name: string;
+  url: string;
+  productId: string;
+  productNameAr: string;
+  productNameEn: string;
+}
+
+export async function getAdminProductImages(): Promise<AdminMediaImage[]> {
+  const images = await prisma.productImage.findMany({
+    orderBy: { sortOrder: 'asc' },
+    take: 200,
+    include: {
+      product: {
+        select: { titleAr: true, titleEn: true },
+      },
+    },
+  });
+
+  return images.map((img) => ({
+    id: img.id,
+    name: img.url.split('/').pop() || img.id,
+    url: img.url,
+    productId: img.productId,
+    productNameAr: img.product.titleAr,
+    productNameEn: img.product.titleEn,
+  }));
+}
+
 export async function updateAdminStoreSettings(payload: AdminSettingsDTO) {
   const homeVideos = normalizeHomeVideos(payload.homeVideos);
 
