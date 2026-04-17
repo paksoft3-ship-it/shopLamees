@@ -99,8 +99,10 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                 });
                 uploadedUrls.push(blob.url);
                 setUploadProgress(p => ({ ...p, done: p.done + 1 }));
-            } catch {
-                alert(isRtl ? `فشل رفع "${file.name}"` : `Failed to upload "${file.name}"`);
+            } catch (err) {
+                const msg = err instanceof Error ? err.message : String(err);
+                console.error('Upload error for', file.name, msg);
+                alert(`Failed to upload "${file.name}": ${msg}`);
             }
         }
 
