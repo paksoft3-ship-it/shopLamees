@@ -6,7 +6,6 @@ import { trackEvent } from '@/lib/tracking/track';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getOrderByNumber } from '@/lib/actions/orders';
-import { formatPrice } from '@/lib/utils/price';
 
 type Order = Awaited<ReturnType<typeof getOrderByNumber>>;
 

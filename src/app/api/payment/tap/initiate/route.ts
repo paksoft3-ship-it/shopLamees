@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
             locale = 'ar',
             customerName, phone, email,
             country, city, zone, street, building, unit,
-            shippingMethod, shippingFee,
-            currency, subtotal, vat, total,
+            shippingFee,
+            currency, subtotal, total,
             customerNote, items,
         } = body;
 
