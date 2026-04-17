@@ -1,7 +1,5 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 interface OrderEmailData {
     orderNumber: string;
     customerName: string;
@@ -171,6 +169,7 @@ function buildEmailHtml(order: OrderEmailData, locale: 'ar' | 'en'): string {
 export async function sendOrderConfirmationEmail(order: OrderEmailData, locale: 'ar' | 'en' = 'ar') {
     if (!process.env.RESEND_API_KEY || !order.email) return;
 
+    const resend = new Resend(process.env.RESEND_API_KEY);
     const isAr = locale === 'ar';
     const fromEmail = process.env.RESEND_FROM_EMAIL || 'orders@shop-lamees.com';
     const subject = isAr
