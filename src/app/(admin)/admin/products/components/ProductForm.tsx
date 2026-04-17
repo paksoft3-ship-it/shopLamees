@@ -60,6 +60,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
             } else {
                 await createAdminProduct(formData);
             }
+            router.refresh();
             router.push(`/admin/products`);
         } catch (error) {
             console.error('Error saving product:', error);

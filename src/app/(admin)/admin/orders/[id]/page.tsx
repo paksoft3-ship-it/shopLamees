@@ -21,6 +21,9 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
     const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
     const [noteText, setNoteText] = useState('');
     const [isEditingNote, setIsEditingNote] = useState(false);
+    const [isShipmentModalOpen, setIsShipmentModalOpen] = useState(false);
+    const [trackingNumber, setTrackingNumber] = useState('');
+    const [isCreatingShipment, setIsCreatingShipment] = useState(false);
     const tr = {
         orders: isRtl ? 'الطلبات' : 'Orders',
         orderDetails: isRtl ? 'تفاصيل الطلب' : 'Order details',
@@ -76,6 +79,15 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
         setOrder({ ...order, status: newStatus });
         await updateAdminOrderStatus(order.id, newStatus);
         setIsUpdatingStatus(false);
+    };
+
+    const handleCreateShipment = async () => {
+        if (!order) return;
+        setIsCreatingShipment(true);
+        await updateAdminOrderStatus(order.id, 'shipped');
+        setOrder({ ...order, status: 'shipped' });
+        setIsCreatingShipment(false);
+        setIsShipmentModalOpen(false);
     };
 
     const handleSaveNote = async () => {
@@ -150,7 +162,9 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
 
                 {/* Primary Actions */}
                 <div className="flex flex-wrap gap-3 items-center">
-                    <button className="h-10 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition-colors flex items-center gap-2 shadow-sm">
+                    <button
+                        onClick={() => window.print()}
+                        className="h-10 px-4 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-bold text-sm transition-colors flex items-center gap-2 shadow-sm">
                         <span className="material-symbols-outlined text-[18px]">print</span>
                         <span className="hidden sm:inline">{tr.print}</span>
                     </button>
@@ -173,7 +187,9 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                         )}
                     </div>
 
-                    <button className="h-10 px-6 rounded-xl bg-primary hover:bg-[#edab1d]/90 text-slate-900 font-bold text-sm transition-colors flex items-center gap-2 shadow-md shadow-primary/20">
+                    <button
+                        onClick={() => setIsShipmentModalOpen(true)}
+                        className="h-10 px-6 rounded-xl bg-primary hover:bg-[#edab1d]/90 text-slate-900 font-bold text-sm transition-colors flex items-center gap-2 shadow-md shadow-primary/20">
                         <span className="material-symbols-outlined text-[18px]">local_shipping</span>
                         <span className="hidden sm:inline">{tr.createShipment}</span>
                     </button>
@@ -428,6 +444,96 @@ export default function OrderDetailsPage({ params }: { params: { id: string } })
                     </div>
                 </div>
             </div>
+
+            {/* Shipment Modal */}
+            {isShipmentModalOpen && (
+                <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden">
+                        {/* Modal Header */}
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-100">
+                            <h2 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                                <span className="material-symbols-outlined text-primary text-[22px]">local_shipping</span>
+                                {tr.createShipment}
+                            </h2>
+                            <button onClick={() => setIsShipmentModalOpen(false)} className="text-slate-400 hover:text-slate-600 transition-colors">
+                                <span className="material-symbols-outlined">close</span>
+                            </button>
+                        </div>
+
+                        {/* Order Summary */}
+                        <div className="px-6 py-4 space-y-4">
+                            <div className="bg-slate-50 rounded-xl p-4 space-y-2 text-sm">
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">{isRtl ? 'رقم الطلب' : 'Order'}</span>
+                                    <span className="font-bold text-slate-900">#{order.id}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">{isRtl ? 'العميل' : 'Customer'}</span>
+                                    <span className="font-medium text-slate-900">{order.customerName}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">{isRtl ? 'الهاتف' : 'Phone'}</span>
+                                    <span className="font-medium text-slate-900 dir-ltr">{order.customerPhone}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">{tr.deliveryAddress}</span>
+                                    <span className="font-medium text-slate-900 text-end">{order.shippingAddress.city}، {order.shippingAddress.street}</span>
+                                </div>
+                                <div className="flex justify-between">
+                                    <span className="text-slate-500">{isRtl ? 'عدد المنتجات' : 'Items'}</span>
+                                    <span className="font-medium text-slate-900">{order.items.length}</span>
+                                </div>
+                                <div className="flex justify-between border-t border-slate-200 pt-2">
+                                    <span className="text-slate-500">{tr.total}</span>
+                                    <span className="font-bold text-slate-900">{formatMoney(order.amount)}</span>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-slate-700 mb-1.5">
+                                    {isRtl ? 'رقم التتبع (اختياري)' : 'Tracking Number (optional)'}
+                                </label>
+                                <input
+                                    type="text"
+                                    value={trackingNumber}
+                                    onChange={e => setTrackingNumber(e.target.value)}
+                                    placeholder={isRtl ? 'أدخل رقم التتبع...' : 'Enter tracking number...'}
+                                    className="w-full h-11 px-4 rounded-xl border border-slate-200 bg-slate-50 text-slate-900 text-sm focus:ring-2 focus:ring-primary/40 focus:border-primary outline-none transition-all"
+                                    dir="ltr"
+                                />
+                            </div>
+
+                            <p className="text-xs text-slate-400">
+                                {isRtl
+                                    ? 'سيتم تحديث حالة الطلب إلى "تم الشحن" تلقائياً عند تأكيد الشحنة.'
+                                    : 'The order status will automatically update to "Shipped" when you confirm.'}
+                            </p>
+                        </div>
+
+                        {/* Modal Footer */}
+                        <div className="flex gap-3 px-6 py-4 border-t border-slate-100">
+                            <button
+                                onClick={() => setIsShipmentModalOpen(false)}
+                                className="flex-1 h-11 rounded-xl border border-slate-200 text-slate-700 font-bold text-sm hover:bg-slate-50 transition-colors"
+                            >
+                                {isRtl ? 'إلغاء' : 'Cancel'}
+                            </button>
+                            <button
+                                onClick={handleCreateShipment}
+                                disabled={isCreatingShipment}
+                                className="flex-1 h-11 rounded-xl bg-primary hover:bg-[#edab1d]/90 text-slate-900 font-bold text-sm transition-colors flex items-center justify-center gap-2 disabled:opacity-60"
+                            >
+                                {isCreatingShipment ? (
+                                    <span className="material-symbols-outlined animate-spin text-[18px]">progress_activity</span>
+                                ) : (
+                                    <span className="material-symbols-outlined text-[18px]">check_circle</span>
+                                )}
+                                {isRtl ? 'تأكيد الشحن' : 'Confirm Shipment'}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 }
