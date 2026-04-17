@@ -96,6 +96,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                 const blob = await upload(file.name, file, {
                     access: 'public',
                     handleUploadUrl: '/api/upload',
+                    addRandomSuffix: true,
                 });
                 uploadedUrls.push(blob.url);
                 setUploadProgress(p => ({ ...p, done: p.done + 1 }));

@@ -177,6 +177,7 @@ export default function MediaPage() {
       const blob = await upload(file.name, file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
+        addRandomSuffix: true,
       });
 
       setHomeVideos((prev) => [
@@ -228,6 +229,7 @@ export default function MediaPage() {
       const blob = await upload(file.name, file, {
         access: 'public',
         handleUploadUrl: '/api/upload',
+        addRandomSuffix: true,
       });
       setVideoField(targetIndex, { poster: blob.url });
       setVideoMessage(L('تم رفع صورة الغلاف. اضغط حفظ التغييرات.', 'Poster uploaded. Click Save Changes.'));
