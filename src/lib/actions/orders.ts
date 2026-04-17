@@ -1,6 +1,7 @@
 'use server';
 
 import prisma from '@/lib/db';
+import { sendOrderConfirmationEmail } from '@/lib/email';
 
 async function sendTelegramNotification(order: {
     orderNumber: string;
@@ -162,6 +163,28 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderNumbe
             },
         },
     });
+
+    // Send customer email receipt (fire-and-forget, EFT orders only)
+    if (input.email) {
+        void sendOrderConfirmationEmail({
+            orderNumber,
+            customerName: input.customerName,
+            email: input.email,
+            paymentMethod: input.paymentMethod,
+            currency,
+            subtotal: input.subtotal,
+            shippingFee: input.shippingFee,
+            total: input.total,
+            city: input.city,
+            country: input.country,
+            items: input.items.map(item => ({
+                name: item.name,
+                qty: item.quantity,
+                unitPrice: item.unitPrice,
+                variantLabel: [item.size && `${item.size} cm`, item.cut].filter(Boolean).join(' / ') || null,
+            })),
+        });
+    }
 
     // Send Telegram notification to admin (fire-and-forget)
     void sendTelegramNotification({

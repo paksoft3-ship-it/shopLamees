@@ -37,6 +37,7 @@ export default function CheckoutPage() {
     const [unit, setUnit] = useState('');
     const [shippingMethod, setShippingMethod] = useState('standard');
     const [customerNote, setCustomerNote] = useState('');
+    const [paymentMethod, setPaymentMethod] = useState<'EFT' | 'TAP'>('TAP');
 
     const shippingOptions = [
         { id: 'standard', label: locale === 'ar' ? 'شحن عادي (5-7 أيام)' : 'Standard (5-7 days)', price: 0 },
@@ -106,39 +107,62 @@ export default function CheckoutPage() {
         }
     };
 
+    const orderPayload = () => ({
+        locale,
+        customerName: name,
+        phone,
+        email: email || undefined,
+        country,
+        city,
+        zone: zone || undefined,
+        street,
+        building: building || undefined,
+        unit: unit || undefined,
+        shippingMethod,
+        shippingFee,
+        currency,
+        subtotal,
+        vat,
+        total,
+        customerNote: customerNote || undefined,
+        items: items.map(item => ({
+            variantId: item.variantId,
+            productId: item.productId,
+            name: item.name,
+            unitPrice: item.unitPrice,
+            quantity: item.quantity,
+            image: item.image,
+            size: item.size,
+            cut: item.cut,
+        })),
+    });
+
     const handleConfirm = async () => {
         if (!validate('payment')) return;
         setIsSubmitting(true);
+
+        if (paymentMethod === 'TAP') {
+            try {
+                const res = await fetch('/api/payment/tap/initiate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(orderPayload()),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Payment initiation failed');
+                clearCart();
+                window.location.href = data.redirectUrl;
+            } catch (err) {
+                console.error(err);
+                setErrors({ submit: locale === 'ar' ? 'فشل الاتصال بخدمة الدفع، يرجى المحاولة مجدداً' : 'Payment service error. Please try again.' });
+                setIsSubmitting(false);
+            }
+            return;
+        }
+
+        // Bank Transfer (EFT) flow
         try {
-            const { orderNumber } = await createOrder({
-                customerName: name,
-                phone,
-                email: email || undefined,
-                country,
-                city,
-                zone: zone || undefined,
-                street,
-                building: building || undefined,
-                unit: unit || undefined,
-                shippingMethod,
-                shippingFee,
-                paymentMethod: 'EFT',
-                currency,
-                subtotal,
-                vat,
-                total,
-                customerNote: customerNote || undefined,
-                items: items.map(item => ({
-                    variantId: item.variantId,
-                    productId: item.productId,
-                    name: item.name,
-                    unitPrice: item.unitPrice,
-                    quantity: item.quantity,
-                    image: item.image,
-                    size: item.size,
-                    cut: item.cut,
-                })),
-            });
+            const { orderNumber } = await createOrder({ ...orderPayload(), paymentMethod: 'EFT' });
             trackEvent('purchase', {
                 transaction_id: orderNumber,
                 currency,
@@ -389,50 +413,89 @@ export default function CheckoutPage() {
                             {/* STEP: Payment */}
                             {currentStep === 'payment' && (
                                 <div className="space-y-4">
-                                    <label className="flex items-center p-4 rounded-xl border-2 border-primary bg-primary/5 shadow-sm">
+                                    {/* Tap — Card / Apple Pay / All methods */}
+                                    <label
+                                        onClick={() => setPaymentMethod('TAP')}
+                                        className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all shadow-sm ${paymentMethod === 'TAP' ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
+                                    >
+                                        <div className="w-12 h-8 bg-slate-900 rounded flex items-center justify-center shrink-0">
+                                            <svg viewBox="0 0 40 16" fill="none" className="h-4 w-auto px-1">
+                                                <text x="0" y="13" fontSize="13" fontWeight="bold" fill="white" fontFamily="Arial">tap</text>
+                                            </svg>
+                                        </div>
+                                        <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
+                                            <span className="text-sm font-bold text-slate-900">
+                                                {locale === 'ar' ? 'بطاقة ائتمانية / مدى / Apple Pay' : 'Card / mada / Apple Pay'}
+                                            </span>
+                                            <span className="text-xs text-slate-500">
+                                                {locale === 'ar' ? 'دفع آمن عبر بوابة Tap Payments' : 'Secure payment via Tap Payments'}
+                                            </span>
+                                        </div>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'TAP' ? 'border-primary' : 'border-slate-300'}`}>
+                                            {paymentMethod === 'TAP' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                        </div>
+                                    </label>
+
+                                    {/* Tap card icons */}
+                                    {paymentMethod === 'TAP' && (
+                                        <div className="flex items-center gap-2 px-4">
+                                            {['VISA', 'MC', 'mada', 'AMEX'].map(brand => (
+                                                <span key={brand} className="text-[10px] font-bold border border-slate-200 rounded px-1.5 py-0.5 text-slate-500 bg-white">{brand}</span>
+                                            ))}
+                                            <span className="text-[10px] font-bold border border-slate-200 rounded px-1.5 py-0.5 text-slate-500 bg-white"> Pay</span>
+                                        </div>
+                                    )}
+
+                                    {/* Bank Transfer */}
+                                    <label
+                                        onClick={() => setPaymentMethod('EFT')}
+                                        className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all shadow-sm ${paymentMethod === 'EFT' ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
+                                    >
                                         <div className="w-12 h-8 bg-slate-100 rounded flex items-center justify-center text-slate-600 shrink-0">
                                             <span className="material-symbols-outlined">account_balance</span>
                                         </div>
                                         <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
                                             <span className="text-sm font-bold text-slate-900">{locale === 'ar' ? 'تحويل بنكي' : 'Bank Transfer'}</span>
-                                            <span className="text-xs text-slate-500">{locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send the receipt via WhatsApp'}</span>
+                                            <span className="text-xs text-slate-500">{locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send receipt via WhatsApp'}</span>
                                         </div>
-                                        <div className="w-5 h-5 rounded-full border-2 border-primary flex items-center justify-center">
-                                            <div className="w-2.5 h-2.5 rounded-full bg-primary" />
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'EFT' ? 'border-primary' : 'border-slate-300'}`}>
+                                            {paymentMethod === 'EFT' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                                         </div>
                                     </label>
 
-                                    {/* Bank details */}
-                                    <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
-                                        <p className="text-slate-800 font-kufi text-sm font-bold mb-2 flex items-center gap-2">
-                                            <span className="material-symbols-outlined text-[18px] text-primary">account_balance</span>
-                                            {locale === 'ar' ? 'بيانات الحساب البنكي' : 'Bank Account Details'}
-                                        </p>
-                                        {[
-                                            { label: locale === 'ar' ? 'اسم الحساب' : 'Account Name', value: 'MUHAMMAD OMAR FAROOQ' },
-                                            { label: locale === 'ar' ? 'رقم الحساب' : 'Account Number', value: '473010890020101' },
-                                            { label: 'IBAN', value: 'QA66CBQA000000473010890020101' },
-                                            { label: 'SWIFT', value: 'CBQAQAQA' },
-                                            { label: locale === 'ar' ? 'البنك' : 'Bank', value: 'Commercial Bank (QSC) — Doha, Qatar' },
-                                        ].map(({ label, value }) => (
-                                            <div key={label} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 text-xs border-b border-slate-100 last:border-0 py-1">
-                                                <span className="text-slate-500 font-kufi">{label}</span>
-                                                <span className="font-bold text-slate-800 font-display tracking-wide" dir="ltr">{value}</span>
+                                    {/* Bank details — shown only when EFT selected */}
+                                    {paymentMethod === 'EFT' && (
+                                        <>
+                                            <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2">
+                                                <p className="text-slate-800 font-kufi text-sm font-bold mb-2 flex items-center gap-2">
+                                                    <span className="material-symbols-outlined text-[18px] text-primary">account_balance</span>
+                                                    {locale === 'ar' ? 'بيانات الحساب البنكي' : 'Bank Account Details'}
+                                                </p>
+                                                {[
+                                                    { label: locale === 'ar' ? 'اسم الحساب' : 'Account Name', value: 'MUHAMMAD OMAR FAROOQ' },
+                                                    { label: locale === 'ar' ? 'رقم الحساب' : 'Account Number', value: '473010890020101' },
+                                                    { label: 'IBAN', value: 'QA66CBQA000000473010890020101' },
+                                                    { label: 'SWIFT', value: 'CBQAQAQA' },
+                                                    { label: locale === 'ar' ? 'البنك' : 'Bank', value: 'Commercial Bank (QSC) — Doha, Qatar' },
+                                                ].map(({ label, value }) => (
+                                                    <div key={label} className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-0.5 text-xs border-b border-slate-100 last:border-0 py-1">
+                                                        <span className="text-slate-500 font-kufi">{label}</span>
+                                                        <span className="font-bold text-slate-800 font-display tracking-wide" dir="ltr">{value}</span>
+                                                    </div>
+                                                ))}
                                             </div>
-                                        ))}
-                                    </div>
-
-                                    {/* Payment instructions */}
-                                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
-                                        <p className="text-amber-800 font-kufi text-sm font-bold mb-1">
-                                            {locale === 'ar' ? 'تعليمات الدفع' : 'Payment Instructions'}
-                                        </p>
-                                        <p className="text-amber-700 font-kufi text-xs leading-relaxed">
-                                            {locale === 'ar'
-                                                ? 'بعد تأكيد طلبك، يرجى تحويل المبلغ الكامل وإرسال صورة إيصال التحويل عبر واتساب على الرقم: +974 3311 4232'
-                                                : 'After confirming your order, please transfer the full amount and send a photo of the receipt via WhatsApp to: +974 3311 4232'}
-                                        </p>
-                                    </div>
+                                            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                                <p className="text-amber-800 font-kufi text-sm font-bold mb-1">
+                                                    {locale === 'ar' ? 'تعليمات الدفع' : 'Payment Instructions'}
+                                                </p>
+                                                <p className="text-amber-700 font-kufi text-xs leading-relaxed">
+                                                    {locale === 'ar'
+                                                        ? 'بعد تأكيد طلبك، يرجى تحويل المبلغ الكامل وإرسال صورة إيصال التحويل عبر واتساب على الرقم: +974 3311 4232'
+                                                        : 'After confirming your order, please transfer the full amount and send a photo of the receipt via WhatsApp to: +974 3311 4232'}
+                                                </p>
+                                            </div>
+                                        </>
+                                    )}
 
                                     {errors.submit && (
                                         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
@@ -470,6 +533,11 @@ export default function CheckoutPage() {
                                             <>
                                                 <span className="animate-spin material-symbols-outlined text-lg">autorenew</span>
                                                 {locale === 'ar' ? 'جارٍ التأكيد...' : 'Placing order...'}
+                                            </>
+                                        ) : paymentMethod === 'TAP' ? (
+                                            <>
+                                                <span className="material-symbols-outlined text-lg">lock</span>
+                                                {locale === 'ar' ? 'الدفع الآن' : 'Pay Now'}
                                             </>
                                         ) : (
                                             <>
