@@ -18,6 +18,7 @@ async function sendTelegramNotification(order: {
     subtotal: number;
     shippingFee: number;
     total: number;
+    paymentMethod: string;
     customerNote?: string | null;
     items: Array<{ name: string; qty: number; unitPrice: number; variantLabel?: string | null }>;
 }) {
@@ -55,7 +56,7 @@ ${itemLines}
 ${flag} *العنوان:*
 ${address}
 
-💳 الدفع: تحويل بنكي${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
+💳 الدفع: ${order.paymentMethod === 'COD' ? 'الدفع عند الاستلام (كاش)' : order.paymentMethod === 'TAP' ? 'بطاقة إلكترونية (Tap)' : 'تحويل بنكي'}${order.customerNote ? `\n\n📝 ملاحظة: ${order.customerNote}` : ''}`;
 
     const recipients = [chatId, chatId2].filter(Boolean);
     try {
@@ -202,6 +203,7 @@ export async function createOrder(input: CreateOrderInput): Promise<{ orderNumbe
         subtotal: input.subtotal,
         shippingFee: input.shippingFee,
         total: input.total,
+        paymentMethod: input.paymentMethod,
         customerNote: input.customerNote,
         items: input.items.map(item => ({
             name: item.name,

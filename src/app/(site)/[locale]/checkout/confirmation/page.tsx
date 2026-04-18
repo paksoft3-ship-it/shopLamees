@@ -9,7 +9,7 @@ import { getOrderByNumber } from '@/lib/actions/orders';
 
 type Order = Awaited<ReturnType<typeof getOrderByNumber>>;
 
-type PayState = 'loading' | 'paid' | 'pending_eft' | 'failed';
+type PayState = 'loading' | 'paid' | 'pending_eft' | 'cod' | 'failed';
 
 function buildWhatsAppReceipt(order: Order, locale: 'ar' | 'en'): string {
     if (!order) return '';
@@ -51,15 +51,17 @@ export default function OrderConfirmationPage() {
                         if (d) setOrder(d);
                     });
                 }, 2500);
+            } else if (data.paymentMethod === 'COD') {
+                setState('cod');
             } else {
                 setState('pending_eft');
             }
         });
     }, [orderNumber, statusParam]);
 
-    // Track purchase once on success
+    // Track purchase once on success (paid, COD, or EFT confirmed)
     useEffect(() => {
-        if (state === 'paid' && !hasTracked.current && orderNumber) {
+        if ((state === 'paid' || state === 'cod' || state === 'pending_eft') && !hasTracked.current && orderNumber) {
             hasTracked.current = true;
             trackEvent('purchase', { transaction_id: orderNumber, value: Number(order?.total || 0) });
         }
@@ -98,8 +100,8 @@ export default function OrderConfirmationPage() {
             <main className="flex-grow flex flex-col items-center justify-center py-10 px-4 relative overflow-hidden">
                 {/* Background glows */}
                 <div className="absolute inset-0 pointer-events-none">
-                    <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[100px] ${state === 'paid' ? 'bg-green-200/30' : state === 'failed' ? 'bg-red-200/30' : 'bg-primary/5'}`} />
-                    <div className={`absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[100px] ${state === 'paid' ? 'bg-primary/10' : state === 'failed' ? 'bg-red-200/20' : 'bg-primary/5'}`} />
+                    <div className={`absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full blur-[100px] ${state === 'paid' ? 'bg-green-200/30' : state === 'failed' ? 'bg-red-200/30' : state === 'cod' ? 'bg-emerald-200/30' : 'bg-primary/5'}`} />
+                    <div className={`absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full blur-[100px] ${state === 'paid' ? 'bg-primary/10' : state === 'failed' ? 'bg-red-200/20' : state === 'cod' ? 'bg-primary/10' : 'bg-primary/5'}`} />
                 </div>
 
                 <div className="w-full max-w-md relative z-10 space-y-4">
@@ -176,6 +178,47 @@ export default function OrderConfirmationPage() {
                                     className="w-full h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi">
                                     <span className="material-symbols-outlined text-[20px]">chat</span>
                                     {locale === 'ar' ? 'أرسل إيصال التحويل عبر واتساب' : 'Send Transfer Receipt via WhatsApp'}
+                                </a>
+                                <Link href="/"
+                                    className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi">
+                                    {locale === 'ar' ? 'متابعة التسوق' : 'Continue Shopping'}
+                                </Link>
+                            </div>
+                        </div>
+                    )}
+
+                    {/* ── STATE: CASH ON DELIVERY ── */}
+                    {state === 'cod' && (
+                        <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 text-center">
+                            <div className="w-20 h-20 bg-emerald-50 rounded-full flex items-center justify-center mx-auto mb-5 ring-8 ring-emerald-50">
+                                <span className="material-symbols-outlined text-emerald-500 text-[44px]">check_circle</span>
+                            </div>
+                            <h1 className="text-2xl font-bold text-slate-900 font-kufi mb-1">
+                                {locale === 'ar' ? 'تم استلام طلبك ✓' : 'Order Received ✓'}
+                            </h1>
+                            <p className="text-slate-500 font-kufi text-sm mb-6">
+                                {locale === 'ar' ? 'ستدفع نقداً عند وصول طلبك إليك' : 'You will pay cash when your order is delivered'}
+                            </p>
+
+                            <OrderSummaryCard order={order} locale={locale} />
+
+                            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 mt-4 text-start">
+                                <p className="text-emerald-800 font-kufi text-sm font-bold mb-1 flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-[18px]">payments</span>
+                                    {locale === 'ar' ? 'تفاصيل الدفع عند الاستلام' : 'Cash on Delivery Details'}
+                                </p>
+                                <p className="text-emerald-700 font-kufi text-xs leading-relaxed">
+                                    {locale === 'ar'
+                                        ? 'جهّز المبلغ الكامل نقداً عند استلام الطلب. إذا كان لديك أي استفسار تواصل معنا عبر واتساب.'
+                                        : 'Please prepare the full amount in cash upon delivery. For any questions, contact us via WhatsApp.'}
+                                </p>
+                            </div>
+
+                            <div className="flex flex-col gap-3 mt-5">
+                                <a href={waUrl} target="_blank" rel="noopener noreferrer"
+                                    className="w-full h-12 bg-[#25D366] hover:bg-[#1ebe5d] text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi">
+                                    <span className="material-symbols-outlined text-[20px]">chat</span>
+                                    {locale === 'ar' ? 'تواصل معنا عبر واتساب' : 'Contact us via WhatsApp'}
                                 </a>
                                 <Link href="/"
                                     className="w-full h-12 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 font-kufi">

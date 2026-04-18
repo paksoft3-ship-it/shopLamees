@@ -37,17 +37,20 @@ export default function CheckoutPage() {
     const [unit, setUnit] = useState('');
     const [shippingMethod, setShippingMethod] = useState('standard');
     const [customerNote, setCustomerNote] = useState('');
-    const [paymentMethod, setPaymentMethod] = useState<'EFT' | 'TAP'>('TAP');
+    const [paymentMethod, setPaymentMethod] = useState<'EFT' | 'TAP' | 'COD'>('TAP');
+
+    const COD_FEE = 25;
 
     const shippingOptions = [
         { id: 'standard', label: locale === 'ar' ? 'شحن عادي (5-7 أيام)' : 'Standard (5-7 days)', price: 0 },
         { id: 'express', label: locale === 'ar' ? 'شحن سريع (2-3 أيام)' : 'Express (2-3 days)', price: 50 },
     ];
     const shippingFee = shippingOptions.find(o => o.id === shippingMethod)?.price ?? 0;
+    const codFee = paymentMethod === 'COD' ? COD_FEE : 0;
 
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
     const vat = Math.round(subtotal * VAT_RATE);
-    const total = subtotal + vat + shippingFee;
+    const total = subtotal + vat + shippingFee + codFee;
 
     useEffect(() => {
         if (!hasTrackedBeginCheckout.current && items.length > 0) {
@@ -119,7 +122,7 @@ export default function CheckoutPage() {
         building: building || undefined,
         unit: unit || undefined,
         shippingMethod,
-        shippingFee,
+        shippingFee: shippingFee + codFee,
         currency,
         subtotal,
         vat,
@@ -160,9 +163,10 @@ export default function CheckoutPage() {
             return;
         }
 
-        // Bank Transfer (EFT) flow
+        // COD / Bank Transfer flow
+        const pm = paymentMethod === 'COD' ? 'COD' : 'EFT';
         try {
-            const { orderNumber } = await createOrder({ ...orderPayload(), paymentMethod: 'EFT' });
+            const { orderNumber } = await createOrder({ ...orderPayload(), paymentMethod: pm });
             trackEvent('purchase', {
                 transaction_id: orderNumber,
                 currency,
@@ -264,6 +268,12 @@ export default function CheckoutPage() {
                                         }
                                     </span>
                                 </div>
+                                {codFee > 0 && (
+                                    <div className="flex justify-between text-slate-600">
+                                        <span className="font-kufi">{locale === 'ar' ? 'رسوم الدفع عند الاستلام' : 'Cash on Delivery fee'}</span>
+                                        <span className="font-display font-medium text-amber-600">+{formatPrice(codFee, currency, locale)}</span>
+                                    </div>
+                                )}
                             </div>
                             <div className="h-px w-full bg-slate-200 my-4" />
                             <div className="flex justify-between items-end mb-2">
@@ -424,14 +434,19 @@ export default function CheckoutPage() {
                                             </svg>
                                         </div>
                                         <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
-                                            <span className="text-sm font-bold text-slate-900">
-                                                {locale === 'ar' ? 'بطاقة ائتمانية / مدى / Apple Pay' : 'Card / mada / Apple Pay'}
-                                            </span>
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="text-sm font-bold text-slate-900">
+                                                    {locale === 'ar' ? 'بطاقة ائتمانية / مدى / Apple Pay' : 'Card / mada / Apple Pay'}
+                                                </span>
+                                                <span className="text-[10px] font-bold bg-green-100 text-green-700 rounded-full px-2 py-0.5">
+                                                    {locale === 'ar' ? '🎁 شحن مجاني' : '🎁 Free delivery'}
+                                                </span>
+                                            </div>
                                             <span className="text-xs text-slate-500">
                                                 {locale === 'ar' ? 'دفع آمن عبر بوابة Tap Payments' : 'Secure payment via Tap Payments'}
                                             </span>
                                         </div>
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'TAP' ? 'border-primary' : 'border-slate-300'}`}>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${paymentMethod === 'TAP' ? 'border-primary' : 'border-slate-300'}`}>
                                             {paymentMethod === 'TAP' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                                         </div>
                                     </label>
@@ -443,6 +458,47 @@ export default function CheckoutPage() {
                                                 <span key={brand} className="text-[10px] font-bold border border-slate-200 rounded px-1.5 py-0.5 text-slate-500 bg-white">{brand}</span>
                                             ))}
                                             <span className="text-[10px] font-bold border border-slate-200 rounded px-1.5 py-0.5 text-slate-500 bg-white"> Pay</span>
+                                        </div>
+                                    )}
+
+                                    {/* Cash on Delivery */}
+                                    <label
+                                        onClick={() => setPaymentMethod('COD')}
+                                        className={`flex items-center p-4 rounded-xl border-2 cursor-pointer transition-all shadow-sm ${paymentMethod === 'COD' ? 'border-primary bg-primary/5' : 'border-slate-200 hover:border-slate-300 bg-white'}`}
+                                    >
+                                        <div className="w-12 h-8 bg-emerald-50 rounded flex items-center justify-center text-emerald-600 shrink-0">
+                                            <span className="material-symbols-outlined text-[22px]">payments</span>
+                                        </div>
+                                        <div className="flex flex-col grow ltr:ml-4 rtl:mr-4">
+                                            <div className="flex items-center gap-2 flex-wrap">
+                                                <span className="text-sm font-bold text-slate-900">
+                                                    {locale === 'ar' ? 'الدفع عند الاستلام (كاش)' : 'Cash on Delivery'}
+                                                </span>
+                                                <span className="text-[10px] font-bold bg-amber-100 text-amber-700 rounded-full px-2 py-0.5">
+                                                    +{COD_FEE} {currency}
+                                                </span>
+                                            </div>
+                                            <span className="text-xs text-slate-500">
+                                                {locale === 'ar' ? 'ادفع نقداً عند وصول طلبك — رسوم إضافية ٢٥ ريال' : 'Pay cash when your order arrives — extra 25 fee'}
+                                            </span>
+                                        </div>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${paymentMethod === 'COD' ? 'border-primary' : 'border-slate-300'}`}>
+                                            {paymentMethod === 'COD' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
+                                        </div>
+                                    </label>
+
+                                    {/* COD notice */}
+                                    {paymentMethod === 'COD' && (
+                                        <div className="bg-amber-50 border border-amber-200 rounded-xl p-4">
+                                            <p className="text-amber-800 font-kufi text-sm font-bold mb-1 flex items-center gap-2">
+                                                <span className="material-symbols-outlined text-[18px]">info</span>
+                                                {locale === 'ar' ? 'ملاحظة حول الدفع عند الاستلام' : 'Cash on Delivery Note'}
+                                            </p>
+                                            <p className="text-amber-700 font-kufi text-xs leading-relaxed">
+                                                {locale === 'ar'
+                                                    ? `يُضاف ${COD_FEE} ${currency} كرسوم خدمة للدفع عند الاستلام. إذا دفعت بالبطاقة، يكون الشحن مجاناً دون رسوم إضافية.`
+                                                    : `A ${COD_FEE} ${currency} service fee is added for cash on delivery. Paying by card gives you free delivery with no extra charges.`}
+                                            </p>
                                         </div>
                                     )}
 
@@ -458,7 +514,7 @@ export default function CheckoutPage() {
                                             <span className="text-sm font-bold text-slate-900">{locale === 'ar' ? 'تحويل بنكي' : 'Bank Transfer'}</span>
                                             <span className="text-xs text-slate-500">{locale === 'ar' ? 'حوّل المبلغ وأرسل إيصال التحويل عبر واتساب' : 'Transfer the amount and send receipt via WhatsApp'}</span>
                                         </div>
-                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors ${paymentMethod === 'EFT' ? 'border-primary' : 'border-slate-300'}`}>
+                                        <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors shrink-0 ${paymentMethod === 'EFT' ? 'border-primary' : 'border-slate-300'}`}>
                                             {paymentMethod === 'EFT' && <div className="w-2.5 h-2.5 rounded-full bg-primary" />}
                                         </div>
                                     </label>
@@ -538,6 +594,11 @@ export default function CheckoutPage() {
                                             <>
                                                 <span className="material-symbols-outlined text-lg">lock</span>
                                                 {locale === 'ar' ? 'الدفع الآن' : 'Pay Now'}
+                                            </>
+                                        ) : paymentMethod === 'COD' ? (
+                                            <>
+                                                <span className="material-symbols-outlined text-lg">payments</span>
+                                                {locale === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'}
                                             </>
                                         ) : (
                                             <>
