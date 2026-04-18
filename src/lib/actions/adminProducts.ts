@@ -141,15 +141,12 @@ export async function getAdminProduct(id: string): Promise<AdminProduct | null> 
 export async function createAdminProduct(data: Partial<AdminProduct>) {
     const {
         titleAr, titleEn, slug, descriptionAr, descriptionEn,
-        status, isCustom, isMadeToOrder, leadTimeDays,
+        status, isCustom, isMadeToOrder, leadTimeDays, isBestSeller, fabric, color,
         images = [], variants = [], category
     } = data;
 
     const catRecord = await findCategoryBySlug(category || '');
-
-    const priceQar = (variants.length > 0 && variants[0].price != null && variants[0].price > 0)
-        ? variants[0].price
-        : (data.price || 0);
+    const fallbackPrice = data.price || 0;
 
     await prisma.product.create({
         data: {
@@ -162,6 +159,9 @@ export async function createAdminProduct(data: Partial<AdminProduct>) {
             isCustom: isCustom || false,
             madeToOrder: isMadeToOrder || false,
             leadTimeDays: leadTimeDays || 0,
+            isBestSeller: isBestSeller || false,
+            fabric: fabric || null,
+            color: color || null,
             ...(catRecord ? {
                 categories: {
                     create: {
@@ -181,8 +181,8 @@ export async function createAdminProduct(data: Partial<AdminProduct>) {
                     size: v.size || 'Standard',
                     color: v.color || 'Default',
                     stock: v.stock || 0,
-                    priceQar: v.price || priceQar || 0,
-                    priceSar: v.price || priceQar || 0
+                    priceQar: v.price != null && v.price > 0 ? v.price : fallbackPrice,
+                    priceSar: v.price != null && v.price > 0 ? v.price : fallbackPrice,
                 }))
             }
         }
@@ -196,7 +196,7 @@ export async function createAdminProduct(data: Partial<AdminProduct>) {
 export async function updateAdminProduct(id: string, data: Partial<AdminProduct>) {
     const {
         titleAr, titleEn, slug, descriptionAr, descriptionEn,
-        status, isCustom, isMadeToOrder, leadTimeDays,
+        status, isCustom, isMadeToOrder, leadTimeDays, isBestSeller, fabric, color,
         images = [], variants = [], category
     } = data;
 
@@ -207,9 +207,8 @@ export async function updateAdminProduct(id: string, data: Partial<AdminProduct>
 
     const catRecord = await findCategoryBySlug(category || '');
 
-    const priceQar = (variants.length > 0 && variants[0].price != null && variants[0].price > 0)
-        ? variants[0].price
-        : (data.price || 0);
+    // Use top-level price as authoritative fallback for variants without their own price
+    const fallbackPrice = data.price || 0;
 
     await prisma.product.update({
         where: { id },
@@ -223,6 +222,9 @@ export async function updateAdminProduct(id: string, data: Partial<AdminProduct>
             isCustom: isCustom,
             madeToOrder: isMadeToOrder,
             leadTimeDays: leadTimeDays,
+            isBestSeller: isBestSeller ?? false,
+            fabric: fabric || null,
+            color: color || null,
             ...(catRecord ? {
                 categories: {
                     create: {
@@ -242,8 +244,8 @@ export async function updateAdminProduct(id: string, data: Partial<AdminProduct>
                     size: v.size || 'Standard',
                     color: v.color || 'Default',
                     stock: v.stock || 0,
-                    priceQar: v.price || priceQar || 0,
-                    priceSar: v.price || priceQar || 0
+                    priceQar: v.price != null && v.price > 0 ? v.price : fallbackPrice,
+                    priceSar: v.price != null && v.price > 0 ? v.price : fallbackPrice,
                 }))
             }
         }

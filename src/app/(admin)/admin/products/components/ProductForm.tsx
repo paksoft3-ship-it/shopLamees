@@ -237,12 +237,16 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                     {activeTab === 'pricing' && (
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div className="col-span-2 md:col-span-1">
-                                <label className="block text-sm font-bold text-gray-700 mb-2">{isRtl ? 'السعر' : 'Price'}</label>
+                                <label className="block text-sm font-bold text-gray-700 mb-2">{isRtl ? 'السعر (يطبّق على جميع الخيارات)' : 'Price (applies to all variants)'}</label>
                                 <input
                                     className="w-full rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:border-primary focus:ring-primary px-4 py-3"
                                     type="number"
                                     value={formData.price}
-                                    onChange={(e) => handleChange('price', Number(e.target.value))}
+                                    onChange={(e) => {
+                                        const newPrice = Number(e.target.value);
+                                        handleChange('price', newPrice);
+                                        handleChange('variants', (formData.variants || []).map(v => ({ ...v, price: newPrice })));
+                                    }}
                                 />
                             </div>
                             <div className="col-span-2 md:col-span-1">
@@ -307,6 +311,19 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                                 />
                                             </div>
                                             <div className="w-24 shrink-0">
+                                                <label className="block text-xs font-bold text-gray-600 mb-1">{isRtl ? 'السعر' : 'Price'}</label>
+                                                <input
+                                                    type="number"
+                                                    className="w-full rounded-lg border-gray-200 px-3 py-2 text-sm focus:border-primary focus:ring-primary"
+                                                    value={variant.price ?? formData.price ?? 0}
+                                                    onChange={(e) => {
+                                                        const newVariants = [...(formData.variants || [])];
+                                                        newVariants[index] = { ...newVariants[index], price: Number(e.target.value) };
+                                                        handleChange('variants', newVariants);
+                                                    }}
+                                                />
+                                            </div>
+                                            <div className="w-24 shrink-0">
                                                 <label className="block text-xs font-bold text-gray-600 mb-1">{isRtl ? 'المخزون' : 'Stock'}</label>
                                                 <input
                                                     type="number"
@@ -314,7 +331,7 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
                                                     value={variant.stock}
                                                     onChange={(e) => {
                                                         const newVariants = [...(formData.variants || [])];
-                                                        newVariants[index].stock = Number(e.target.value);
+                                                        newVariants[index] = { ...newVariants[index], stock: Number(e.target.value) };
                                                         handleChange('variants', newVariants);
                                                     }}
                                                 />
@@ -336,6 +353,49 @@ export default function ProductForm({ initialData, isEdit, locale }: ProductForm
 
                     {activeTab === 'manufacturing' && (
                         <div className="max-w-xl space-y-6">
+                            {/* isBestSeller */}
+                            <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50">
+                                <div className="pt-1">
+                                    <label className="relative inline-flex items-center cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={formData.isBestSeller || false}
+                                            onChange={(e) => handleChange('isBestSeller', e.target.checked)}
+                                        />
+                                        <div className="w-11 h-6 bg-gray-300 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
+                                    </label>
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-gray-900 mb-1">{isRtl ? 'الأكثر مبيعاً (Best Seller)' : 'Best Seller'}</h4>
+                                    <p className="text-sm text-gray-500">{isRtl ? 'تمييز هذا المنتج كأكثر المنتجات مبيعاً.' : 'Mark this product as a best seller.'}</p>
+                                </div>
+                            </div>
+
+                            {/* Fabric & Color */}
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">{isRtl ? 'القماش / المادة' : 'Fabric / Material'}</label>
+                                    <input
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:border-primary focus:ring-primary px-4 py-3 text-sm"
+                                        type="text"
+                                        value={formData.fabric || ''}
+                                        onChange={(e) => handleChange('fabric', e.target.value)}
+                                        placeholder={isRtl ? 'مثال: كريب، شيفون' : 'e.g. Crepe, Chiffon'}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-gray-700 mb-2">{isRtl ? 'اللون الرئيسي' : 'Primary Color'}</label>
+                                    <input
+                                        className="w-full rounded-xl border-gray-200 bg-gray-50 text-gray-900 focus:border-primary focus:ring-primary px-4 py-3 text-sm"
+                                        type="text"
+                                        value={formData.color || ''}
+                                        onChange={(e) => handleChange('color', e.target.value)}
+                                        placeholder={isRtl ? 'مثال: أسود، كحلي' : 'e.g. Black, Navy'}
+                                    />
+                                </div>
+                            </div>
+
                             <div className="flex items-start gap-4 p-4 rounded-xl border border-gray-200 bg-gray-50">
                                 <div className="pt-1">
                                     <label className="relative inline-flex items-center cursor-pointer">
