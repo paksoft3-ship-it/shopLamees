@@ -13,11 +13,15 @@ interface NavCategory {
 interface FooterProps {
     categories: NavCategory[];
     phone: string;
+    email: string;
+    addressAr: string;
+    addressEn: string;
 }
 
-export function Footer({ categories, phone }: FooterProps) {
+export function Footer({ categories, phone, email, addressAr, addressEn }: FooterProps) {
     const t = useTranslations('Home.Layout.Footer');
     const locale = useLocale() as 'ar' | 'en';
+    const address = locale === 'ar' ? addressAr : addressEn;
 
     return (
         <footer className="bg-[#111] text-white pt-16 pb-32 lg:pb-8 border-t border-slate-800">
@@ -74,16 +78,16 @@ export function Footer({ categories, phone }: FooterProps) {
                         <h4 className="font-display font-bold text-lg mb-6 text-white">{t('contact_us')}</h4>
                         <ul className="space-y-4">
                             <li className="flex items-start gap-3">
-                                <MapPin className="text-primary mt-1 w-5 h-5" />
-                                <span className="text-gray-400">{t('address')}</span>
+                                <MapPin className="text-primary mt-1 w-5 h-5 shrink-0" />
+                                <span className="text-gray-400">{address}</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Smartphone className="text-primary w-5 h-5" />
+                                <Smartphone className="text-primary w-5 h-5 shrink-0" />
                                 <span className="text-gray-400 dir-ltr text-right">{phone}</span>
                             </li>
                             <li className="flex items-center gap-3">
-                                <Mail className="text-primary w-5 h-5" />
-                                <span className="text-gray-400">info@shop-lamees.com</span>
+                                <Mail className="text-primary w-5 h-5 shrink-0" />
+                                <span className="text-gray-400">{email}</span>
                             </li>
                         </ul>
                     </div>

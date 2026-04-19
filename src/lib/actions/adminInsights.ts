@@ -63,6 +63,9 @@ export interface AdminSEOInsight {
 export interface AdminSettingsDTO {
   storeName: string;
   whatsappNumber: string;
+  contactEmail: string;
+  addressAr: string;
+  addressEn: string;
   shippingQarQA: number;
   shippingSarSA: number;
   freeShipAbove: number;
@@ -426,6 +429,9 @@ export async function getAdminStoreSettings(): Promise<AdminSettingsDTO> {
   return {
     storeName: settings.storeName,
     whatsappNumber: settings.whatsappNumber,
+    contactEmail: settings.contactEmail,
+    addressAr: settings.addressAr,
+    addressEn: settings.addressEn,
     shippingQarQA: Number(settings.shippingQarQA),
     shippingSarSA: Number(settings.shippingSarSA),
     freeShipAbove: Number(settings.freeShipAbove),
@@ -550,32 +556,28 @@ export async function getAdminProductImages(): Promise<AdminMediaImage[]> {
 export async function updateAdminStoreSettings(payload: AdminSettingsDTO) {
   const homeVideos = normalizeHomeVideos(payload.homeVideos);
 
+  const settingsData = {
+    storeName: payload.storeName,
+    whatsappNumber: payload.whatsappNumber,
+    contactEmail: payload.contactEmail,
+    addressAr: payload.addressAr,
+    addressEn: payload.addressEn,
+    shippingQarQA: payload.shippingQarQA,
+    shippingSarSA: payload.shippingSarSA,
+    freeShipAbove: payload.freeShipAbove,
+    defaultCurrency: payload.defaultCurrency,
+    vatPercent: payload.vatPercent,
+    homeVideosJson: JSON.stringify(homeVideos),
+  };
+
   await prisma.storeSettings.upsert({
     where: { id: 1 },
-    update: {
-      storeName: payload.storeName,
-      whatsappNumber: payload.whatsappNumber,
-      shippingQarQA: payload.shippingQarQA,
-      shippingSarSA: payload.shippingSarSA,
-      freeShipAbove: payload.freeShipAbove,
-      defaultCurrency: payload.defaultCurrency,
-      vatPercent: payload.vatPercent,
-      homeVideosJson: JSON.stringify(homeVideos),
-    },
-    create: {
-      id: 1,
-      storeName: payload.storeName,
-      whatsappNumber: payload.whatsappNumber,
-      shippingQarQA: payload.shippingQarQA,
-      shippingSarSA: payload.shippingSarSA,
-      freeShipAbove: payload.freeShipAbove,
-      defaultCurrency: payload.defaultCurrency,
-      vatPercent: payload.vatPercent,
-      homeVideosJson: JSON.stringify(homeVideos),
-    },
+    update: settingsData,
+    create: { id: 1, ...settingsData },
   });
 
   revalidateTag('home-videos');
   revalidateTag('products');
   revalidateTag('categories');
+  revalidateTag('store-settings');
 }

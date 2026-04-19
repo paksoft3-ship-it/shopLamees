@@ -9,6 +9,9 @@ import { useAdminAuth } from '@/lib/stores/adminAuth';
 const emptySettings: AdminSettingsDTO = {
   storeName: '',
   whatsappNumber: '',
+  contactEmail: 'info@shop-lamees.com',
+  addressAr: 'الدوحة، قطر',
+  addressEn: 'Doha, Qatar',
   shippingQarQA: 0,
   shippingSarSA: 0,
   freeShipAbove: 0,
@@ -83,10 +86,7 @@ export default function SettingsPage() {
 
   const handleSave = async () => {
     setSaving(true);
-    await updateAdminStoreSettings({
-      ...form,
-      whatsappNumber: extras.phone || form.whatsappNumber,
-    });
+    await updateAdminStoreSettings(form);
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2500);
@@ -210,19 +210,15 @@ export default function SettingsPage() {
 
           {activeTab === 'contact' && (
             <div>
-              <SettingsCard title={L('بيانات التواصل', 'Contact Information')} description={L('معلومات الاتصال الظاهرة للعملاء', 'Public contact details')}>
-                <InputField label={L('رقم الهاتف', 'Phone Number')} value={extras.phone} onChange={(v) => setExtras((e) => ({ ...e, phone: v }))} dir="ltr" />
-                <InputField label={'WhatsApp'} value={form.whatsappNumber} onChange={(v) => setForm((f) => ({ ...f, whatsappNumber: v }))} dir="ltr" />
-                <InputField label={L('البريد الإلكتروني', 'Email')} value={extras.email} onChange={(v) => setExtras((e) => ({ ...e, email: v }))} type="email" dir="ltr" />
+              <SettingsCard title={L('بيانات التواصل', 'Contact Information')} description={L('معلومات الاتصال الظاهرة للعملاء في الموقع', 'Public contact details shown on the website')}>
+                <InputField label={L('رقم الواتساب / الهاتف', 'WhatsApp / Phone Number')} value={form.whatsappNumber} onChange={(v) => setForm((f) => ({ ...f, whatsappNumber: v }))} dir="ltr" />
+                <InputField label={L('البريد الإلكتروني', 'Email Address')} value={form.contactEmail} onChange={(v) => setForm((f) => ({ ...f, contactEmail: v }))} type="email" dir="ltr" />
               </SettingsCard>
 
-              <SettingsCard title={L('العنوان', 'Address')} description={L('عنوان المتجر الفيزيائي', 'Physical store address')}>
-                <SelectField label={L('الدولة', 'Country')} value={extras.country} onChange={(v) => setExtras((e) => ({ ...e, country: v }))} options={[{ value: 'QA', label: L('قطر 🇶🇦', 'Qatar 🇶🇦') }, { value: 'SA', label: L('المملكة العربية السعودية 🇸🇦', 'Saudi Arabia 🇸🇦') }]} />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6">
-                  <InputField label={L('المدينة', 'City')} value={extras.city} onChange={(v) => setExtras((e) => ({ ...e, city: v }))} />
-                  <InputField label={L('المنطقة', 'District')} value={extras.district} onChange={(v) => setExtras((e) => ({ ...e, district: v }))} />
-                </div>
-                <InputField label={L('العنوان التفصيلي', 'Detailed Address')} value={extras.address} onChange={(v) => setExtras((e) => ({ ...e, address: v }))} />
+              <SettingsCard title={L('العنوان', 'Store Address')} description={L('يظهر هذا العنوان في أسفل الموقع (الفوتر)', 'This address is displayed in the website footer')}>
+                <InputField label={L('العنوان (عربي)', 'Address (Arabic)')} value={form.addressAr} onChange={(v) => setForm((f) => ({ ...f, addressAr: v }))} />
+                <InputField label={L('العنوان (إنجليزي)', 'Address (English)')} value={form.addressEn} onChange={(v) => setForm((f) => ({ ...f, addressEn: v }))} dir="ltr" />
+                <p className="text-xs text-neutral-400 mt-1">{L('مثال: الدوحة، قطر | Example: Doha, Qatar', 'Example: Doha, Qatar | مثال: الدوحة، قطر')}</p>
               </SettingsCard>
             </div>
           )}

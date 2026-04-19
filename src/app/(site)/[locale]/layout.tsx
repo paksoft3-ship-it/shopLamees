@@ -53,7 +53,7 @@ export default async function SiteLayout({
                         <TrustBar />
                         <Header categories={navCategories} />
                         <main className="flex-1 pb-20 lg:pb-0">{children}</main>
-                        <Footer categories={navCategories} phone={storeContact.phone} />
+                        <Footer categories={navCategories} phone={storeContact.phone} email={storeContact.email} addressAr={storeContact.addressAr} addressEn={storeContact.addressEn} />
                         <MobileBottomNav />
                         <WhatsAppChatbot />
                     </div>

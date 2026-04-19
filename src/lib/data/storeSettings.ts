@@ -30,9 +30,15 @@ export async function getStoreContact() {
         where: { id: 1 },
         update: {},
         create: { id: 1 },
-        select: { whatsappNumber: true, storeName: true },
+        select: { whatsappNumber: true, storeName: true, contactEmail: true, addressAr: true, addressEn: true },
       });
-      return { phone: settings.whatsappNumber, storeName: settings.storeName };
+      return {
+        phone: settings.whatsappNumber,
+        storeName: settings.storeName,
+        email: settings.contactEmail,
+        addressAr: settings.addressAr,
+        addressEn: settings.addressEn,
+      };
     },
     ['store-contact'],
     { revalidate: 3600, tags: ['store-settings'] }
