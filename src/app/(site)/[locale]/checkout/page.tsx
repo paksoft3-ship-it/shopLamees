@@ -76,6 +76,13 @@ export default function CheckoutPage() {
         payment: t('step_payment'),
     };
 
+    // ── Helpers ─────────────────────────────────────────────────────
+    const handlePhoneChange = (raw: string) => {
+        // Allow only digits, +, spaces, and hyphens — strip everything else
+        const cleaned = raw.replace(/[^\d+\s-]/g, '');
+        setPhone(cleaned);
+    };
+
     // ── Validation ──────────────────────────────────────────────────
     const validate = (step: Step): boolean => {
         const errs: Record<string, string> = {};
@@ -83,7 +90,26 @@ export default function CheckoutPage() {
 
         if (step === 'info') {
             if (!name.trim()) errs.name = required;
-            if (!phone.trim()) errs.phone = required;
+
+            if (!phone.trim()) {
+                errs.phone = required;
+            } else {
+                const digitsOnly = phone.replace(/\D/g, '');
+                if (digitsOnly.length < 7) {
+                    errs.phone = locale === 'ar'
+                        ? 'رقم الهاتف غير صحيح — يجب أن يحتوي على 7 أرقام على الأقل'
+                        : 'Invalid phone number — must contain at least 7 digits';
+                }
+            }
+
+            if (email.trim()) {
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(email.trim())) {
+                    errs.email = locale === 'ar'
+                        ? 'صيغة البريد الإلكتروني غير صحيحة'
+                        : 'Invalid email address';
+                }
+            }
         }
         if (step === 'address') {
             if (!city.trim()) errs.city = required;
@@ -339,12 +365,32 @@ export default function CheckoutPage() {
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">{t('phone')} <span className="text-red-500">*</span></label>
-                                        <input type="tel" value={phone} onChange={e => setPhone(e.target.value)} placeholder="+974 XXXX XXXX" className={inputCls('phone')} />
-                                        {errors.phone && <p className="text-xs text-red-500 mt-1 font-kufi">{errors.phone}</p>}
+                                        <input
+                                            type="tel"
+                                            value={phone}
+                                            onChange={e => handlePhoneChange(e.target.value)}
+                                            placeholder="+974 XXXX XXXX"
+                                            inputMode="tel"
+                                            dir="ltr"
+                                            className={inputCls('phone')}
+                                        />
+                                        {errors.phone
+                                            ? <p className="text-xs text-red-500 mt-1 font-kufi">{errors.phone}</p>
+                                            : <p className="text-xs text-slate-400 mt-1 font-kufi">{locale === 'ar' ? 'أرقام فقط، مثال: 97433114232+' : 'Digits only, e.g. +97433114232'}</p>
+                                        }
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">{t('email')} <span className="text-slate-400 font-normal">({t('optional')})</span></label>
-                                        <input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="email@example.com" className={inputCls('email')} />
+                                        <input
+                                            type="email"
+                                            value={email}
+                                            onChange={e => setEmail(e.target.value)}
+                                            placeholder="email@example.com"
+                                            inputMode="email"
+                                            dir="ltr"
+                                            className={inputCls('email')}
+                                        />
+                                        {errors.email && <p className="text-xs text-red-500 mt-1 font-kufi">{errors.email}</p>}
                                     </div>
                                     <div>
                                         <label className="block text-sm font-medium text-slate-700 mb-2">

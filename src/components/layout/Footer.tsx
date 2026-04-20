@@ -83,11 +83,11 @@ export function Footer({ categories, phone, email, addressAr, addressEn }: Foote
                             </li>
                             <li className="flex items-center gap-3">
                                 <Smartphone className="text-primary w-5 h-5 shrink-0" />
-                                <span className="text-gray-400 dir-ltr text-right">{phone}</span>
+                                <span className="text-gray-400" dir="ltr">{phone}</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail className="text-primary w-5 h-5 shrink-0" />
-                                <span className="text-gray-400">{email}</span>
+                                <span className="text-gray-400" dir="ltr">{email}</span>
                             </li>
                         </ul>
                     </div>
