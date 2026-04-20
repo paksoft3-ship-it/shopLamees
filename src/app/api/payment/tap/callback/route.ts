@@ -10,7 +10,10 @@ export async function GET(req: NextRequest) {
     const locale = searchParams.get('locale') || 'ar';
 
     if (!tapId || !orderNumber) {
-        return NextResponse.redirect(new URL(`/${locale}`, req.url));
+        const dest = orderNumber
+            ? `/${locale}/checkout/confirmation?order=${orderNumber}&status=failed`
+            : `/${locale}`;
+        return NextResponse.redirect(new URL(dest, req.url));
     }
 
     try {

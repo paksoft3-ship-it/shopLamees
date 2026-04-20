@@ -1,8 +1,11 @@
 const TAP_BASE = 'https://api.tap.company/v2';
 
 function getBaseUrl() {
+    // NEXT_PUBLIC_BASE_URL must be set to your production domain in Vercel env vars
+    // e.g. https://shoplamees.com — VERCEL_URL gives a deployment-specific URL, not the custom domain
+    if (process.env.NEXT_PUBLIC_BASE_URL) return process.env.NEXT_PUBLIC_BASE_URL.replace(/\/$/, '');
     if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
-    return process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    return 'http://localhost:3000';
 }
 
 function parsePhone(phone: string, country: string): { countryCode: string; number: string } {
