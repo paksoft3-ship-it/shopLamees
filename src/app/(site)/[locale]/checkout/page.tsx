@@ -179,7 +179,7 @@ export default function CheckoutPage() {
                 });
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Payment initiation failed');
-                clearCart();
+                // Cart is cleared on the confirmation page after payment is confirmed
                 window.location.href = data.redirectUrl;
             } catch (err) {
                 console.error(err);

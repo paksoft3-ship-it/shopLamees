@@ -6,6 +6,7 @@ import { trackEvent } from '@/lib/tracking/track';
 import { useEffect, useRef, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { getOrderByNumber } from '@/lib/actions/orders';
+import { useCartStore } from '@/lib/stores/cart';
 
 type Order = Awaited<ReturnType<typeof getOrderByNumber>>;
 
@@ -29,6 +30,8 @@ export default function OrderConfirmationPage() {
     const orderNumber = searchParams.get('order') || '';
     const statusParam = searchParams.get('status'); // 'failed' | null
     const hasTracked = useRef(false);
+    const hasCleared = useRef(false);
+    const { clearCart } = useCartStore();
 
     const [order, setOrder] = useState<Order>(null);
     const [state, setState] = useState<PayState>('loading');
@@ -59,13 +62,19 @@ export default function OrderConfirmationPage() {
         });
     }, [orderNumber, statusParam]);
 
-    // Track purchase once on success (paid, COD, or EFT confirmed)
+    // Clear cart and track purchase once on any successful state
     useEffect(() => {
-        if ((state === 'paid' || state === 'cod' || state === 'pending_eft') && !hasTracked.current && orderNumber) {
-            hasTracked.current = true;
-            trackEvent('purchase', { transaction_id: orderNumber, value: Number(order?.total || 0) });
+        if ((state === 'paid' || state === 'cod' || state === 'pending_eft') && orderNumber) {
+            if (!hasCleared.current) {
+                hasCleared.current = true;
+                clearCart();
+            }
+            if (!hasTracked.current) {
+                hasTracked.current = true;
+                trackEvent('purchase', { transaction_id: orderNumber, value: Number(order?.total || 0) });
+            }
         }
-    }, [state, orderNumber, order]);
+    }, [state, orderNumber, order, clearCart]);
 
     const waMsg = buildWhatsAppReceipt(order, locale);
     const waUrl = `https://wa.me/97433114232?text=${waMsg}`;
