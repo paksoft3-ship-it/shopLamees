@@ -1,7 +1,7 @@
 'use client';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Link, useRouter } from '@/i18n/navigation';
+import { useRouter } from '@/i18n/navigation';
 import { useFormattedMoney } from '@/lib/money';
 import { ProductDTO } from '@/lib/data/types';
 import { useCartStore } from '@/lib/stores/cart';
