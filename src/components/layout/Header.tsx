@@ -21,8 +21,7 @@ interface HeaderProps {
 export function Header({ categories }: HeaderProps) {
     const t = useTranslations('Home.Header');
     const locale = useLocale() as 'ar' | 'en';
-    const items = useCartStore((state) => state.items);
-    const hasHydrated = useCartStore((state) => state.hasHydrated);
+    const { items, hasHydrated, openDrawer } = useCartStore();
     const cartCount = items.reduce((total, item) => total + item.quantity, 0);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -44,9 +43,12 @@ export function Header({ categories }: HeaderProps) {
                 <div className="lg:hidden w-full px-4 sm:px-6 h-16 grid grid-cols-3 items-center">
                     <div className="flex items-center justify-start">
                         <div className="relative">
-                            <Link href="/cart" className="p-2 rounded-full hover:bg-black/5 transition-colors inline-block text-slate-900">
+                            <button
+                                onClick={openDrawer}
+                                className="p-2 rounded-full hover:bg-black/5 transition-colors inline-block text-slate-900"
+                            >
                                 <ShoppingBag className="w-6 h-6" />
-                            </Link>
+                            </button>
                             {hasHydrated && cartCount > 0 && (
                                 <span className="absolute top-1 left-1 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-white">
                                     {cartCount}
@@ -98,9 +100,12 @@ export function Header({ categories }: HeaderProps) {
                             <Search className="w-6 h-6" />
                         </Link>
                         <div className="relative">
-                            <Link href="/cart" className="p-2 text-slate-900 hover:text-primary transition-colors inline-block">
+                            <button
+                                onClick={openDrawer}
+                                className="p-2 text-slate-900 hover:text-primary transition-colors inline-block"
+                            >
                                 <ShoppingBag className="w-6 h-6" />
-                            </Link>
+                            </button>
                             {hasHydrated && cartCount > 0 && (
                                 <span className="absolute top-1 right-0 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-[10px] font-bold text-slate-900">
                                     {cartCount}

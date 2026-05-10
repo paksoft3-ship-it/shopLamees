@@ -233,10 +233,7 @@ export default function SettingsPage() {
                 </div>
               </SettingsCard>
 
-              <SettingsCard title={L('الضريبة (VAT)', 'Tax (VAT)')} description={L('إعدادات ضريبة القيمة المضافة', 'Value-added tax settings')}>
-                <InputField label={L('نسبة الضريبة %', 'VAT Percent %')} value={String(form.vatPercent)} onChange={(v) => setForm((f) => ({ ...f, vatPercent: Number(v) }))} type="number" dir="ltr" />
-                <div className="text-xs text-neutral-500">{L('يتم تطبيق هذه النسبة في الحسابات.', 'This percentage is used in checkout calculations.')}</div>
-              </SettingsCard>
+
             </div>
           )}
 

@@ -12,8 +12,7 @@ export function CartSummary() {
     const { format } = useFormattedMoney();
 
     const subtotal = items.reduce((total, item) => total + item.unitPrice * item.quantity, 0);
-    const vat = Math.round(subtotal * 0.15); // 15% VAT
-    const total = subtotal + vat;
+    const total = subtotal;
 
     return (
         <div className="lg:sticky lg:top-24">
@@ -27,10 +26,7 @@ export function CartSummary() {
                         <span>{t('subtotal')}</span>
                         <span className="font-bold text-on-surface font-display text-2xl">{format(subtotal)}</span>
                     </div>
-                    <div className="flex justify-between text-subtle text-base font-kufi">
-                        <span>{locale === 'ar' ? 'ضريبة القيمة المضافة (15%)' : 'VAT (15%)'}</span>
-                        <span className="font-bold text-on-surface font-display">{format(vat)}</span>
-                    </div>
+
                     <div className="flex justify-between text-subtle text-base font-kufi">
                         <span>{t('shipping')}</span>
                         <span className="text-green-600 font-bold font-kufi">
@@ -49,9 +45,7 @@ export function CartSummary() {
                         <span className="block text-[2rem] font-extrabold text-on-surface font-display">
                             {format(total)}
                         </span>
-                        <span className="text-xs text-subtle font-kufi mt-2 block">
-                            {locale === 'ar' ? 'شاملاً الضريبة' : 'Including tax'}
-                        </span>
+
                     </div>
                 </div>
 

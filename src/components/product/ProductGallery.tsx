@@ -46,11 +46,11 @@ export function ProductGallery({ images, productName }: ProductGalleryProps) {
                 {isHovered && (
                     <div className="hidden md:block fixed inset-0 z-[100] pointer-events-none transition-opacity duration-300">
                         <div 
-                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] lg:w-[400px] lg:h-[400px] bg-white border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.15)] rounded-2xl pointer-events-none overflow-hidden"
+                            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[320px] h-[320px] lg:w-[450px] lg:h-[450px] bg-white border border-white/20 shadow-[0_20px_60px_rgba(0,0,0,0.2)] rounded-2xl pointer-events-none overflow-hidden"
                             style={{
                                 backgroundImage: `url(${images[activeIndex]})`,
                                 backgroundPosition: bgPosition,
-                                backgroundSize: '300%',
+                                backgroundSize: '200%',
                                 backgroundRepeat: 'no-repeat',
                             }}
                         />

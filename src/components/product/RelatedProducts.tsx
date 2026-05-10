@@ -1,9 +1,11 @@
 'use client';
 import { useLocale, useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { Link } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { useFormattedMoney } from '@/lib/money';
 import { ProductDTO } from '@/lib/data/types';
+import { useCartStore } from '@/lib/stores/cart';
+import { toast } from 'react-hot-toast';
 
 interface RelatedProductsProps {
     products: ProductDTO[];
@@ -13,6 +15,8 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
     const locale = useLocale() as 'ar' | 'en';
     const t = useTranslations('Product.Related');
     const { format } = useFormattedMoney();
+    const { addItem } = useCartStore();
+    const router = useRouter();
 
     if (products.length === 0) return null;
 
@@ -39,7 +43,11 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                     const price = prod.variants[0]?.priceSar || prod.basePriceSar;
 
                     return (
-                        <Link key={prod.id} href={`/product/${prod.slug}`} className="group flex flex-col gap-3 cursor-pointer">
+                        <div 
+                            key={prod.id} 
+                            onClick={() => router.push(`/product/${prod.slug}`)}
+                            className="group flex flex-col gap-3 cursor-pointer"
+                        >
                             <div className="relative aspect-[3/4] overflow-hidden rounded-lg bg-[#f3f4f6]">
                                 <Image
                                     src={prod.image}
@@ -54,7 +62,25 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                                     </div>
                                 )}
                                 <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <button className="bg-white p-2 rounded-full shadow-lg text-[#0e1b12] hover:text-primary">
+                                    <button
+                                        onClick={(e) => {
+                                            e.preventDefault();
+                                            e.stopPropagation();
+                                            addItem({
+                                                id: prod.id,
+                                                productId: prod.id,
+                                                variantId: `${prod.id}-default`,
+                                                slug: prod.slug,
+                                                name: name,
+                                                unitPrice: price,
+                                                currency: 'SAR',
+                                                quantity: 1,
+                                                image: prod.image,
+                                            });
+                                            toast.success(locale === 'en' ? `${name} added to cart!` : `تمت إضافة ${name} للسلة بنجاح!`, { icon: '🛍️' });
+                                        }}
+                                        className="bg-white p-2 rounded-full shadow-lg text-[#0e1b12] hover:text-primary"
+                                    >
                                         <span className="material-symbols-outlined text-[20px]">shopping_bag</span>
                                     </button>
                                 </div>
@@ -63,7 +89,7 @@ export function RelatedProducts({ products }: RelatedProductsProps) {
                                 <h4 className="text-sm font-bold text-[#0e1b12] font-kufi mb-1">{name}</h4>
                                 <p className="text-sm text-[#6b7280]">{format(price)}</p>
                             </div>
-                        </Link>
+                        </div>
                     );
                 })}
             </div>

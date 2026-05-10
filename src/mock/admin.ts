@@ -13,7 +13,7 @@ export const mockOrders: Order[] = [
     {
         id: 'ORD-1002',
         date: '2026-02-22T14:30:00Z',
-        customer: { name: 'Noura Salem', phone: '+97477808007', email: 'noura@example.com' },
+        customer: { name: 'Noura Salem', phone: '+97433114232', email: 'noura@example.com' },
         status: 'processing',
         total: 850,
         items: 1,

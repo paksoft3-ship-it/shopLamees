@@ -12,7 +12,6 @@ import Image from 'next/image';
 
 type Step = 'info' | 'address' | 'shipping' | 'payment';
 const STEPS: Step[] = ['info', 'address', 'shipping', 'payment'];
-const VAT_RATE = 0.15;
 
 export default function CheckoutPage() {
     const t = useTranslations('Checkout');
@@ -49,8 +48,7 @@ export default function CheckoutPage() {
     const codFee = paymentMethod === 'COD' ? COD_FEE : 0;
 
     const subtotal = items.reduce((sum, item) => sum + item.unitPrice * item.quantity, 0);
-    const vat = Math.round(subtotal * VAT_RATE);
-    const total = subtotal + vat + shippingFee + codFee;
+    const total = subtotal + shippingFee + codFee;
 
     useEffect(() => {
         if (!hasTrackedBeginCheckout.current && items.length > 0) {
@@ -151,7 +149,7 @@ export default function CheckoutPage() {
         shippingFee: shippingFee + codFee,
         currency,
         subtotal,
-        vat,
+        vat: 0,
         total,
         customerNote: customerNote || undefined,
         items: items.map(item => ({
@@ -281,10 +279,7 @@ export default function CheckoutPage() {
                                     <span>{t('subtotal')}</span>
                                     <span className="font-display font-medium">{formatPrice(subtotal, currency, locale)}</span>
                                 </div>
-                                <div className="flex justify-between text-slate-600">
-                                    <span>{t('vat')}</span>
-                                    <span className="font-display font-medium">{formatPrice(vat, currency, locale)}</span>
-                                </div>
+
                                 <div className="flex justify-between text-slate-600">
                                     <span>{t('shipping')}</span>
                                     <span className="font-display font-medium">
@@ -305,7 +300,7 @@ export default function CheckoutPage() {
                             <div className="flex justify-between items-end mb-2">
                                 <span className="font-bold text-lg">{t('total')}</span>
                                 <div className="text-end">
-                                    <span className="text-xs text-slate-500 block">{t('inc_vat')}</span>
+
                                     <span className="font-bold text-2xl font-display text-primary">{formatPrice(total, currency, locale)}</span>
                                 </div>
                             </div>

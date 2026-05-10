@@ -158,7 +158,8 @@
             "fast_delivery": "Fast Delivery",
             "delivery_time": "Within 3-5 working days",
             "secure_payment": "Secure Payment",
-            "cod_available": "Cash on delivery available"
+            "cod_available": "Cash on delivery available",
+            "share": "Share"
         },
         "Specs": {
             "title": "Product Details",

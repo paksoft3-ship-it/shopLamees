@@ -62,7 +62,7 @@ export default function TermsPage() {
                                 <ul className="space-y-4 text-slate-600 list-disc list-inside marker:text-primary">
                                     <li>{isAr ? 'يحق لنا تعديل هذه الشروط في أي وقت. التعديلات تكون سارية فور نشرها على الموقع.' : 'We reserve the right to modify these terms at any time. Changes are effective immediately upon posting.'}</li>
                                     <li>{isAr ? 'يجب أن يكون عمر المستخدم ١٨ عاماً أو أكثر لإجراء عملية شراء.' : 'Users must be 18 years or older to make a purchase.'}</li>
-                                    <li>{isAr ? 'جميع الأسعار المعروضة شاملة لضريبة القيمة المضافة ما لم يذكر خلاف ذلك.' : 'All prices include VAT unless stated otherwise.'}</li>
+
                                 </ul>
                             </div>
                         </section>
@@ -125,7 +125,7 @@ export default function TermsPage() {
                         <div className="bg-white border border-slate-100 rounded-xl p-6 text-center shadow-sm">
                             <p className="font-bold text-lg mb-2 font-kufi">{isAr ? 'هل لديك استفسار؟' : 'Have a question?'}</p>
                             <p className="text-slate-500 text-sm mb-4">{isAr ? 'تواصل معنا عبر الواتساب' : 'Contact us via WhatsApp'}</p>
-                            <a href="https://wa.me/97477808007" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold hover:bg-[#20bd5a] transition-colors font-kufi">
+                            <a href="https://wa.me/97433114232" target="_blank" rel="noopener noreferrer" className="inline-flex items-center justify-center gap-2 bg-[#25D366] text-white px-6 py-3 rounded-full font-bold hover:bg-[#20bd5a] transition-colors font-kufi">
                                 <span className="material-symbols-outlined text-xl">chat</span>
                                 {isAr ? 'تواصل معنا' : 'Contact Us'}
                             </a>

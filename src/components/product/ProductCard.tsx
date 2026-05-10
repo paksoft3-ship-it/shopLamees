@@ -30,6 +30,7 @@ export function ProductCard({ product }: { product: ProductDTO }) {
 
     const handleAddToCart = (e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         addItem(buildItem());
         toast.success(locale === 'en' ? `${product.name[locale]} added to cart!` : `تمت إضافة ${product.name[locale]} للسلة بنجاح!`, {
             icon: '🛍️',
@@ -38,6 +39,7 @@ export function ProductCard({ product }: { product: ProductDTO }) {
 
     const handleBuyNow = (e: React.MouseEvent) => {
         e.preventDefault();
+        e.stopPropagation();
         addItem(buildItem());
         router.push('/checkout');
     };

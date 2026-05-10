@@ -260,3 +260,19 @@ model StoreSettings {
 
   @@map("store_settings")
 }
+
+// ─── CMS Pages ──────────────────────────────────────────────────────
+
+model Page {
+  id        String   @id @default(cuid())
+  slug      String   @unique
+  titleAr   String
+  titleEn   String
+  contentAr String   @db.Text
+  contentEn String   @db.Text
+  status    String   @default("published")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("pages")
+}

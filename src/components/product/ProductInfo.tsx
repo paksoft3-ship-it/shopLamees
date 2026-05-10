@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { useCartStore } from '@/lib/stores/cart';
 import { usePrefsStore } from '@/lib/stores/prefs';
+import { Share2 } from 'lucide-react';
 import { useFormattedMoney } from '@/lib/money';
 import { trackEvent } from '@/lib/tracking/track';
 import { ProductDTO } from '@/lib/data/types';
@@ -39,7 +40,11 @@ export function ProductInfo({ product }: ProductInfoProps) {
         });
     }, [product.id, productName, productPrice, currency]);
 
-    const handleAddToCart = () => {
+    const handleAddToCart = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         addItem({
             id: product.id,
             productId: product.id,
@@ -70,9 +75,35 @@ export function ProductInfo({ product }: ProductInfoProps) {
         });
     };
 
-    const handleBuyNow = () => {
+    const handleBuyNow = (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
         handleAddToCart();
         router.push('/checkout');
+    };
+    
+    const handleShare = async (e?: React.MouseEvent) => {
+        if (e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: productName,
+                    text: locale === 'ar' ? `اكتشفي ${productName} في شوب لاميس` : `Discover ${productName} at Shop Lamees`,
+                    url: window.location.href,
+                });
+            } catch (error) {
+                console.error('Error sharing:', error);
+            }
+        } else {
+            // Fallback: Copy to clipboard
+            navigator.clipboard.writeText(window.location.href);
+            toast.success(locale === 'en' ? 'Link copied to clipboard!' : 'تم نسخ الرابط!');
+        }
     };
 
     return (
@@ -83,9 +114,18 @@ export function ProductInfo({ product }: ProductInfoProps) {
                     <h1 className="text-3xl md:text-4xl font-bold font-kufi text-[#0e1b12] leading-tight">
                         {productName}
                     </h1>
-                    <button className="hidden md:block p-2 rounded-full hover:bg-[#f3f4f6] transition-colors text-[#9ca3af] hover:text-red-500">
-                        <span className="material-symbols-outlined">favorite</span>
-                    </button>
+                    <div className="flex items-center gap-1">
+                        <button 
+                            onClick={(e) => handleShare(e)}
+                            className="p-2 rounded-full hover:bg-[#f3f4f6] transition-colors text-[#9ca3af] hover:text-primary"
+                            title={t('share')}
+                        >
+                            <Share2 className="w-5 h-5" />
+                        </button>
+                        <button className="hidden md:block p-2 rounded-full hover:bg-[#f3f4f6] transition-colors text-[#9ca3af] hover:text-red-500">
+                            <span className="material-symbols-outlined">favorite</span>
+                        </button>
+                    </div>
                     {/* Mobile top stock indicator */}
                     <span className="md:hidden shrink-0 bg-[#f4f2e6] px-3 py-1 rounded-lg flex items-center gap-1.5 ml-2">
                         <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
@@ -256,7 +296,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
                         {/* Add to Cart */}
                         <button
-                            onClick={handleAddToCart}
+                            onClick={(e) => handleAddToCart(e)}
                             className="flex-1 h-14 bg-[#0e1b12] hover:bg-black text-white font-bold rounded-lg shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-2 font-kufi text-base pb-1"
                         >
                             <span>{t('add_to_cart')}</span>
@@ -266,7 +306,7 @@ export function ProductInfo({ product }: ProductInfoProps) {
 
                     {/* Buy Now */}
                     <button
-                        onClick={handleBuyNow}
+                        onClick={(e) => handleBuyNow(e)}
                         className="w-full h-14 bg-primary hover:bg-primary/90 text-[#0e1b12] font-bold rounded-lg shadow-lg transition-all flex items-center justify-center gap-2 font-kufi text-base"
                     >
                         <span>{t('buy_now')}</span>
@@ -280,14 +320,14 @@ export function ProductInfo({ product }: ProductInfoProps) {
                 <div className="md:hidden mt-8 pt-6 border-t border-slate-200">
                     <div className="flex gap-4">
                         <button
-                            onClick={handleAddToCart}
+                            onClick={(e) => handleAddToCart(e)}
                             className="flex-1 bg-[#0e1b12] text-white py-3.5 h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-[15px] transition-all shadow-md active:scale-[0.98]"
                         >
                             <span className="material-symbols-outlined text-[20px]">shopping_cart</span>
                             <span>{t('add_to_cart')}</span>
                         </button>
                         <button
-                            onClick={handleBuyNow}
+                            onClick={(e) => handleBuyNow(e)}
                             className="flex-1 bg-primary text-[#0e1b12] py-3.5 h-14 rounded-full flex items-center justify-center gap-2 font-bold font-kufi text-[15px] transition-all shadow-md active:scale-[0.98]"
                         >
                             <span className="material-symbols-outlined text-[20px]">bolt</span>

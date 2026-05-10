@@ -158,7 +158,8 @@
             "fast_delivery": "توصيل سريع",
             "delivery_time": "خلال ٣-٥ أيام عمل",
             "secure_payment": "دفع آمن",
-            "cod_available": "الدفع عند الاستلام متاح"
+            "cod_available": "الدفع عند الاستلام متاح",
+            "share": "مشاركة"
         },
         "Specs": {
             "title": "تفاصيل المنتج",
