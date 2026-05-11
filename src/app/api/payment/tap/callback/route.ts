@@ -19,6 +19,8 @@ export async function GET(req: NextRequest) {
     try {
         const charge = await getTapCharge(tapId);
 
+        console.log('[tap/callback] charge', charge.id, 'status:', charge.status, 'order:', orderNumber);
+
         if (charge.status === 'CAPTURED') {
             await prisma.order.updateMany({
                 where: { orderNumber, paymentMethod: 'TAP' },
