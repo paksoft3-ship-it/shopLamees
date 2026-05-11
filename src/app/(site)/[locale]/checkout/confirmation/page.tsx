@@ -42,18 +42,30 @@ export default function OrderConfirmationPage() {
             setOrder(data);
             if (!data) { setState('failed'); return; }
 
-            if (statusParam === 'failed' || data.status === 'CANCELLED') {
-                setState('failed');
-            } else if (data.paymentMethod === 'TAP' && data.status === 'PROCESSING') {
+            // Check actual DB status first — the webhook may have already updated
+            // the order to PROCESSING even if the callback URL says status=failed.
+            if (data.status === 'PROCESSING') {
                 setState('paid');
+            } else if (data.status === 'CANCELLED') {
+                setState('failed');
             } else if (data.paymentMethod === 'TAP' && data.status === 'NEW') {
-                // Still processing — poll once more after a short delay
-                setTimeout(() => {
-                    getOrderByNumber(orderNumber).then(d => {
-                        setState(d?.status === 'PROCESSING' ? 'paid' : d?.status === 'CANCELLED' ? 'failed' : 'paid');
-                        if (d) setOrder(d);
-                    });
-                }, 2500);
+                if (statusParam === 'failed') {
+                    // Callback said failed but webhook may still be on its way — poll once
+                    setTimeout(() => {
+                        getOrderByNumber(orderNumber).then(d => {
+                            if (d) setOrder(d);
+                            setState(d?.status === 'PROCESSING' ? 'paid' : 'failed');
+                        });
+                    }, 3000);
+                } else {
+                    // No failure param — poll once in case webhook hasn't fired yet
+                    setTimeout(() => {
+                        getOrderByNumber(orderNumber).then(d => {
+                            if (d) setOrder(d);
+                            setState(d?.status === 'PROCESSING' ? 'paid' : d?.status === 'CANCELLED' ? 'failed' : 'paid');
+                        });
+                    }, 2500);
+                }
             } else if (data.paymentMethod === 'COD') {
                 setState('cod');
             } else {
