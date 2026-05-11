@@ -6,16 +6,19 @@ function makeClient() {
             $allOperations({ args, query }: { args: unknown; query: (args: unknown) => Promise<unknown> }) {
                 return query(args).catch(async (err: unknown) => {
                     const msg = err instanceof Error ? err.message : String(err);
-                    const isConnectionError =
+                    const code = (err as { code?: string }).code;
+
+                    const isRetryable =
                         msg.includes("Can't reach database server") ||
                         msg.includes('Connection refused') ||
-                        msg.includes('connection timeout') ||
-                        msg.includes('ECONNREFUSED');
+                        msg.includes('ECONNREFUSED') ||
+                        msg.includes('Timed out fetching a new connection') ||
+                        code === 'P2024';
 
-                    if (!isConnectionError) throw err;
+                    if (!isRetryable) throw err;
 
-                    // Wait for Neon to wake up then retry once
-                    await new Promise(r => setTimeout(r, 3000));
+                    // Wait for Neon to wake up / free a connection, then retry once
+                    await new Promise(r => setTimeout(r, 4000));
                     return query(args);
                 });
             },
