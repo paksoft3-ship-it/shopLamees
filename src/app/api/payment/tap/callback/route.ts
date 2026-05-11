@@ -19,7 +19,7 @@ export async function GET(req: NextRequest) {
     try {
         const charge = await getTapCharge(tapId);
 
-        console.log('[tap/callback] charge', charge.id, 'status:', charge.status, 'order:', orderNumber);
+        console.log('[tap/callback]', JSON.stringify({ id: charge.id, status: charge.status, order: orderNumber, response: (charge as unknown as Record<string, unknown>).response, currency: charge.currency, amount: charge.amount }));
 
         if (charge.status === 'CAPTURED') {
             await prisma.order.updateMany({
